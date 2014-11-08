@@ -90,8 +90,9 @@ def open(
         crs=None,
         encoding=None,
         layer=None,
-        vfs=None ):
-    
+        vfs=None,
+        sql=None):
+
     """Open file at ``path`` in ``mode`` "r" (read), "a" (append), or
     "w" (write) and return a ``Collection`` object.
     
@@ -135,8 +136,8 @@ def open(
                 raise IOError("no such archive file: %r" % archive)
         elif path != '-' and not os.path.exists(path):
             raise IOError("no such file or directory: %r" % path)
-        c = Collection(path, mode, 
-                encoding=encoding, layer=layer, vsi=vsi, archive=archive)
+        c = Collection(path, mode, encoding=encoding, layer=layer, vsi=vsi,
+                       archive=archive, sql=sql)
     elif mode == 'w':
         if schema:
             # Make an ordered dict of schema properties.
@@ -235,4 +236,33 @@ def bounds(ob):
     The ``ob`` may be a feature record or geometry."""
     geom = ob.get('geometry') or ob
     return _bounds(geom)
+
+
+def executeSQL(
+        path,
+        sql,
+        driver=None,
+        vfs=None):
+    """Executes an SQL statement.
+
+    The required ``path`` argument may be an absolute or relative file or
+    directory path.
+
+    The required ``sql`` argument may be a valid SQL statement in the SQL
+    dialect understood by the datasource. Further information can be found
+    on the gdal homepage: http://www.gdal.org/ogr_sql.html
+
+    Please note that no error will be risen for non valid SQL statements.
+
+    A virtual filesystem can be specified. The ``vfs`` parameter may be
+    an Apache Commons VFS style string beginning with "zip://" or
+    "tar://"". In this case, the ``path`` must be an absolute path
+    within that container.
+    """
+    with open(path=path,
+             mode='r',
+             driver=driver,
+             sql=sql,
+             vfs=None) as c:
+        pass
 

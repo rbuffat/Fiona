@@ -5,7 +5,7 @@ import os
 import sys
 
 from fiona.ogrext import Iterator, ItemsIterator, KeysIterator
-from fiona.ogrext import Session, WritingSession
+from fiona.ogrext import Session, SQLSession, WritingSession
 from fiona.ogrext import calc_gdal_version_num, get_gdal_version_num, get_gdal_release_name
 from fiona.errors import DriverError, SchemaError, CRSError
 from fiona._drivers import driver_count, GDALEnv
@@ -23,6 +23,7 @@ class Collection(object):
             layer=None,
             vsi=None,
             archive=None,
+            sql=None,
             **kwargs):
         
         """The required ``path`` is the absolute or relative path to
@@ -57,6 +58,8 @@ class Collection(object):
                 raise TypeError("invalid vsi: %r" % vsi)
         if archive and not isinstance(archive, string_types):
             raise TypeError("invalid archive: %r" % archive)
+        if sql and not mode == 'r':
+            raise TypeError("sql is only supported in read mode")
 
         # Check GDAL version against drivers
         if (driver == "GPKG" and
@@ -74,7 +77,8 @@ class Collection(object):
         self._crs = None
         self._crs_wkt = None
         self.env = None
-        
+        self.sql = sql
+
         self.path = vsi_path(path, vsi, archive)
         
         if mode == 'w':
@@ -131,7 +135,10 @@ class Collection(object):
 
         if self.mode == "r":
             self.encoding = encoding
-            self.session = Session()
+            if sql is not None:
+                self.session = SQLSession()
+            else:
+                self.session = Session()
             self.session.start(self)
             
             # If encoding param is None, we'll use what the session

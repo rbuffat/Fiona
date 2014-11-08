@@ -7,6 +7,7 @@ import os
 import sys
 import warnings
 import math
+import re
 
 from six import integer_types, string_types, text_type
 
@@ -625,6 +626,68 @@ cdef class Session:
             return 0
 
 
+cdef class SQLSession(Session):
+
+    def start(self, collection):
+        cdef char *path_c
+        cdef char *name_c
+        cdef char *sql_c
+        cdef char *sqldialect_c
+
+        self.collection = collection
+        if collection.path == '-':
+            path = '/vsistdin/'
+        else:
+            path = collection.path
+        try:
+            path_b = path.encode('utf-8')
+        except UnicodeDecodeError:
+            # Presume already a UTF-8 encoded string
+            path_b = path
+        path_c = path_b
+
+        with cpl_errs:
+            self.cogr_ds = ograpi.OGROpen(path_c, 0, NULL)
+        if self.cogr_ds == NULL:
+            raise ValueError(
+                "No data available at path '%s'" % collection.path)
+
+        sql_b = collection.sql.encode('utf-8')
+        sql_c = sql_b
+        sqldialect_c = ""
+        self.cogr_layer = ograpi.OGR_DS_ExecuteSQL(
+                                    self.cogr_ds,
+                                    sql_c,
+                                    NULL,
+                                    sqldialect_c
+                                    )
+
+        if re.search("^\s*(?i)select", collection.sql) is not None and \
+           self.cogr_layer == NULL:
+            raise ValueError("Null layer: " + repr(collection.name))
+
+        userencoding = self.collection.encoding
+        if userencoding:
+            ograpi.CPLSetThreadLocalConfigOption('SHAPE_ENCODING', '')
+            self._fileencoding = userencoding.upper()
+        else:
+            self._fileencoding = (
+                ograpi.OGR_L_TestCapability(
+                    self.cogr_layer, OLC_STRINGSASUTF8) and
+                OGR_DETECTED_ENCODING) or (
+                self.get_driver() == "ESRI Shapefile" and
+                'ISO-8859-1') or locale.getpreferredencoding().upper()
+
+    def stop(self):
+
+        if self.collection.sql is not None and not self.cogr_ds == NULL:
+            ograpi.OGR_DS_ReleaseResultSet(self.cogr_ds, self.cogr_layer)
+        self.cogr_layer = NULL
+        if self.cogr_ds is not NULL:
+            ograpi.OGR_DS_Destroy(self.cogr_ds)
+        self.cogr_ds = NULL
+
+
 cdef class WritingSession(Session):
     
     cdef object _schema_mapping
@@ -972,8 +1035,11 @@ cdef class Iterator:
             session.cogr_layer, OLC_FASTSETNEXTBYINDEX)
 
         ftcount = ograpi.OGR_L_GetFeatureCount(session.cogr_layer, 0)
-        if ftcount == -1:
-            raise RuntimeError("Layer does not support counting")
+        if ftcount == -1 and ((stop is not None and stop < 0) \
+           or (start is not None and start < 0)):
+            raise RuntimeError("Slices with negative start or stop are not"
+                               " supported for layers without support for"
+                               " counting")
 
         if stop is not None and stop < 0:
             stop += ftcount
@@ -990,7 +1056,7 @@ cdef class Iterator:
             raise ValueError("slice step cannot be zero")
         if step < 0 and not self.fastindex:
             warnings.warn("Layer does not support" \
-                    "OLCFastSetNextByIndex, negative step size may" \
+                    " OLCFastSetNextByIndex, negative step size may" \
                     " be slow", RuntimeWarning)
         self.stepsign = int(math.copysign(1, step))
         self.stop = stop
@@ -1035,7 +1101,9 @@ cdef class Iterator:
 
         elif self.step > 1 and not self.fastindex and not self.next_index == self.start:
             for _ in range(self.step - 1):
-                # TODO rbuffat add test -> OGR_L_GetNextFeature increments cursor by 1, therefore self.step - 1 as one increment was performed when feature is read
+                # OGR_L_GetNextFeature increments cursor by 1, therefore
+                # self.step - 1 as one increment is performed when feature
+                # is read
                 cogr_feature = ograpi.OGR_L_GetNextFeature(session.cogr_layer)
                 if cogr_feature == NULL:
                     raise StopIteration
