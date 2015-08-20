@@ -957,8 +957,8 @@ cdef class WritingSession(Session):
             raise ValueError("Null data source")
         log.debug("Syncing OGR to disk")
         retval = ograpi.OGR_DS_SyncToDisk(cogr_ds)
-        if retval != OGRERR_NONE:
-            raise RuntimeError("Failed to sync to disk")
+#         if retval != OGRERR_NONE:
+#             raise RuntimeError("Failed to sync to disk")
 
 
 cdef class Iterator:
