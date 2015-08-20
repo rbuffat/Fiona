@@ -33,7 +33,7 @@ class ReadingTest(unittest.TestCase):
             self.assertRaises(DriverError, fiona.open, 'tests/data/coutwildrnp.gpkg', 'r', driver="GPKG")
         else:
             with fiona.open('tests/data/coutwildrnp.gpkg', 'r', driver="GPKG") as c:
-                self.assertEquals(len(c), 48)
+                self.assertEquals(len(c), 67)
 
 
 class WritingTest(unittest.TestCase):
@@ -51,7 +51,7 @@ class WritingTest(unittest.TestCase):
                   'properties': [('title', 'str')]}
         crs = {
             'a': 6370997,
-            'lon_0': -100,
+            'lon_0':-100,
             'y_0': 0,
             'no_defs': True,
             'proj': 'laea',
