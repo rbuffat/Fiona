@@ -23,7 +23,7 @@ install:
   - "pip install -r requirements-dev.txt"
   - "pip install pytest"
   - "pip install coveralls"
-  - "pip install --upgrade --no-deps --force-reinstall --global-option=build_ext --global-option='-I$HOME/gdal/include' --global-option='-L$HOME/gdal/lib' --global-option='-lgdal' -e ."
+  - "pip install --upgrade --force-reinstall --global-option=build_ext --global-option='-I$HOME/gdal/include' --global-option='-L$HOME/gdal/lib' --global-option='-lgdal' -e ."
 
 script: 
   - nosetests --exclude test_filter_vsi --exclude test_geopackage
