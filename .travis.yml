@@ -11,6 +11,8 @@ cache:
   directories:
     - $HOME/gdalbuild
     - $HOME/.cache/pip
+    - $HOME/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python$TRAVIS_PYTHON_VERSION/site-packages/
+    - $HOME/virtualenv/python$TRAVIS_PYTHON_VERSION/bin/
 
 before_install:
   - . ./scripts/travis_gdal_install.sh
@@ -21,7 +23,7 @@ install:
   - "pip install -r requirements-dev.txt"
   - "pip install pytest"
   - "pip install coveralls"
-  - "pip install --global-option=build_ext --global-option='-I$HOME/gdal/include' --global-option='-L$HOME/gdal/lib' --global-option='-lgdal' -e ."
+  - "pip install --upgrade --no-deps --force-reinstall --global-option=build_ext --global-option='-I$HOME/gdal/include' --global-option='-L$HOME/gdal/lib' --global-option='-lgdal' -e ."
 
 script: 
   - nosetests --exclude test_filter_vsi --exclude test_geopackage

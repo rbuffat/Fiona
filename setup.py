@@ -140,9 +140,11 @@ if os.path.exists("MANIFEST.in"):
         sys.exit(1)
 
     if gdal_output[3][0] == u'1':
+        log.info("Building Fiona for gdal 1.x: {}".format(gdal_output[3]))
         shutil.copy('fiona/ogrext1.pyx', 'fiona/ogrext.pyx')
         shutil.copy('fiona/ograpi2.pxd', 'fiona/ograpi.pxd')
     else:
+        log.info("Building Fiona for gdal 2.x: {}".format(gdal_output[3]))
         shutil.copy('fiona/ogrext2.pyx', 'fiona/ogrext.pyx')
         shutil.copy('fiona/ograpi2.pxd', 'fiona/ograpi.pxd')
 
@@ -160,8 +162,6 @@ else:
         Extension('fiona._drivers', ['fiona/_drivers.c'], **ext_options),
         Extension('fiona._err', ['fiona/_err.c'], **ext_options),
         Extension('fiona.ogrext', ['fiona/ogrext.c'], **ext_options)]
-
-    # TODO: gdal 1 / 2 distinction is missing
 
 requirements = [
     'cligj',
