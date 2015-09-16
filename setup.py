@@ -72,11 +72,11 @@ include_dirs = []
 library_dirs = []
 libraries = []
 extra_link_args = []
-gdal_output = [None]*3
+gdal_output = [None] * 4
 
 try:
     gdal_config = os.environ.get('GDAL_CONFIG', 'gdal-config')
-    for i, flag in enumerate(("--cflags", "--libs", "--datadir")):
+    for i, flag in enumerate(("--cflags", "--libs", "--datadir", "--version")):
         gdal_output[i] = check_output([gdal_config, flag]).strip()
 
     for item in gdal_output[0].split():
@@ -138,6 +138,14 @@ if os.path.exists("MANIFEST.in"):
             "Cython.Build.cythonize not found. "
             "Cython is required to build from a repo.")
         sys.exit(1)
+
+    if gdal_output[3][0] == u'1':
+        shutil.copy('fiona/ogrext1.pyx', 'fiona/ogrext.pyx')
+        shutil.copy('fiona/ograpi2.pxd', 'fiona/ograpi.pxd')
+    else:
+        shutil.copy('fiona/ogrext2.pyx', 'fiona/ogrext.pyx')
+        shutil.copy('fiona/ograpi2.pxd', 'fiona/ograpi.pxd')
+
     ext_modules = cythonize([
         Extension('fiona._geometry', ['fiona/_geometry.pyx'], **ext_options),
         Extension('fiona._transform', ['fiona/_transform.pyx'], **ext_options),
@@ -153,6 +161,8 @@ else:
         Extension('fiona._err', ['fiona/_err.c'], **ext_options),
         Extension('fiona.ogrext', ['fiona/ogrext.c'], **ext_options)]
 
+    # TODO: gdal 1 / 2 distinction is missing
+
 requirements = [
     'cligj',
     'click-plugins',
@@ -166,8 +176,8 @@ setup_args = dict(
     metadata_version='1.2',
     name='Fiona',
     version=version,
-    requires_python = '>=2.6',
-    requires_external = 'GDAL (>=1.8)',
+    requires_python='>=2.6',
+    requires_external='GDAL (>=1.8)',
     description="Fiona reads and writes spatial data files",
     license='BSD',
     keywords='gis vector feature data',
