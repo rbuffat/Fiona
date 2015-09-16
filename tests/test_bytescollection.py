@@ -51,8 +51,8 @@ class ReadingTest(unittest.TestCase):
     def test_mode(self):
         self.failUnlessEqual(self.c.mode, 'r')
 
-    def test_collection(self):
-        self.failUnlessEqual(self.c.encoding, 'utf-8')
+#     def test_collection(self):
+#         self.failUnlessEqual(self.c.encoding, 'utf-8')
 
     def test_iter(self):
         self.failUnless(iter(self.c))
@@ -150,8 +150,8 @@ class ReadingTest(unittest.TestCase):
         self.failUnlessEqual(f['properties']['STATE'], 'UT')
 
     def test_re_iter_list(self):
-        f = list(self.c)[0] # Run through iterator
-        f = list(self.c)[0] # Run through a new, reset iterator
+        f = list(self.c)[0]  # Run through iterator
+        f = list(self.c)[0]  # Run through a new, reset iterator
         self.failUnlessEqual(f['id'], "0")
         self.failUnlessEqual(f['properties']['STATE'], 'UT')
 

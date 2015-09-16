@@ -4,6 +4,54 @@
 
 cdef extern from "gdal.h":
     char * GDALVersionInfo (char *pszRequest)
+    void * GDALGetDriverByName(const char * pszName)
+    void * GDALOpenEx(const char * pszFilename,
+                      unsigned int nOpenFlags,
+                      const char ** papszAllowedDrivers,
+                      const char ** papszOpenOptions,
+                      const char *const *papszSibling1Files
+                      )
+    int GDAL_OF_UPDATE
+    int GDAL_OF_READONLY
+    int GDAL_OF_VECTOR
+    int GDAL_OF_VERBOSE_ERROR
+    int GDALDatasetGetLayerCount(void * hds)
+    void * GDALDatasetGetLayer(void * hDS, int iLayer)
+    void * GDALDatasetGetLayerByName(void * hDS, char * pszName)
+    void GDALClose(void * hDS)
+    void * GDALGetDatasetDriver(void * hDataset)
+    void * GDALCreate(void * hDriver,
+                      const char * pszFilename,
+                      int nXSize,
+                      int     nYSize,
+                      int     nBands,
+                      GDALDataType eBandType,
+                      char ** papszOptions)
+    void * GDALDatasetCreateLayer(void * hDS,
+                                  const char * pszName,
+                                  void * hSpatialRef,
+                                  int eType,
+                                  char ** papszOptions)
+    int GDALDatasetDeleteLayer(void * hDS, int iLayer)
+    void GDALFlushCache(void * hDS)
+    char * GDALGetDriverShortName(void * hDriver)
+    char * GDALGetDatasetDriver (void * hDataset)
+
+
+    ctypedef enum GDALDataType:
+        GDT_Unknown
+        GDT_Byte
+        GDT_UInt16
+        GDT_Int16
+        GDT_UInt32
+        GDT_Int32
+        GDT_Float32
+        GDT_Float64
+        GDT_CInt16
+        GDT_CInt32
+        GDT_CFloat32
+        GDT_CFloat64
+        GDT_TypeCount
 
 cdef extern from "gdal_version.h":
     int    GDAL_COMPUTE_VERSION(int maj, int min, int rev)
