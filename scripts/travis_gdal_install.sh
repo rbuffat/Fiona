@@ -49,10 +49,11 @@ if [ ! -d "$GDALDIR" ]; then
   mkdir $GDALDIR;
 fi
 
+ls -l $GDALDIR
+
 # download and compile gdal version
 if [ "$GDALVERSION" = "1.9.2" ]; then
     cd $GDALDIR
-    ls -l $GDALDIR/gdal-1.9.2
     if [ ! -e "$GDALDIR/gdal-1.9.2/configure" ]; then
       wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
       tar -xzvf gdal-1.9.2.tar.gz
@@ -63,7 +64,6 @@ if [ "$GDALVERSION" = "1.9.2" ]; then
     make install
 elif [ "$GDALVERSION" = "1.11.2" ]; then
     cd $GDALDIR
-    ls -l $GDALDIR/gdal-1.11.2
     if [ ! -e "$GDALDIR/gdal-1.11.2/configure" ]; then
       wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
       tar -xzvf gdal-1.11.2.tar.gz
@@ -74,7 +74,6 @@ elif [ "$GDALVERSION" = "1.11.2" ]; then
     make install
 elif [ "$GDALVERSION" = "2.0.0" ]; then
     cd $GDALDIR
-    ls -l $GDALDIR/gdal-2.0.0
     if [ ! -e "$GDALDIR/gdal-2.0.0/configure" ]; then
       wget http://download.osgeo.org/gdal/2.0.0/gdal-2.0.0.tar.gz
       tar -xzvf gdal-2.0.0.tar.gz
