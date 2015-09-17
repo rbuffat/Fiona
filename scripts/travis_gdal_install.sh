@@ -59,7 +59,11 @@ ls -l $GDALINST
 # download and compile gdal version
 if [ ! -d $GDALINST/gdal-$GDALVERSION ]; then
   cd $GDALDIR
-  wget http://download.osgeo.org/gdal/gdal-$GDALVERSION.tar.gz
+  if [ "$GDALVERSION" = "1.9.2" ]; then
+    wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
+  else
+    wget http://download.osgeo.org/gdal/$GDALVERSION/gdal-$GDALVERSION.tar.gz
+  fi
   tar -xzvf gdal-$GDALVERSION.tar.gz
   cd gdal-$GDALVERSION
   ./configure $GDALOPTS
