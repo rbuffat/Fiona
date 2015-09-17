@@ -33,8 +33,12 @@ after_success:
   - coveralls
 
 env:
+  global:
+    - GDALINST=$HOME/gdalinstall
+    - GDALBUILD=$HOME/gdalbuild
 
   matrix:
-    - GDALVERSION="1.9.2" GDALINST=$HOME/gdalinstall GDALBUILD=$HOME/gdalbuild
-    - GDALVERSION="1.11.2" GDALINST=$HOME/gdalinstall GDALBUILD=$HOME/gdalbuild
-    - GDALVERSION="2.0.0" GDALINST=$HOME/gdalinstall GDALBUILD=$HOME/gdalbuild
+    - GDALVERSION="1.9.2" 
+    - GDALVERSION="1.11.2"
+    - GDALVERSION="2.0.0"
+  
