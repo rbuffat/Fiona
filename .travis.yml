@@ -35,6 +35,6 @@ after_success:
 env:
 
   matrix:
-    - GDALVERSION="1.9.2"
-    - GDALVERSION="1.11.2"
-    - GDALVERSION="2.0.0"
+    - GDALVERSION="1.9.2" GDALINST=$HOME/gdalinstall GDALBUILD=$HOME/gdalbuild
+    - GDALVERSION="1.11.2" GDALINST=$HOME/gdalinstall GDALBUILD=$HOME/gdalbuild
+    - GDALVERSION="2.0.0" GDALINST=$HOME/gdalinstall GDALBUILD=$HOME/gdalbuild

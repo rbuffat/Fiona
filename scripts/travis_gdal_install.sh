@@ -1,7 +1,5 @@
 #!/bin/sh
 set -ex
-GDALDIR="$HOME/gdalbuild"
-GDALINST="$HOME/gdalinstall"
 
 GDALOPTS="--prefix=$GDALINST/gdal-$GDALVERSION --with-ogr \
             --with-geos \
