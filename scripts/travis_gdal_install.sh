@@ -44,8 +44,8 @@ GDALOPTS="--prefix=$GDALINST/gdal-$GDALVERSION --with-ogr \
             --without-python"
 
 # Create build dir if not exists
-if [ ! -d "$GDALDIR" ]; then
-  mkdir $GDALDIR;
+if [ ! -d "$GDALBUILD" ]; then
+  mkdir $GDALBUILD;
 fi
 
 if [ ! -d "$GDALINST" ]; then
@@ -56,7 +56,7 @@ ls -l $GDALINST
 
 # download and compile gdal version
 if [ ! -d $GDALINST/gdal-$GDALVERSION ]; then
-  cd $GDALDIR
+  cd $GDALBUILD
   if [ "$GDALVERSION" = "1.9.2" ]; then
     wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
   else
