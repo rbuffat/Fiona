@@ -1,7 +1,7 @@
 #!/bin/sh
 set -ex
 
-GDALOPTS="--prefix=$GDALINST/gdal-$GDALVERSION --with-ogr \
+GDALOPTS="  --with-ogr \
             --with-geos \
             --with-expat \
             --without-libtool \
@@ -55,16 +55,32 @@ fi
 ls -l $GDALINST
 
 # download and compile gdal version
-if [ ! -d $GDALINST/gdal-$GDALVERSION ]; then
+if [ ! -d $GDALINST/gdal-1.9.2 ]; then
   cd $GDALBUILD
-  if [ "$GDALVERSION" = "1.9.2" ]; then
-    wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
-  else
-    wget http://download.osgeo.org/gdal/$GDALVERSION/gdal-$GDALVERSION.tar.gz
-  fi
-  tar -xzvf gdal-$GDALVERSION.tar.gz
-  cd gdal-$GDALVERSION
-  ./configure $GDALOPTS
+  wget http://download.osgeo.org/gdal/gdal-1.9.2.tar.gz
+  tar -xzvf gdal-1.9.2.tar.gz
+  cd gdal-1.9.2
+  ./configure --prefix=$GDALINST/gdal-1.9.2 $GDALOPTS
+  make -j 2
+  make install
+fi
+
+if [ ! -d $GDALINST/gdal-1.11.2 ]; then
+  cd $GDALBUILD
+  wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
+  tar -xzvf gdal-1.11.2.tar.gz
+  cd gdal-1.11.2
+  ./configure --prefix=$GDALINST/gdal-1.11.2 $GDALOPTS
+  make -j 2
+  make install
+fi
+
+if [ ! -d $GDALINST/gdal-2.0.0 ]; then
+  cd $GDALBUILD
+  wget http://download.osgeo.org/gdal/2.0.0/gdal-2.0.0.tar.gz
+  tar -xzvf gdal-2.0.0.tar.gz
+  cd gdal-2.0.0
+  ./configure --prefix=$GDALINST/gdal-2.0.0 $GDALOPTS
   make -j 2
   make install
 fi
