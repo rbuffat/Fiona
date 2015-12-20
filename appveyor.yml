@@ -11,7 +11,7 @@ environment:
 
         # set the directory to use for OSGeo4W install, our CMake find packages know
         # to look here
-        OSGEODIR: C:\OSGeo4W64
+        OSGEODIR: "C:\\OSGeo4W64"
 
     matrix:
 
@@ -59,6 +59,10 @@ install:
 
   # and install our dependencies
   - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR% > nul
+  
+  - ECHO "OSGeo4W:"
+  - ps: "ls %OSGEODIR%"
+
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
