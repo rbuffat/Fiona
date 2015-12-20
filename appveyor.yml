@@ -61,7 +61,7 @@ install:
   - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR% > nul
   
   - ECHO "OSGeo4W:"
-  - ps: "ls %OSGEODIR%"
+  - ps: "ls \"C:\\OSGeo4W64\""
 
 
   # Install the build dependencies of the project. If some dependencies contain
@@ -72,7 +72,8 @@ install:
   
 build_script:
   # Build the compiled extension
-  - "%CMD_IN_ENV% python setup.py build"
+  - "%CMD_IN_ENV% pip install --upgrade --force-reinstall --global-option=build_ext --global-option='-I%OSGEODIR%/include' --global-option='-L%OSGEODIR%/lib' --global-option='--gdalversion 1.11.3' -e ."
+"
   
 test_script:
   # Run the project tests
