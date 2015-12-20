@@ -58,11 +58,8 @@ install:
   - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR% > nul
   
   - cmd: SET PATH=%PATH%;%OSGEODIR%/bin
+  - cmd: SET PYTHONPATH=%PYTHONPATH%;%OSGEODIR%/bin
   
-  - ECHO "OSGeo4W:"
-  - ps: "ls \"C:\\OSGeo4W64\""
-
-
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
@@ -71,6 +68,10 @@ install:
   
 build_script:
   # Build the compiled extension
+  - cmd %PATH%
+
+  - cmd %PYTHONPATH%
+  
   - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
 
   - "%CMD_IN_ENV% python setup.py install"
