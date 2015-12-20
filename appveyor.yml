@@ -66,11 +66,11 @@ install:
   # target Python version and architecture
   - "%CMD_IN_ENV% pip install -r requirements-dev.txt"
   
-  build_script:
+build_script:
   # Build the compiled extension
   - "%CMD_IN_ENV% python setup.py build"
   
-  test_script:
+test_script:
   # Run the project tests
   - "%CMD_IN_ENV% python setup.py nosetests"
   
