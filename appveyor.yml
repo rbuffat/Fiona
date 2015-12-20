@@ -68,9 +68,9 @@ install:
   
 build_script:
   # Build the compiled extension
-  - ps echo %PATH%
+  - ps: echo %PATH%
 
-  - ps echo %PYTHONPATH%
+  - ps: echo %PYTHONPATH%
   
   - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
 
