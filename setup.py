@@ -69,19 +69,23 @@ with open('CHANGES.txt', **open_kwds) as f:
 
 def copy_gdalapi(gdalversion):
     if gdalversion[0] == u'1':
-        log.info("Building Fiona for gdal 1.x: {}".format(gdal_output[3]))
+        log.info("Building Fiona for gdal 1.x: {}".format(gdalversion))
         shutil.copy('fiona/ogrext1.pyx', 'fiona/ogrext.pyx')
         shutil.copy('fiona/ograpi1.pxd', 'fiona/ograpi.pxd')
     else:
-        log.info("Building Fiona for gdal 2.x: {}".format(gdal_output[3]))
+        log.info("Building Fiona for gdal 2.x: {}".format(gdalversion))
         shutil.copy('fiona/ogrext2.pyx', 'fiona/ogrext.pyx')
         shutil.copy('fiona/ograpi2.pxd', 'fiona/ograpi.pxd')
 
-if '--gdalversion' in sys.argv:
-    index = sys.argv.index('--gdalversion')
-    sys.argv.pop(index)
-    gdalversion = sys.argv.pop(index)
-    copy_gdalapi(gdalversion)
+print sys.argv
+for i, arg in enumerate(sys.argv):
+    if arg.startswith('--gdalversion'):
+        if "=" in arg:
+            gdalversion = arg.split('=')[1]
+        else:
+            gdalversion = sys.argv[i+1]
+            
+        copy_gdalapi(gdalversion)
 
 # By default we'll try to get options via gdal-config. On systems without,
 # options will need to be set in setup.cfg or on the setup command line.
