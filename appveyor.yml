@@ -60,7 +60,7 @@ install:
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
   - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
   
-  - gdalinfo --version
+  - "gdalinfo --version"
   
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
