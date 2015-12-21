@@ -58,7 +58,9 @@ install:
   - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR% > nul
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
-  - "SET PYTHONPATH=%PYTHONPATH%;%OSGEODIR%\\bin"
+  - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
+  
+  - gdalinfo --version
   
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
