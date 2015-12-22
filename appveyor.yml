@@ -59,10 +59,7 @@ install:
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
   - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
-  
-  - cmd: gdalinfo --version
 
-  
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
@@ -74,6 +71,8 @@ build_script:
   - cmd: echo %PATH%
 
   - cmd: echo %PYTHONPATH%
+  
+  - cmd: gdalinfo --version
   
   - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
 
