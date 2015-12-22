@@ -72,7 +72,7 @@ build_script:
 
   - cmd: echo %PYTHONPATH%
 
-  - ps: "ls \"C:/\""
+  - ps: "ls \"C:\OSGeo4W64\bin\""
   
   - ps: "gdalinfo --version"
   
