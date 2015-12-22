@@ -55,15 +55,17 @@ install:
   - ps: wget http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -OutFile C:\temp\osgeo4w-setup.exe | out-null
 
   # and install our dependencies
-  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR%
+  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR% > nul
 
-  - cmd: mkdir C:\gdal
+  - cmd: mkdir C:\gdal > nul
   
-  - cmd: cd C:\gdal
+  - cmd: cd C:\gdal > nul
   
-  - ps: wget http://download.osgeo.org/gdal/2.0.1/gdal201.zip -OutFile C:\gdal\gdal201.zip
+  - ps: wget http://download.osgeo.org/gdal/2.0.1/gdal201.zip -OutFile C:\gdal\gdal201.zip | out-null
   
   - cmd: 7z x gdal201.zip > nul
+  
+  - ps: "ls \"C:/gdal\""
   
   - cmd: cd gdal201
   
