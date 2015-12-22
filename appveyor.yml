@@ -74,7 +74,7 @@ build_script:
 
   - ps: "ls \"C:\\OSGeo4W64\\bin\""
   
-  - ps: "gdalinfo --version"
+  - ps: "\"C:\\OSGeo4W64\\bin\\gdalinfo\" --version"
   
   - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
 
