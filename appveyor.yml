@@ -55,7 +55,7 @@ install:
   - ps: wget http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -OutFile C:\temp\osgeo4w-setup.exe | out-null
 
   # and install our dependencies
-  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR% > nul
+  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR%
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
   - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
@@ -71,8 +71,10 @@ build_script:
   - cmd: echo %PATH%
 
   - cmd: echo %PYTHONPATH%
+
+  - ps: "ls \"C:/\""
   
-  - cmd: gdalinfo --version
+  - ps: "gdalinfo --version"
   
   - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
 
