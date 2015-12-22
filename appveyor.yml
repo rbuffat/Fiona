@@ -61,7 +61,7 @@ install:
   
   - cmd: cd C:\gdal
   
-  - cmd: wget http://download.osgeo.org/gdal/2.0.1/gdal201.zip -OutFile C:\gdal\gdal201.zip
+  - ps: wget http://download.osgeo.org/gdal/2.0.1/gdal201.zip -OutFile C:\gdal\gdal201.zip
   
   - cmd: 7z x gdal201.zip > nul
   
