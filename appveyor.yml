@@ -65,7 +65,7 @@ install:
   
   - cmd: 7z x gdal201.zip > nul
   
-  - cmd: cd gdal201 | out-null
+  - cmd: cd gdal201
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
   - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
