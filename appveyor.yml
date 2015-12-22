@@ -67,7 +67,9 @@ install:
   
   - ps: "ls \"C:/gdal\""
   
-  - cmd: cd gdal201
+  - cmd: cd gdal-2.0.1
+  
+  - "%CMD_IN_ENV% nmake /f makefile.vc
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
   - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
