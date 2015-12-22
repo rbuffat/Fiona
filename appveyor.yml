@@ -56,6 +56,16 @@ install:
 
   # and install our dependencies
   - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P geos,gdal -R %OSGEODIR%
+
+  - cmd: mkdir C:\gdal | out-null
+  
+  - cmd: cd C:\gdal | out-null
+  
+  - cmd: wget http://download.osgeo.org/gdal/2.0.1/gdal201.zip -OutFile C:\gdal\gdal201.zip | out-null
+  
+  - cmd: 7z x gdal201.zip > nul
+  
+  - cmd: cd C:\gdal201 | out-null
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin"
   - "SET PYTHONPATH=%OSGEODIR%\\bin;%PYTHONPATH%"
