@@ -85,5 +85,5 @@ test_script:
   
   - cmd: cd tests
 
-  - "%CMD_IN_ENV% nosetests --exclude test_filter_vsi --exclude test_geopackage"
+  - "nosetests --exclude test_filter_vsi --exclude test_geopackage"
   
