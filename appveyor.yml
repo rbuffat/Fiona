@@ -83,5 +83,5 @@ test_script:
   # Run the project tests
   - cmd: SET
 
-  - "nosetests --exclude test_filter_vsi --exclude test_geopackage"
+  - "%CMD_IN_ENV% nosetests --exclude test_filter_vsi --exclude test_geopackage"
   
