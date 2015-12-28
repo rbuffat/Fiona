@@ -1,6 +1,9 @@
 # Based on appveyor.yml from https://github.com/PDAL/PDAL and https://github.com/ogrisel/python-appveyor-demo
 #
 
+platform: x64
+
+
 environment:
 
     global:
