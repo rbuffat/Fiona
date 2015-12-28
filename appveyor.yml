@@ -11,7 +11,7 @@ environment:
 
         # set the directory to use for OSGeo4W install, our CMake find packages know
         # to look here
-        OSGEODIR: "C:\\OSGeo4W64"
+        OSGEO4W_ROOT: "C:\\OSGeo4W64"
 
     matrix:
 
@@ -49,23 +49,23 @@ install:
   - ps: mkdir C:\temp | out-null
 
   # make the osgeo directory
-  - ps: mkdir %OSGEODIR% | out-null
+  - ps: mkdir %OSGEO4W_ROOT% | out-null
 
   # get the OSGeo installer
   - ps: wget http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -OutFile C:\temp\osgeo4w-setup.exe | out-null
 
   # and install our dependencies
-  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P shell,libpng,libtiff,libjpeg,libgeotiff,proj,curl,geos,libmysql,sqlite3,netcdf,libpq,expat,xerces-c-vc10,hdf4,hdf5,ogdi,iconv,openjpeg,spatialite,freexl,gdal,msvcrt,msvcrt2008,shell,setup -R %OSGEODIR% > nul
+  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P shell,libpng,libtiff,libjpeg,libgeotiff,proj,curl,geos,libmysql,sqlite3,netcdf,libpq,expat,xerces-c-vc10,hdf4,hdf5,ogdi,iconv,openjpeg,spatialite,freexl,gdal,msvcrt,msvcrt2008,shell,setup -R %OSGEO4W_ROOT% > nul
   
-  - "SET PATH=%PATH%;%OSGEODIR%\\bin\\"
-  - "SET PATH=%PATH%;%OSGEODIR%\\share\\gdal"
-  - "SET PYTHONPATH=%OSGEODIR%\\bin\\;%PYTHONPATH%"
+  - "SET PATH=%PATH%;%OSGEO4W_ROOT%\\bin\\"
+  - "SET PATH=%PATH%;%OSGEO4W_ROOT%\\share\\gdal"
+  - "SET PYTHONPATH=%OSGEO4W_ROOT%\\bin\\;%PYTHONPATH%"
 
   - ps: "ls \"C:\\OSGeo4W64\""
   
   - ps: "ls \"C:\\OSGeo4W64\\bin\""
   
-  - cmd: "call  \"C:\\OSGeo4W64\\OSGeo4W.bat\""
+  - cmd: "call  \"C:\\OSGeo4W64\\OSGeo4W.bat\\etc\\ini\\gdal.bat""
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
@@ -79,7 +79,7 @@ build_script:
 
   - cmd: echo %PYTHONPATH%
 
-  - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
+  - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEO4W_ROOT%\\include -lgdal_i -L%OSGEO4W_ROOT%\\lib --gdalversion 1.11.3"
   
   - "%CMD_IN_ENV% python setup.py install"
   
