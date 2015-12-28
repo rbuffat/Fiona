@@ -60,6 +60,9 @@ install:
   - "SET PATH=%PATH%;%OSGEODIR%\\bin\\"
   - "SET PATH=%PATH%;%OSGEODIR%\\share\\gdal"
   - "SET PYTHONPATH=%OSGEODIR%\\bin\\;%PYTHONPATH%"
+
+  - ps: "ls \"C:\\OSGeo4W64\\bin\""
+  
   - "call %OSGEODIR%\\OSGeo4W.bat"
 
   # Install the build dependencies of the project. If some dependencies contain
@@ -74,8 +77,6 @@ build_script:
 
   - cmd: echo %PYTHONPATH%
 
-  - ps: "ls \"C:\\OSGeo4W64\\bin\""
-  
   - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEODIR%\\include -lgdal_i -L%OSGEODIR%\\lib --gdalversion 1.11.3"
   
   - "%CMD_IN_ENV% python setup.py install"
