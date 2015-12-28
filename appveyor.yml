@@ -61,6 +61,8 @@ install:
   - "SET PATH=%PATH%;%OSGEODIR%\\share\\gdal"
   - "SET PYTHONPATH=%OSGEODIR%\\bin\\;%PYTHONPATH%"
 
+  - ps: "ls \"C:\\OSGeo4W64\\""
+  
   - ps: "ls \"C:\\OSGeo4W64\\bin\""
   
   - "call %OSGEODIR%\\OSGeo4W.bat"
