@@ -55,10 +55,12 @@ install:
   - ps: wget http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -OutFile C:\temp\osgeo4w-setup.exe | out-null
 
   # and install our dependencies
-  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P shell,libpng,libtiff,libjpeg,libgeotiff,proj,curl,geos,libmysql,sqlite3,netcdf,libpq,expat,xerces-c-vc10,hdf4,hdf5,ogdi,iconv,openjpeg,spatialite,freexl,gdal110dll,gdal -R %OSGEODIR% > nul
+  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a -q -P shell,libpng,libtiff,libjpeg,libgeotiff,proj,curl,geos,libmysql,sqlite3,netcdf,libpq,expat,xerces-c-vc10,hdf4,hdf5,ogdi,iconv,openjpeg,spatialite,freexl,gdal -R %OSGEODIR% > nul
   
   - "SET PATH=%PATH%;%OSGEODIR%\\bin\\"
+  - "SET PATH=%PATH%;%OSGEODIR%\\share\\gdal"
   - "SET PYTHONPATH=%OSGEODIR%\\bin\\;%PYTHONPATH%"
+  - "call %OSGEODIR%\\OSGeo4W.bat"
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
