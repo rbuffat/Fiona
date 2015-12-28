@@ -65,7 +65,7 @@ install:
   
   - ps: "ls \"C:\\OSGeo4W64\\bin\""
   
-  - "call %OSGEODIR%\\OSGeo4W.bat"
+  - cmd: "call  \"C:\\OSGeo4W64\\OSGeo4W.bat\""
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
