@@ -53,8 +53,8 @@ install:
   - 7z x proj-4.9.1.tar.gz
   - 7z x proj-4.9.1.tar
   - cd proj-4.9.1
-  - nmake /f makefile.vc
-  - nmake /f makefile.vc install-all
+  - "%CMD_IN_ENV% nmake /f makefile.vc"
+  - "%CMD_IN_ENV% nmake /f makefile.vc install-all"
 
   - cd C:\build
   - ps: Start-FileDownload http://download.osgeo.org/gdal/2.0.1/gdal-2.0.1.tar.gz
