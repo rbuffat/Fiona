@@ -12,10 +12,6 @@ environment:
         # See: http://stackoverflow.com/a/13751649/163740
         CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
-        # set the directory to use for OSGeo4W install, our CMake find packages know
-        # to look here
-        OSGEO4W_ROOT: "C:\\OSGeo4W64"
-
     matrix:
 
         - PYTHON: "C:\\Python27.10-x64"
@@ -44,31 +40,34 @@ install:
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
+  - if "%platform%" == "x86" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat"
+  - if "%platform%" == "x64" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+  - if "%platform%" == "x64" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" x86_amd64
+  - if "%platform%" == "x64" set WIN64_ARG="WIN64=YES"
+
+  - ps: mkdir C:\build | out-null
+  
+  - cd C:\build
+  - ps: Start-FileDownload http://download.osgeo.org/proj/proj-4.9.1.tar.gz
+  - 7z x proj-4.9.1.tar.gz
+  - 7z x proj-4.9.1.tar
+  - cd proj-4.9.1
+  - nmake /f makefile.vc
+  - nmake /f makefile.vc install-all
+
+  - cd C:\build
+  - ps: Start-FileDownload http://download.osgeo.org/gdal/2.0.1/gdal-2.0.1.tar.gz
+  - 7z x gdal-2.0.1.tar.gz
+  - 7z x gdal-2.0.1.tar
+  - cd gdal-2.0.1
+  
+  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% USER_DEFS=/WX
+  - cd apps
+  - nmake /f makefile.vc test_ogrsf.exe MSVC_VER=1500 DEBUG=1 %WIN64_ARG% USER_DEFS=/WX
+  
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
   - "pip install --disable-pip-version-check --user --upgrade pip"
-
-  # make a temp directory for downloading osgeo4w-setup.exe
-  - ps: mkdir C:\temp | out-null
-
-  # make the osgeo directory
-  - ps: mkdir %OSGEO4W_ROOT% | out-null
-
-  # get the OSGeo installer
-  - ps: wget http://download.osgeo.org/osgeo4w/osgeo4w-setup-x86_64.exe -OutFile C:\temp\osgeo4w-setup.exe | out-null
-
-  # and install our dependencies
-  - C:\temp\osgeo4w-setup.exe -s http://download.osgeo.org/osgeo4w/ -a x86_64 -q -P shell,libpng,libtiff,libjpeg,libgeotiff,proj,curl,geos,libmysql,sqlite3,netcdf,libpq,expat,xerces-c-vc10,hdf4,hdf5,ogdi,iconv,openjpeg,spatialite,freexl,gdal,msvcrt,msvcrt2008,shell,setup -R %OSGEO4W_ROOT% > nul
-  
-  - "SET PATH=%PATH%;%OSGEO4W_ROOT%\\bin\\"
-  - "SET PATH=%PATH%;%OSGEO4W_ROOT%\\share\\gdal"
-  - "SET PYTHONPATH=%OSGEO4W_ROOT%\\bin\\;%PYTHONPATH%"
-
-  - ps: "ls \"C:\\OSGeo4W64\""
-  
-  - ps: "ls \"C:\\OSGeo4W64\\bin\""
-  
-  - cmd: "call  \"C:\\OSGeo4W64\\etc\\ini\\gdal.bat\""
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
@@ -82,7 +81,7 @@ build_script:
 
   - cmd: echo %PYTHONPATH%
 
-  - "%CMD_IN_ENV% python setup.py build_ext -I%OSGEO4W_ROOT%\\include -lgdal_i -L%OSGEO4W_ROOT%\\lib --gdalversion 1.11.3"
+  - "%CMD_IN_ENV% python setup.py build_ext -IC:\build\\gdal-2.0.1\\include -lgdal_i -LC:\build\\gdal-2.0.1\\lib --gdalversion 2.0.1"
   
   - "%CMD_IN_ENV% python setup.py install"
   
