@@ -42,7 +42,7 @@ install:
 
   - if "%platform%" == "x86" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat"
   - if "%platform%" == "x64" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
-  - if "%platform%" == "x64" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" x86_amd64
+  - if "%platform%" == "x64" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" amd64
   - if "%platform%" == "x64" set WIN64_ARG="WIN64=YES"
 
   - ps: mkdir C:\build | out-null
