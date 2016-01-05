@@ -40,6 +40,9 @@ install:
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
+  
+  # https://code.google.com/p/pymat2/wiki/WindowsTips
+  - ps: (Get-Content "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat) | ForEach-Object { $_ -replace "vcvarsamd64.bat", "vcvars64.bat" } | Set-Content "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat
   - '%CMD_IN_ENV% echo "conv env"'
   - if "%platform%" == "x86" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat"
   - if "%platform%" == "x64" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" amd64
