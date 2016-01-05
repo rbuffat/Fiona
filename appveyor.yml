@@ -44,6 +44,7 @@ install:
   - if "%platform%" == "x64" "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   - if "%platform%" == "x64" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" amd64
   - if "%platform%" == "x64" set WIN64_ARG="WIN64=YES"
+  - '%CMD_IN_ENV% echo "conv env"'
 
   - ps: mkdir C:\build | out-null
   
@@ -61,7 +62,6 @@ install:
   - 7z x gdal-2.0.1.tar
   - cd gdal-2.0.1
   
-  - '%CMD_IN_ENV% echo "conv env"'
   - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% USER_DEFS=/WX
   - cd apps
   - nmake /f makefile.vc test_ogrsf.exe MSVC_VER=1500 DEBUG=1 %WIN64_ARG% USER_DEFS=/WX
