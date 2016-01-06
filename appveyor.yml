@@ -70,10 +70,9 @@ install:
   - 7z x gdal-2.0.1RC1.tar
   - cd gdal-2.0.1
   
-  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:/gdal USER_DEFS=/WX
-  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:/gdal install
-  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:/gdal devinstall
-  - ps: "ls \"C:/build/gdal-2.0.1\""
+  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:\gdal USER_DEFS=/WX
+  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:\gdal install
+  - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:\gdal devinstall
 
   - cd C:\projects\fiona
   # Upgrade to the latest version of pip to avoid it displaying warnings
