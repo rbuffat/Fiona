@@ -42,7 +42,7 @@ install:
 
   
   # https://code.google.com/p/pymat2/wiki/WindowsTips
-  - ps: (Get-Content "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat) | ForEach-Object { $_ -replace "vcvarsamd64.bat", "vcvars64.bat" } | Set-Content "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat
+  #- ps: (Get-Content "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat) | ForEach-Object { $_ -replace "vcvarsamd64.bat", "vcvars64.bat" } | Set-Content "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat
   - '%CMD_IN_ENV% echo "conv env"'
   - if "%platform%" == "x86" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat"
   - if "%platform%" == "x64" xcopy "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
