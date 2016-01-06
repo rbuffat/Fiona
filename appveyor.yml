@@ -46,7 +46,7 @@ install:
   - '%CMD_IN_ENV% echo "conv env"'
   - ps: 'ls "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin"'
   - if "%platform%" == "x86" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat"
-  - if "%platform%" == "x64" xcopy 'C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat' 'C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat'
+  - if "%platform%" == "x64" echo f | xcopy /f /y "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\amd64\vcvarsamd64.bat"
   - if "%platform%" == "x64" call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" amd64
   - if "%platform%" == "x64" set WIN64_ARG="WIN64=YES"
 
