@@ -75,7 +75,7 @@ install:
   - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:\gdal install
   - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% GDAL_HOME=C:\gdal devinstall
   - "SET PATH=C:\\gdal;C:\\gdal\\bin;C:\\gdal\\data;%PATH%"
-  - "SET GDAL_DATA=C:\\gdal\\data;%"
+  - "SET GDAL_DATA=C:\\gdal\\data"
   
   - cd C:\projects\fiona
   # Upgrade to the latest version of pip to avoid it displaying warnings
