@@ -68,13 +68,13 @@ install:
   - cd gdal-2.0.1
   
   - nmake /f makefile.vc MSVC_VER=1500 DEBUG=1 %WIN64_ARG% USER_DEFS=/WX
-  - cd apps
-  - nmake /f makefile.vc test_ogrsf.exe MSVC_VER=1500 DEBUG=1 %WIN64_ARG% USER_DEFS=/WX
- 
+  - ps: "ls \"C:/build/gdal-2.0.1\""
+
+  - cd C:\projects\fiona
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
   - "pip install --disable-pip-version-check --user --upgrade pip"
-
+ 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
