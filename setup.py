@@ -5,6 +5,8 @@ import os
 import shutil
 import subprocess
 import sys
+import re
+import fileinput
 
 from setuptools import setup
 from setuptools.extension import Extension
@@ -149,6 +151,23 @@ if 'clean' not in sys.argv:
                   "to gdal-config using a GDAL_CONFIG environment variable "
                   "or use a GDAL_VERSION environment variable.")
         sys.exit(1)
+
+    # Embed compile time gdal version in Fiona for run time compatibility checks 
+    def calc_gdal_version_num(maj, min, rev):
+        """Calculates the internal gdal version number based on major, minor and revision"""
+        return int(maj * 1000000 + min * 10000 + rev*100)
+
+    gdalversion_clean = re.sub("[^0-9.]", '', gdalversion)
+    gdal_api_version_num = calc_gdal_version_num(*list(map(int, gdalversion_clean.split("."))))
+
+    line_gdalversion_compiletime = "__gdal_version_compiletime__ = '{}'".format(gdalversion)
+    line_gdal_version_num_compiletime = "__gdal_version_num_compiletime__ = {}".format(gdal_api_version_num)
+
+    for line in fileinput.FileInput('fiona/__init__.py', inplace=True):
+        line = re.sub("^(__gdal_version_compiletime__ =)(.*)$", line_gdalversion_compiletime, line.rstrip())
+        line = re.sub("^(__gdal_version_num_compiletime__ =)(.*)$", line_gdal_version_num_compiletime, line.rstrip())
+        print(line)
+
 
     if os.environ.get('PACKAGE_DATA'):
         destdir = 'fiona/gdal_data'

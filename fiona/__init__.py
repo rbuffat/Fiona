@@ -83,12 +83,22 @@ import uuid
 __all__ = ['bounds', 'listlayers', 'open', 'prop_type', 'prop_width']
 __version__ = "1.7.2"
 __gdal_version__ = get_gdal_release_name().decode('utf-8')
+__gdal_version_num_compiletime__ = None
+__gdal_version_compiletime__ = None
 
 log = logging.getLogger('Fiona')
 class NullHandler(logging.Handler):
     def emit(self, record):
         pass
 log.addHandler(NullHandler())
+
+
+if not get_gdal_version_num() == __gdal_version_num_compiletime__:
+    log.warn("Fiona detected that the current installed version of GDAL does not match " \
+             "the version Fiona was compiled against. Please check your GDAL environment " \
+             "to avoid incompatibilites.\n" \
+             "Runtime version of GDAL:  {}, Compile time version of GDAL: {}".format(__gdal_version__,
+                                                                                     __gdal_version_compiletime__))
 
 def open(
         path,
