@@ -109,15 +109,14 @@ class ReadingTest(unittest.TestCase):
     def test_open_repr(self):
         self.assertEqual(
             repr(self.c),
-            ("<open Collection 'tests/data/coutwildrnp.shp:coutwildrnp', mode 'r' "
-             "at %s>" % hex(id(self.c))))
-
+            ("<open Collection 'tests{sep}data{sep}coutwildrnp.shp:coutwildrnp', mode 'r' "
+             "at {hexid}>".format(hexid=hex(id(self.c)), sep=os.sep)))
     def test_closed_repr(self):
         self.c.close()
         self.assertEqual(
             repr(self.c),
-            ("<closed Collection 'tests/data/coutwildrnp.shp:coutwildrnp', mode 'r' "
-             "at %s>" % hex(id(self.c))))
+            ("<closed Collection 'tests{sep}data{sep}coutwildrnp.shp:coutwildrnp', mode 'r' "
+             "at {hexid}>".format(hexid=hex(id(self.c)), sep=os.sep)))
 
     def test_path(self):
         self.assertEqual(self.c.path, WILDSHP)
