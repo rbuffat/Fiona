@@ -102,7 +102,6 @@ class ReadingTest(unittest.TestCase):
 
     def setUp(self):
         self.c = fiona.open(WILDSHP, "r")
-        self.path = os.path.join('tests', 'data', 'coutwildrnp.shp')
 
     def tearDown(self):
         self.c.close()
@@ -111,13 +110,13 @@ class ReadingTest(unittest.TestCase):
         self.assertEqual(
             repr(self.c),
             ("<open Collection '{path}:coutwildrnp', mode 'r' "
-             "at {hexid}>".format(hexid=hex(id(self.c)), path=self.path)))
+             "at {hexid}>".format(hexid=hex(id(self.c)), path=WILDSHP)))
     def test_closed_repr(self):
         self.c.close()
         self.assertEqual(
             repr(self.c),
             ("<closed Collection '{path}:coutwildrnp', mode 'r' "
-             "at {hexid}>".format(hexid=hex(id(self.c)), path=self.path)))
+             "at {hexid}>".format(hexid=hex(id(self.c)), path=WILDSHP)))
 
     def test_path(self):
         self.assertEqual(self.c.path, WILDSHP)
