@@ -21,7 +21,7 @@ if FIXME_WINDOWS:
     # Set extra path if in windows
     OGRINFO_TOOL = 'gdal\\apps\\' + OGRINFO_TOOL
 
-WILDSHP = 'tests/data/coutwildrnp.shp'
+WILDSHP = os.path.join('tests', 'data','coutwildrnp.shp')
 
 #logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
@@ -664,7 +664,7 @@ class OpenKeywordArgsTest(unittest.TestCase):
 
     def test_kwargs(self):
         dstfile = os.path.join(self.tempdir, 'test.json')
-        with fiona.open('tests/data/coutwildrnp.shp') as src:
+        with fiona.open(os.path.join('tests', 'data', 'coutwildrnp.shp')) as src:
             kwds = src.profile
             kwds['driver'] = 'GeoJSON'
             kwds['coordinate_precision'] = 2
