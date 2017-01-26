@@ -102,7 +102,7 @@ class TarArchiveReadingTest(VsiReadingTest):
     def setUp(self):
         vfs = "tar://{}".format(self.path_coutwildrnp_tar)
         self.c = fiona.open("/testing/coutwildrnp.shp", "r", vfs=vfs)
-        self.path = os.path.join(data_dir, 'coutwildrnp.tar')
+        self.path = os.path.join(self.data_dir, 'coutwildrnp.tar')
     
     def tearDown(self):
         self.c.close()
