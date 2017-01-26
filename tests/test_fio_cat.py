@@ -47,9 +47,6 @@ def test_bbox_yes():
     assert result.output.count('"Feature"') == 19
 
 
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test is not working.")
 def test_bbox_json_yes():
     runner = CliRunner()
     result = runner.invoke(
