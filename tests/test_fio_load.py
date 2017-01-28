@@ -12,9 +12,6 @@ import fiona
 from fiona.fio.main import main_group
 
 
-FIXME_WINDOWS = sys.platform.startswith('win')
-
-
 def test_err(runner):
     result = runner.invoke(
         main_group, ['load'], '', catch_exceptions=False)
