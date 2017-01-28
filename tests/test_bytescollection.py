@@ -29,7 +29,7 @@ class ReadingTest(unittest.TestCase):
     def test_open_repr(self):
         # I'm skipping checking the name of the virtual file as it produced by uuid.
         print(repr(self.c))
-        self.assertTrue(repr(self.c).startswith("<open BytesCollection '/vsimem/".format(os.sep)))
+        self.assertTrue(repr(self.c).startswith("<open BytesCollection '/vsimem/"))
         self.assertTrue(repr(self.c).endswith(":OGRGeoJSON', mode 'r' at %s>" % hex(id(self.c))))
 
     def test_closed_repr(self):
