@@ -8,14 +8,10 @@ from click.testing import CliRunner
 
 from fiona.fio import cat
 
+DATA_DIR = os.path.join('tests', 'data')
+WILDSHP = os.path.join(DATA_DIR, 'coutwildrnp.shp')
 
-WILDSHP = 'tests/data/coutwildrnp.shp'
-FIXME_WINDOWS = sys.platform.startswith('win')
 
-
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test is not working.")
 def test_one():
     runner = CliRunner()
     result = runner.invoke(cat.cat, [WILDSHP])
@@ -23,9 +19,6 @@ def test_one():
     assert result.output.count('"Feature"') == 67
 
 
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test is not working.")
 def test_two():
     runner = CliRunner()
     result = runner.invoke(cat.cat, [WILDSHP, WILDSHP])
@@ -33,9 +26,6 @@ def test_two():
     assert result.output.count('"Feature"') == 134
 
 
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test is not working.")
 def test_bbox_no():
     runner = CliRunner()
     result = runner.invoke(
@@ -46,9 +36,7 @@ def test_bbox_no():
     assert result.output == ""
 
 
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test is not working.")
+
 def test_bbox_yes():
     runner = CliRunner()
     result = runner.invoke(
@@ -59,9 +47,6 @@ def test_bbox_yes():
     assert result.output.count('"Feature"') == 19
 
 
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test is not working.")
 def test_bbox_json_yes():
     runner = CliRunner()
     result = runner.invoke(
@@ -74,10 +59,9 @@ def test_bbox_json_yes():
 
 def test_multi_layer():
     layerdef = "1:coutwildrnp,1:coutwildrnp"
-    print(os.getcwd())
     runner = CliRunner()
     result = runner.invoke(
-        cat.cat, ['--layer', layerdef, os.path.join('tests', 'data')])
+        cat.cat, ['--layer', layerdef, DATA_DIR])
     assert result.output.count('"Feature"') == 134
 
 
@@ -85,7 +69,7 @@ def test_multi_layer_fail():
     runner = CliRunner()
     result = runner.invoke(cat.cat, '--layer'
                            '200000:coutlildrnp',
-                           'tests/data')
+                           DATA_DIR)
     assert result.exit_code == 1
 
 
