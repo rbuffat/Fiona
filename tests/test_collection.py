@@ -317,10 +317,6 @@ class UnsupportedDriverTest(unittest.TestCase):
             fiona.open, os.path.join(TEMPDIR, "foo"), "w", "Bogus", schema=schema)
 
 
-@pytest.mark.skipif(
-    FIXME_WINDOWS,
-    reason="FIXME on Windows. Please look into why this test isn't working. "
-           "There is a codepage issue regarding Windows-1252 and UTF-8. ")
 class GenericWritingTest(unittest.TestCase):
     tempdir = None
     c = None
@@ -615,8 +611,7 @@ class GeoJSONCRSWritingTest(unittest.TestCase):
             'GEOGCS["WGS 84' in info.decode('utf-8'),
             info)
 
-@pytest.mark.skipif(FIXME_WINDOWS,
-                 reason="FIXME on Windows. Test raises PermissionError.  Please look into why this test isn't working.")
+
 class DateTimeTest(unittest.TestCase):
 
     def setUp(self):
