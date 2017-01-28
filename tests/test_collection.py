@@ -15,9 +15,9 @@ import fiona
 from fiona.collection import Collection, supported_drivers
 from fiona.errors import FionaValueError, DriverError
 
-FIXME_WINDOWS = sys.platform.startswith('win')
+
 OGRINFO_TOOL = "ogrinfo"
-if FIXME_WINDOWS:
+if sys.platform.startswith('win'):
     # Set extra path if in windows
     OGRINFO_TOOL = 'gdal\\apps\\' + OGRINFO_TOOL
 
