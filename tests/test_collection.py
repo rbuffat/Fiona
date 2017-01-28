@@ -120,7 +120,7 @@ class ReadingTest(unittest.TestCase):
             repr(self.c),
             ("<closed Collection '{path}:coutwildrnp', mode 'r' "
              "at {hexid}>".format(hexid=hex(id(self.c)), path=WILDSHP)))
-        self.assertTrue(false)
+        self.assertTrue(False)
 
     def test_path(self):
         print(self.c.path)
