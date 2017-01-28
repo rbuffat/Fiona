@@ -101,6 +101,7 @@ class OpenExceptionTest(unittest.TestCase):
 class ReadingTest(unittest.TestCase):
 
     def setUp(self):
+        print("SETUO", WILDSHP)
         self.c = fiona.open(WILDSHP, "r")
 
     def tearDown(self):
@@ -121,6 +122,7 @@ class ReadingTest(unittest.TestCase):
     def test_path(self):
         print(self.c.path)
         print("WILDSHP", WILDSHP)
+        print(repr(self.c))
         self.assertEqual(self.c.path, WILDSHP)
 
     def test_name(self):
