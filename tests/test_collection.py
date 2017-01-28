@@ -108,10 +108,14 @@ class ReadingTest(unittest.TestCase):
         self.c.close()
 
     def test_open_repr(self):
+        print("test_open_repr:WILDSHP", WILDSHP)
+        print(repr(self.c))
         self.assertEqual(
             repr(self.c),
             ("<open Collection '{path}:coutwildrnp', mode 'r' "
              "at {hexid}>".format(hexid=hex(id(self.c)), path=WILDSHP)))
+        self.assertTrue(False)
+
     def test_closed_repr(self):
         self.c.close()
         print("test_closed_repr:WILDSHP", WILDSHP)
