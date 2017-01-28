@@ -9,10 +9,6 @@ import six
 
 import fiona
 
-
-FIXME_WINDOWS = sys.platform.startswith('win')
-
-
 @pytest.mark.usefixtures('uttc_path_coutwildrnp_json')
 class ReadingTest(unittest.TestCase):
 
@@ -30,17 +26,11 @@ class ReadingTest(unittest.TestCase):
             strbuf = src.read()
         self.assertRaises(ValueError, fiona.BytesCollection, strbuf)
 
-    @pytest.mark.skipif(
-        FIXME_WINDOWS,
-        reason="FIXME on Windows. Please look into why this test is not working.")
     def test_open_repr(self):
         # I'm skipping checking the name of the virtual file as it produced by uuid.
         self.assertTrue(repr(self.c).startswith("<open BytesCollection '/vsimem/"))
         self.assertTrue(repr(self.c).endswith(":OGRGeoJSON', mode 'r' at %s>" % hex(id(self.c))))
 
-    @pytest.mark.skipif(
-        FIXME_WINDOWS,
-        reason="FIXME on Windows. Please look into why this test is not working.")
     def test_closed_repr(self):
         # I'm skipping checking the name of the virtual file as it produced by uuid.
         self.c.close()
@@ -64,9 +54,6 @@ class ReadingTest(unittest.TestCase):
     def test_mode(self):
         self.assertEqual(self.c.mode, 'r')
 
-    @pytest.mark.skipif(
-        FIXME_WINDOWS,
-        reason="FIXME on Windows. Please look into why this test is not working.")
     def test_collection(self):
         self.assertEqual(self.c.encoding, 'utf-8')
 
