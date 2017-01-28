@@ -10,9 +10,6 @@ import fiona
 import fiona.ogrext
 
 
-FIXME_WINDOWS = sys.platform.startswith("win")
-
-
 def test_single_file_private(path_coutwildrnp_shp):
     with fiona.drivers():
         assert fiona.ogrext._listlayers(path_coutwildrnp_shp) == ['coutwildrnp']
