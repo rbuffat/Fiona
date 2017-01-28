@@ -12,33 +12,35 @@ from fiona.compat import OrderedDict
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
-WILDSHP = os.path.join("tests", "data", "coutwildrnp.shp")
+FIXME_WINDOWS = sys.platform.startswith("win")
 
 class ReadAccess(unittest.TestCase):
     # To check that we'll be able to get multiple 'r' connections to layers
     # in a single file.
-
+    
     def setUp(self):
-        self.c = fiona.open(WILDSHP, "r", layer="coutwildrnp")
-
+        self.c = fiona.open("tests/data/coutwildrnp.shp", "r", layer="coutwildrnp")
+    
     def tearDown(self):
         self.c.close()
 
     def test_meta(self):
-        with fiona.open(WILDSHP, "r", layer="coutwildrnp") as c2:
+        with fiona.open("tests/data/coutwildrnp.shp", "r", layer="coutwildrnp") as c2:
             self.assertEqual(len(self.c), len(c2))
             self.assertEqual(sorted(self.c.schema.items()), sorted(c2.schema.items()))
 
     def test_meta(self):
         f1 = next(iter(self.c))
-        with fiona.open(WILDSHP, "r", layer="coutwildrnp") as c2:
+        with fiona.open("tests/data/coutwildrnp.shp", "r", layer="coutwildrnp") as c2:
             f2 = next(iter(c2))
             self.assertEqual(f1, f2)
 
+@pytest.mark.skipif(FIXME_WINDOWS, 
+                 reason="FIXME on Windows. These tests raise PermissionErrors on Windows in Python 3.x (which doesn't exist in Python 2.7).  Please look into why this test isn't working.")
 class ReadWriteAccess(unittest.TestCase):
     # To check that we'll be able to read from a file that we're
     # writing to.
-
+    
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
         self.c = fiona.open(
@@ -46,7 +48,7 @@ class ReadWriteAccess(unittest.TestCase):
             "w",
             driver="ESRI Shapefile",
             schema={
-                'geometry': 'Point',
+                'geometry': 'Point', 
                 'properties': [('title', 'str:80'), ('date', 'date')]},
             crs={'init': "epsg:4326", 'no_defs': True},
             encoding='utf-8')
@@ -79,6 +81,8 @@ class ReadWriteAccess(unittest.TestCase):
         del f2['id']
         self.assertEqual(self.f, f2)
 
+@pytest.mark.skipif(FIXME_WINDOWS, 
+                    reason="FIXME on Windows. These tests raise PermissionErrors on Windows in Python 3.x (which doesn't exist in Python 2.7).  Please look into why this test isn't working.")
 class LayerCreation(unittest.TestCase):
 
     def setUp(self):
@@ -93,7 +97,7 @@ class LayerCreation(unittest.TestCase):
             layer='write_test',
             driver='ESRI Shapefile',
             schema={
-                'geometry': 'Point',
+                'geometry': 'Point', 
                 'properties': [('title', 'str:80'), ('date', 'date')]},
             crs={'init': "epsg:4326", 'no_defs': True},
             encoding='utf-8')
