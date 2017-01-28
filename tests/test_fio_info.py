@@ -12,6 +12,9 @@ import pytest
 from fiona.fio.main import main_group
 
 
+FIXME_WINDOWS = sys.platform.startswith('win')
+
+
 def test_info_json(path_coutwildrnp_shp):
     runner = CliRunner()
     result = runner.invoke(main_group, ['info', path_coutwildrnp_shp])
