@@ -101,24 +101,35 @@ class OpenExceptionTest(unittest.TestCase):
 class ReadingTest(unittest.TestCase):
 
     def setUp(self):
+        print("SETUO", WILDSHP)
         self.c = fiona.open(WILDSHP, "r")
 
     def tearDown(self):
         self.c.close()
 
     def test_open_repr(self):
+        print("test_open_repr:WILDSHP", WILDSHP)
+        print(repr(self.c))
         self.assertEqual(
             repr(self.c),
             ("<open Collection '{path}:coutwildrnp', mode 'r' "
              "at {hexid}>".format(hexid=hex(id(self.c)), path=WILDSHP)))
+        self.assertTrue(False)
+
     def test_closed_repr(self):
         self.c.close()
+        print("test_closed_repr:WILDSHP", WILDSHP)
+        print(repr(self.c))
         self.assertEqual(
             repr(self.c),
             ("<closed Collection '{path}:coutwildrnp', mode 'r' "
              "at {hexid}>".format(hexid=hex(id(self.c)), path=WILDSHP)))
+        self.assertTrue(False)
 
     def test_path(self):
+        print(self.c.path)
+        print("WILDSHP", WILDSHP)
+        print(repr(self.c))
         self.assertEqual(self.c.path, WILDSHP)
 
     def test_name(self):
@@ -599,7 +610,7 @@ class GeoJSONCRSWritingTest(unittest.TestCase):
                 'geometry': 'Point',
                 'properties': [('title', 'str'), ('date', 'date')]},
             crs={'a': 6370997, 'lon_0': -100, 'y_0': 0, 'no_defs': True, 'proj': 'laea', 'x_0': 0, 'units': 'm', 'b': 6370997, 'lat_0': 45})
-        
+
 
     def tearDown(self):
         self.sink.close()
@@ -614,7 +625,7 @@ class GeoJSONCRSWritingTest(unittest.TestCase):
             'GEOGCS["WGS 84' in info.decode('utf-8'),
             info)
 
-@pytest.mark.skipif(FIXME_WINDOWS, 
+@pytest.mark.skipif(FIXME_WINDOWS,
                  reason="FIXME on Windows. Test raises PermissionError.  Please look into why this test isn't working.")
 class DateTimeTest(unittest.TestCase):
 
@@ -650,7 +661,7 @@ class DateTimeTest(unittest.TestCase):
             rf1, rf2 = list(c)
             self.assertEqual(rf1['properties']['date'], '2013-02-25')
             self.assertEqual(rf2['properties']['date'], '2014-02-03')
-        
+
 
     def tearDown(self):
         shutil.rmtree(self.tempdir)
