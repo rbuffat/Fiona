@@ -33,8 +33,8 @@ GEOMETRY_TYPES = {
     #13: 'Curve',
     #14: 'Surface',
     #15: 'PolyhedralSurface',
-    #16: 'TIN',
-    #17: 'Triangle',
+    16: 'TIN',
+    17: 'Triangle',
     100: 'None',
     101: 'LinearRing',
     0x80000001: '3D Point',
@@ -44,6 +44,12 @@ GEOMETRY_TYPES = {
     0x80000005: '3D MultiLineString',
     0x80000006: '3D MultiPolygon',
     0x80000007: '3D GeometryCollection' }
+
+# Gdal geometry types that are not supported by GeoJSON but can be mapped
+# to sufficient similar GeoJSON type names
+JSON_NOT_SUPPORTED_MAPPING = {
+    'TIN' : 'MultiPolygon',
+    'Triangle': 'Polygon'}
 
 # mapping of GeoJSON type names to OGR integer geometry types
 GEOJSON2OGR_GEOMETRY_TYPES = dict((v, k) for k, v in GEOMETRY_TYPES.iteritems())
@@ -174,6 +180,9 @@ cdef class GeomBuilder:
             raise UnsupportedGeometryTypeError(self.code)
 
         self.geomtypename = GEOMETRY_TYPES[self.code]
+        if self.geomtypename in JSON_NOT_SUPPORTED_MAPPING:
+            self.geomtypename = JSON_NOT_SUPPORTED_MAPPING[self.geomtypename]
+
         self.ndims = OGR_G_GetCoordinateDimension(geom)
         self.geom = geom
         return getattr(self, '_build' + self.geomtypename)()
