@@ -14,6 +14,14 @@ environment:
         GDAL_HOME: "C:\\gdal"
 
     matrix:
+
+        - PYTHON: "C:\\Python27-x64"
+          PYTHON_VERSION: "2.7.14"
+          PYTHON_ARCH: "64"
+          GDAL_VERSION: "1.8.0"
+          GIS_INTERNALS: "release-1600-x64-gdal-1-8-0-mapserver-6-0-0.zip"
+          GIS_INTERNALS_LIBS: "release-1600-x64-gdal-1-8-0-mapserver-6-0-0-libs.zip"
+    
         - PYTHON: "C:\\Python27-x64"
           PYTHON_VERSION: "2.7.14"
           PYTHON_ARCH: "64"
