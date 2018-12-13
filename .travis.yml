@@ -13,17 +13,16 @@ env:
     - GDALBUILD=$HOME/gdalbuild
 
   matrix:
-#    - GDALVERSION="1.8.0"
+    - GDALVERSION="1.8.0"
     - GDALVERSION="1.11.5"
-#    - GDALVERSION="2.0.3"
-#    - GDALVERSION="2.1.4"
-#    - GDALVERSION="2.2.4"
+    - GDALVERSION="2.0.3"
     - GDALVERSION="2.3.2"
-#    - GDALVERSION="trunk"
+    - GDALVERSION="trunk"
 
-#matrix:
-#  allow_failures:
-#    - env: GDALVERSION="trunk"
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: GDALVERSION="trunk"
 
 addons:
   apt:
@@ -71,15 +70,12 @@ before_cache:
   - if [ "$GDALVERSION" = "trunk" ]; then rm -rf $GDALINST/gdal-$GDALVERSION; fi
 
 
+git:
+  depth: 3
+  quiet: true
+  
 jobs:
   include:
-    - stage: Stage 2
-      python: 2.7
-      env: GDALVERSION="2.0.3"
-
-    - stage: Stage 2
-      python: 3.6
-      env: GDALVERSION="2.0.3"
     
     - stage: Stage 2
       python: 2.7
@@ -97,14 +93,9 @@ jobs:
       python: 3.6
       env: GDALVERSION="2.2.4"
 
-    - stage: Stage 3
-      python: 2.7
-      env: GDALVERSION="1.8.0"
 
-    - stage: Stage 3
-      python: 2.7
-      env: GDALVERSION="trunk"
 
-    - stage: Stage 3
-      python: 3.6
-      env: GDALVERSION="trunk"
+#stages:
+  #- name: Stage 2
+    ## require the branch name to be master (note for PRs this is the base branch name)
+    #if: branch = master
