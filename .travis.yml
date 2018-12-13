@@ -73,7 +73,38 @@ before_cache:
 
 jobs:
   include:
-    - stage: legacy
+    - stage: Stage 2
+      python: 2.7
+      env: GDALVERSION="2.0.3"
+
+    - stage: Stage 2
+      python: 3.6
+      env: GDALVERSION="2.0.3"
+    
+    - stage: Stage 2
+      python: 2.7
+      env: GDALVERSION="2.1.4"
+    
+    - stage: Stage 2
+      python: 3.6
+      env: GDALVERSION="2.1.4"
+    
+    - stage: Stage 2
+      python: 2.7
+      env: GDALVERSION="2.2.4"
+
+    - stage: Stage 2
+      python: 3.6
+      env: GDALVERSION="2.2.4"
+
+    - stage: Stage 3
       python: 2.7
       env: GDALVERSION="1.8.0"
 
+    - stage: Stage 3
+      python: 2.7
+      env: GDALVERSION="trunk"
+
+    - stage: Stage 3
+      python: 3.6
+      env: GDALVERSION="trunk"
