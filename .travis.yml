@@ -11,18 +11,19 @@ env:
     - PIP_FIND_LINKS=file://$HOME/.cache/pip/wheels
     - GDALINST=$HOME/gdalinstall
     - GDALBUILD=$HOME/gdalbuild
-  matrix:
-    - GDALVERSION="1.8.0"
-    - GDALVERSION="1.11.5"
-    - GDALVERSION="2.0.3"
-    - GDALVERSION="2.1.4"
-    - GDALVERSION="2.2.4"
-    - GDALVERSION="2.3.2"
-    - GDALVERSION="trunk"
 
-matrix:
-  allow_failures:
-    - env: GDALVERSION="trunk"
+  matrix:
+#    - GDALVERSION="1.8.0"
+    - GDALVERSION="1.11.5"
+#    - GDALVERSION="2.0.3"
+#    - GDALVERSION="2.1.4"
+#    - GDALVERSION="2.2.4"
+    - GDALVERSION="2.3.2"
+#    - GDALVERSION="trunk"
+
+#matrix:
+#  allow_failures:
+#    - env: GDALVERSION="trunk"
 
 addons:
   apt:
@@ -68,3 +69,11 @@ after_success:
 
 before_cache:
   - if [ "$GDALVERSION" = "trunk" ]; then rm -rf $GDALINST/gdal-$GDALVERSION; fi
+
+
+jobs:
+  include:
+    - stage: legacy
+      python: 2.7
+      env: GDALVERSION="1.8.0"
+
