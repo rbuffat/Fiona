@@ -37,7 +37,12 @@ python:
   - "2.7"
   - "3.6"
 
+addons:
+  apt:
+    update: true
+  
 before_install:
+  - sudo apt-get source -y gdal
   - sudo apt-get build-dep -y gdal
   - pip install -U pip
   - pip install wheel coveralls>=1.1 --upgrade
