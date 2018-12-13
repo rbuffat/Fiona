@@ -39,11 +39,16 @@ python:
 
 addons:
   apt:
-    update: true
-  
+
+    packages:
+    - libproj-dev
+    - libhdf5-serial-dev
+    - libatlas-dev
+    - libatlas-base-dev
+    - gfortran
+    - libwebp5
+    
 before_install:
-  - sudo apt-get source -y gdal
-  - sudo apt-get build-dep -y gdal
   - pip install -U pip
   - pip install wheel coveralls>=1.1 --upgrade
   - pip install setuptools==36.0.1
