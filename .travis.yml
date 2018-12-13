@@ -15,6 +15,8 @@ env:
   matrix:
     - GDALVERSION="1.11.5"
     - GDALVERSION="2.0.3"
+    - GDALVERSION="2.1.4"
+    - GDALVERSION="2.2.4"
     - GDALVERSION="2.3.2"
     - GDALVERSION="1.8.0"
     - GDALVERSION="trunk"
@@ -76,29 +78,3 @@ before_cache:
 git:
   depth: 3
   quiet: true
-  
-jobs:
-  include:
-    
-    - stage: Stage 2
-      python: 2.7
-      env: GDALVERSION="2.1.4"
-    
-    - stage: Stage 2
-      python: 3.6
-      env: GDALVERSION="2.1.4"
-    
-    - stage: Stage 2
-      python: 2.7
-      env: GDALVERSION="2.2.4"
-
-    - stage: Stage 2
-      python: 3.6
-      env: GDALVERSION="2.2.4"
-
-
-
-#stages:
-  #- name: Stage 2
-    ## require the branch name to be master (note for PRs this is the base branch name)
-    #if: branch = master
