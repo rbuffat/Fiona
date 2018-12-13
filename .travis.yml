@@ -15,8 +15,6 @@ env:
   matrix:
     - GDALVERSION="1.11.5"
     - GDALVERSION="2.0.3"
-    - GDALVERSION="2.1.4"
-    - GDALVERSION="2.2.4"
     - GDALVERSION="2.3.2"
     - GDALVERSION="1.8.0"
     - GDALVERSION="trunk"
@@ -26,6 +24,10 @@ matrix:
   allow_failures:
     - env: GDALVERSION="1.8.0"
     - env: GDALVERSION="trunk"
+    
+  exclude:
+    - GDALVERSION="1.8.0"
+      python: 3.6
 
 
 addons:
@@ -60,7 +62,6 @@ install:
   - pip uninstall -y fiona
   - if [ "$GDALVERSION" = "trunk" ]; then echo "Using gdal trunk"; elif [ $(gdal-config --version) == "$GDALVERSION" ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
   - pip install --global-option=build_ext --global-option='-I$GDALINST/gdal-$GDALVERSION/include' --global-option='-L$GDALINST/gdal-$GDALVERSION/lib' --global-option='-R$GDALINST/gdal-$GDALVERSION/lib' -e .[test]
-#  - pip install -e .[test]
   - fio --version
   - gdal-config --version
   - fio --gdal-version
@@ -78,3 +79,28 @@ before_cache:
 git:
   depth: 3
   quiet: true
+  
+jobs:
+  include:
+    
+    - stage: Stage 2
+      python: 2.7
+      env: GDALVERSION="2.1.4"
+    
+    - stage: Stage 2
+      python: 3.6
+      env: GDALVERSION="2.1.4"
+    
+    - stage: Stage 2
+      python: 2.7
+      env: GDALVERSION="2.2.4"
+
+    - stage: Stage 2
+      python: 3.6
+      env: GDALVERSION="2.2.4"
+
+
+stages:
+  - name: Stage 2
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: branch = test
