@@ -22,6 +22,8 @@ def pytest_report_header(config):
     supported_drivers = ", ".join(sorted(list(fiona.drvsupport.supported_drivers.keys())))
     # supported drivers
     headers.append("Supported drivers: {}".format(supported_drivers))
+    # fiona
+    headers.append("Fiona: {}".format(fiona.__version__))
     return '\n'.join(headers)
 
 
