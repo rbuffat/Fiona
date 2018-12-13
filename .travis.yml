@@ -1,5 +1,7 @@
 language: python
 
+dist: xenial
+
 cache:
   directories:
     - $GDALINST
@@ -39,12 +41,14 @@ addons:
     - libatlas-dev
     - libatlas-base-dev
     - gfortran
+    - libwebp5
 
 python:
   - "2.7"
   - "3.6"
 
 before_install:
+  - sudo apt-get install -y libxml2-dev
   - pip install -U pip
   - pip install wheel coveralls>=1.1 --upgrade
   - pip install setuptools==36.0.1
