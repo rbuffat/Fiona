@@ -25,12 +25,12 @@ matrix:
     - env: GDALVERSION="1.8.0"
     - env: GDALVERSION="trunk"
     
-  exclude:
-    - GDALVERSION="1.8.0"
-      python: 3.6
+  #exclude:
+    #- GDALVERSION="1.8.0"
+      #python: 3.6
 
-    - GDALVERSION="trunk"
-      python: 2.7
+    #- GDALVERSION="trunk"
+      #python: 2.7
 
 addons:
   apt:
