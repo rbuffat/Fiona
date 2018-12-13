@@ -33,22 +33,12 @@ matrix:
     - env: GDALVERSION="trunk"
       python: "2.7"
 
-addons:
-  apt:
-    packages:
-    - libproj-dev
-    - libhdf5-serial-dev
-    - libatlas-dev
-    - libatlas-base-dev
-    - gfortran
-    - libwebp5
-
 python:
   - "2.7"
   - "3.6"
 
 before_install:
-  - sudo apt-get install -y libxml2-dev
+  - sudo apt-get build-dep -y gdal
   - pip install -U pip
   - pip install wheel coveralls>=1.1 --upgrade
   - pip install setuptools==36.0.1
