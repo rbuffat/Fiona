@@ -102,7 +102,7 @@ jobs:
       env: GDALVERSION="2.2.4"
 
 
-#stages:
-  #- name: Stage 2
-    ## require the branch name to be master (note for PRs this is the base branch name)
-    #if: branch = test
+stages:
+  - name: Stage 2
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: branch = test
