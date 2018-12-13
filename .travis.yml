@@ -13,16 +13,18 @@ env:
     - GDALBUILD=$HOME/gdalbuild
 
   matrix:
-    - GDALVERSION="1.8.0"
     - GDALVERSION="1.11.5"
     - GDALVERSION="2.0.3"
     - GDALVERSION="2.3.2"
+    - GDALVERSION="1.8.0"
     - GDALVERSION="trunk"
 
 matrix:
   fast_finish: true
   allow_failures:
+    - env: GDALVERSION="1.8.0"
     - env: GDALVERSION="trunk"
+
 
 addons:
   apt:
