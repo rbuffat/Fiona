@@ -15,29 +15,24 @@ env:
     - GDALBUILD=$HOME/gdalbuild
 
   matrix:
-    - GDALVERSION="1.8.0"
-    - GDALVERSION="1.9.2"
-    - GDALVERSION="1.10.1"
     - GDALVERSION="1.11.5"
-    #- GDALVERSION="2.0.3"
-    #- GDALVERSION="2.3.2"
-    #- GDALVERSION="trunk"
+    - GDALVERSION="2.0.3"
+    - GDALVERSION="2.3.2"
+    - GDALVERSION="trunk"
 
 matrix:
   fast_finish: true
   allow_failures:
-    - env: GDALVERSION="1.8.0"
     - env: GDALVERSION="trunk"
     
   exclude:
-    - env: GDALVERSION="1.8.0"
-      python: "3.6"
+
     - env: GDALVERSION="trunk"
       python: "2.7"
 
 python:
   - "2.7"
-#  - "3.6"
+  - "3.6"
 
 addons:
   apt:
@@ -88,24 +83,41 @@ git:
 jobs:
   include:
     
-    - stage: Stage 2
+    - stage: Gdal 2.x legacy
       python: 2.7
       env: GDALVERSION="2.1.4"
     
-    - stage: Stage 2
+    - stage: Gdal 2.x legacy
       python: 3.6
       env: GDALVERSION="2.1.4"
     
-    - stage: Stage 2
+    - stage: Gdal 2.x legacy
       python: 2.7
       env: GDALVERSION="2.2.4"
 
-    - stage: Stage 2
+    - stage: Gdal 2.x legacy
       python: 3.6
       env: GDALVERSION="2.2.4"
 
+      
+    - stage: Gdal 1.x legacy
+      python: 2.7
+      env: GDALVERSION="1.8.0"
 
+    - stage: Gdal 1.x legacy
+      python: 2.7
+      env: GDALVERSION="1.9.2"
+      
+    - stage: Gdal 1.x legacy
+      python: 2.7
+      env: GDALVERSION="1.10.1"
+
+      
 stages:
-  - name: Stage 2
+  - test
+  - name: Gdal 2.x legacy
     # require the branch name to be master (note for PRs this is the base branch name)
-    if: branch = master
+    if: commit_message = test_2x|test_all
+  - name: Gdal 1.x legacy
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: branch = test_1x|test_all
