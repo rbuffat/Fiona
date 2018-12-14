@@ -16,10 +16,12 @@ env:
 
   matrix:
     - GDALVERSION="1.8.0"
+    - GDALVERSION="1.9.2"
+    - GDALVERSION="1.10.1"
     - GDALVERSION="1.11.5"
-    - GDALVERSION="2.0.3"
-    - GDALVERSION="2.3.2"
-    - GDALVERSION="trunk"
+    #- GDALVERSION="2.0.3"
+    #- GDALVERSION="2.3.2"
+    #- GDALVERSION="trunk"
 
 matrix:
   fast_finish: true
@@ -35,7 +37,7 @@ matrix:
 
 python:
   - "2.7"
-  - "3.6"
+#  - "3.6"
 
 addons:
   apt:
