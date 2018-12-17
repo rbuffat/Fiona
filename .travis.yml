@@ -16,17 +16,9 @@ env:
     - GDALVERSION="1.11.5"
     - GDALVERSION="2.0.3"
     - GDALVERSION="2.3.2"
-    - GDALVERSION="trunk"
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - env: GDALVERSION="trunk"
-    
-  exclude:
-
-    - env: GDALVERSION="trunk"
-      python: "2.7"
 
 python:
   - "2.7"
@@ -41,8 +33,7 @@ addons:
     - libatlas-dev
     - libatlas-base-dev
     - gfortran
-    - libwebp5
-    
+
 before_install:
   - pip install -U pip
   - pip install wheel coveralls>=1.1 --upgrade
@@ -79,24 +70,7 @@ git:
   
 jobs:
   include:
-    
-    - stage: Gdal 2.x legacy
-      python: 2.7
-      env: GDALVERSION="2.1.4"
-    
-    - stage: Gdal 2.x legacy
-      python: 3.6
-      env: GDALVERSION="2.1.4"
-    
-    - stage: Gdal 2.x legacy
-      python: 2.7
-      env: GDALVERSION="2.2.4"
 
-    - stage: Gdal 2.x legacy
-      python: 3.6
-      env: GDALVERSION="2.2.4"
-
-      
     - stage: Gdal 1.x legacy
       python: 2.7
       env: GDALVERSION="1.8.0"
@@ -109,12 +83,40 @@ jobs:
       python: 2.7
       env: GDALVERSION="1.10.1"
 
+  
+    - stage: Gdal 2.x legacy
+      python: 2.7
+      env: GDALVERSION="2.1.4"
+    
+    - stage: Gdal 2.x legacy
+      python: 3.6
+      env: GDALVERSION="2.1.4"
+    
+    - stage: Gdal 2.x legacy
+      python: 2.7
+      env: GDALVERSION="2.2.4"
+
+    - stage: Gdal 2.x legacy
+      python: 3.6
+      env: GDALVERSION="2.2.4"
+
+      
+    - stage: Gdal trunk
+      python: 2.7
+      env: GDALVERSION="trunk"
+
+    - stage: Gdal trunk
+      python: 3.6
+      env: GDALVERSION="trunk"
       
 stages:
   - test
-  - name: Gdal 2.x legacy
-    # require the branch name to be master (note for PRs this is the base branch name)
-    if: commit_message = test_2x|test_all
   - name: Gdal 1.x legacy
     # require the branch name to be master (note for PRs this is the base branch name)
-    #if: branch = test_1x|test_all
+    if: commit_message = /ci_gdal1x/
+  - name: Gdal 2.x legacy
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: commit_message = /ci_gdal2x/
+  - name: Gdal trunk
+    # require the branch name to be master (note for PRs this is the base branch name)
+    if: branch = master
