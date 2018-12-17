@@ -19,6 +19,9 @@ env:
 
 matrix:
   fast_finish: true
+  
+allow_failures:
+  - env: GDALVERSION="trunk"
 
 python:
   - "2.7"
@@ -76,14 +79,27 @@ jobs:
       env: GDALVERSION="1.8.0"
 
     - stage: Gdal 1.x legacy
+      python: 3.6
+      env: GDALVERSION="1.8.0"
+      
+    - stage: Gdal 1.x legacy
       python: 2.7
+      env: GDALVERSION="1.9.2"
+
+    - stage: Gdal 1.x legacy
+      python: 3.6
       env: GDALVERSION="1.9.2"
       
     - stage: Gdal 1.x legacy
       python: 2.7
       env: GDALVERSION="1.10.1"
 
+    - stage: Gdal 1.x legacy
+      python: 3.6
+      env: GDALVERSION="1.10.1"
   
+
+
     - stage: Gdal 2.x legacy
       python: 2.7
       env: GDALVERSION="2.1.4"
@@ -100,7 +116,8 @@ jobs:
       python: 3.6
       env: GDALVERSION="2.2.4"
 
-      
+
+
     - stage: Gdal trunk
       python: 2.7
       env: GDALVERSION="trunk"
@@ -113,10 +130,10 @@ stages:
   - test
   - name: Gdal 1.x legacy
     # require the branch name to be master (note for PRs this is the base branch name)
-    if: commit_message =~ /ci_gdal1x/
+    if: commit_message =~ /ci_gdal1x/ OR commit_message =~ /ci_all/
   - name: Gdal 2.x legacy
     # require the branch name to be master (note for PRs this is the base branch name)
-    if: commit_message =~ /ci_gdal2x/
+    if: commit_message =~ /ci_gdal2x/ OR commit_message =~ /ci_all/
   - name: Gdal trunk
     # require the branch name to be master (note for PRs this is the base branch name)
-    if: branch = master OR commit_message =~ /ci_gdaltrunk/
+    if: branch = master OR commit_message =~ /ci_gdaltrunk/ OR commit_message =~ /ci_all/
