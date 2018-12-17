@@ -64,6 +64,7 @@ if [ "$GDALVERSION" = "trunk" ]; then
   ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS
   make -j 2
   make install
+  rm -rf $GDALBUILD
   
 elif [ ! -d "$GDALINST/gdal-$GDALVERSION" ]; then
   # only build if not already installed
@@ -79,6 +80,7 @@ elif [ ! -d "$GDALINST/gdal-$GDALVERSION" ]; then
   ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS
   make -j 2
   make install
+  rm -rf $GDALBUILD
 fi
 
 # change back to travis build dir
