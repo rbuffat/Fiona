@@ -113,10 +113,10 @@ stages:
   - test
   - name: Gdal 1.x legacy
     # require the branch name to be master (note for PRs this is the base branch name)
-    if: commit_message = /ci_gdal1x/
+    if: commit_message =~ /ci_gdal1x/
   - name: Gdal 2.x legacy
     # require the branch name to be master (note for PRs this is the base branch name)
-    if: commit_message = /ci_gdal2x/
+    if: commit_message =~ /ci_gdal2x/
   - name: Gdal trunk
     # require the branch name to be master (note for PRs this is the base branch name)
     if: branch = master
