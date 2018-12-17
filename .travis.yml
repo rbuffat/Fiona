@@ -79,6 +79,18 @@ jobs:
       env: GDALVERSION="1.8.0"
 
     - stage: Gdal legacy
+      python: 2.7
+      env: GDALVERSION="1.8.1"
+
+    - stage: Gdal legacy
+      python: 2.7
+      env: GDALVERSION="1.9.0"
+
+    - stage: Gdal legacy
+      python: 2.7
+      env: GDALVERSION="1.9.1"
+      
+    - stage: Gdal legacy
       python: 3.6
       env: GDALVERSION="1.8.0"
       
