@@ -16,16 +16,21 @@ env:
     - GDALVERSION="1.11.5"
     - GDALVERSION="2.1.4"
     - GDALVERSION="2.3.2"
+    - GDALVERSION="trunk"
     
 python:
   - "2.7"
   - "3.6"
 
-#matrix:
-#  fast_finish: true
-  
-allow_failures:
+matrix:
+  fast_finish: true
+
+  exclude:
   - env: GDALVERSION="trunk"
+    python: "2.7"
+
+  allow_failures:
+    - env: GDALVERSION="trunk"
 
 addons:
   apt:
@@ -106,13 +111,13 @@ jobs:
       python: 3.6
       env: GDALVERSION="2.2.4"
 
-    - stage: Gdal trunk
-      python: 2.7
-      env: GDALVERSION="trunk"
+    #- stage: Gdal trunk
+      #python: 2.7
+      #env: GDALVERSION="trunk"
 
-    - stage: Gdal trunk
-      python: 3.6
-      env: GDALVERSION="trunk"
+    #- stage: Gdal trunk
+      #python: 3.6
+      #env: GDALVERSION="trunk"
       
 stages:
   - test
@@ -120,6 +125,6 @@ stages:
   - name: Gdal legacy
     if: commit_message =~ /@ci_legacy/ OR commit_message =~ /@ci_all/
 
-  - name: Gdal trunk
-    # require the branch name to be master (note for PRs this is the base branch name)
-    if: branch = master OR commit_message =~ /@ci_trunk/ OR commit_message =~ /@ci_all/
+  #- name: Gdal trunk
+    #require the branch name to be master (note for PRs this is the base branch name)
+    #if: branch = master OR commit_message =~ /@ci_trunk/ OR commit_message =~ /@ci_all/
