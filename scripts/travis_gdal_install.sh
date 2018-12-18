@@ -43,7 +43,6 @@ GDALOPTS="  --with-ogr \
             --without-python
             --with-oci=no \
             --without-mrf \
-            --without-lerc \
             --with-webp=no"
 
 # Create build dir if not exists
