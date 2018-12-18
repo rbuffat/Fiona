@@ -111,6 +111,15 @@ jobs:
       python: 3.6
       env: GDALVERSION="2.2.4"
 
+    - stage: Gdal legacy
+      python: 2.7
+      env: GDALVERSION="2.3.3rc2"
+
+    - stage: Gdal legacy
+      python: 3.6
+      env: GDALVERSION="2.3.3rc2"
+
+      
     #- stage: Gdal trunk
       #python: 2.7
       #env: GDALVERSION="trunk"
