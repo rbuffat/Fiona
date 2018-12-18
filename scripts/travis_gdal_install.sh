@@ -70,8 +70,10 @@ elif [ ! -d "$GDALINST/gdal-$GDALVERSION" ]; then
   # only build if not already installed
   cd $GDALBUILD
 
-  if ( curl -o/dev/null -sfI "http://download.osgeo.org/gdal/$GDALVERSION/gdal-$GDALVERSION.tar.gz" ); then
-    wget http://download.osgeo.org/gdal/$GDALVERSION/gdal-$GDALVERSION.tar.gz
+  BASE_GDALVERSION = $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION)
+
+  if ( curl -o/dev/null -sfI "http://download.osgeo.org/gdal/$BASE_GDALVERSION/gdal-$GDALVERSION.tar.gz" ); then
+    wget http://download.osgeo.org/gdal/$BASE_GDALVERSION/gdal-$GDALVERSION.tar.gz
   else
     wget http://download.osgeo.org/gdal/old_releases/gdal-$GDALVERSION.tar.gz
   fi

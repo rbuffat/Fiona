@@ -15,7 +15,7 @@ env:
   matrix:
     - GDALVERSION="1.11.5"
     - GDALVERSION="2.1.4"
-    - GDALVERSION="2.3.2"
+    - GDALVERSION="2.4.0rc1"
     - GDALVERSION="trunk"
     
 python:
