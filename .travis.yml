@@ -1,5 +1,9 @@
+dist: xenial
+
 language: python
+
 sudo: false
+
 cache:
   directories:
     - $GDALINST
@@ -14,16 +18,13 @@ env:
     - PROJBUILD=$HOME/projbuild
     - PROJVERSION="6.0.0"
     
-    
   matrix:
-#    - GDALVERSION="1.11.5"
-#    - GDALVERSION="2.0.3"
-#    - GDALVERSION="2.1.4"
-#    - GDALVERSION="2.2.4"
+
+    - GDALVERSION="2.2.4"
     - GDALVERSION="2.3.3"
     - GDALVERSION="2.4.1"
     - GDALVERSION="2.5.0beta1"
-#    - GDALVERSION="trunk"
+    - GDALVERSION="trunk"
 
 matrix:
   allow_failures:
@@ -42,8 +43,7 @@ addons:
     - sqlite3
 
 python:
-#  - "2.7"
-  - "3.6"
+  - "3.7"
 
 before_install:
   - pip install -U pip
