@@ -60,14 +60,15 @@ before_install:
 install:
   - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements.txt | scripts/remove_version.py > requirements.txt; fi
   - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements-dev.txt | scripts/remove_version.py > requirements-dev.txt; fi
+  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements-dev.txt && cat requirements.txt; fi
   - pip install --upgrade --force-reinstall -r requirements-dev.txt
   - pip uninstall -y fiona
-  - pip freeze
   - if [ "$GDALVERSION" = "trunk" ]; then echo "Using gdal trunk"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
   - pip install --global-option=build_ext --global-option='-I$GDALINST/gdal-$GDALVERSION/include' --global-option='-L$GDALINST/gdal-$GDALVERSION/lib' --global-option='-R$GDALINST/gdal-$GDALVERSION/lib' -e .[test]
   - fio --version
   - gdal-config --version
   - fio --gdal-version
+  - pip freeze
 
 script:
   - python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
