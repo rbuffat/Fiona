@@ -71,7 +71,7 @@ install:
 
   # If event type is cron, remove version constraints from python dependencies 
   - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements.txt | python scripts/remove_version.py | tee requirements.txt; fi
-  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements-dev.txt | python scripts/remove_version.py | tee requirements-dev.txt; fi
+  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements-dev.txt | python scripts/remove_version.py | tee "requirements-dev.txt"; fi
   - cat requirements.txt
   - cat requirements-dev.txt
   
