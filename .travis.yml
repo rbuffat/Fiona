@@ -9,6 +9,9 @@ cache:
     - $GDALINST
     - ~/.cache/pip
 
+git:
+  depth: 3    
+
 env:
   global:
     - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
@@ -51,7 +54,6 @@ addons:
 
 python:
   - "3.7"
-  - "3.8-dev"
 
 before_install:
   - pip install -U pip
@@ -83,7 +85,7 @@ install:
   # Install fiona
   - pip install --global-option=build_ext --global-option='-I$GDALINST/gdal-$GDALVERSION/include' --global-option='-L$GDALINST/gdal-$GDALVERSION/lib' --global-option='-R$GDALINST/gdal-$GDALVERSION/lib' -e .[test]
 
-  # Check installation
+  # Print installation information
   - fio --version
   - gdal-config --version
   - fio --gdal-version
