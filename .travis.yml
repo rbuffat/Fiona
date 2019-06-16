@@ -23,10 +23,18 @@ env:
     - GDALVERSION="2.2.4"
     - GDALVERSION="2.3.3"
     - GDALVERSION="2.4.1"
-    - GDALVERSION="3.0.0"
-    - GDALVERSION="trunk"
 
 matrix:
+
+  include:
+   - python: "3.7"
+     env: GDALVERSION="3.0.0"
+     if: type != cron
+
+   - python: "3.7"
+     env: GDALVERSION="trunk"
+     if: type != cron
+
   allow_failures:
     - env: GDALVERSION="trunk"
     - env: GDALVERSION="3.0.0"
@@ -69,7 +77,7 @@ install:
   - pip install --upgrade --force-reinstall -r requirements-dev.txt
   - pip uninstall -y fiona
 
-  # Check if the installed version of gdal is correct 
+  # Check if the installed version of gdal is correct. Fail if not.
   - if [ "$GDALVERSION" = "trunk" ]; then echo "Using gdal trunk"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
 
   # Install fiona
