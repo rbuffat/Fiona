@@ -59,8 +59,8 @@ before_install:
 
 install:
   - cat requirements-dev.txt && cat requirements.txt
-  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements.txt | python scripts/remove_version.py > requirements.txt; fi
-  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements-dev.txt | python scripts/remove_version.py > requirements-dev.txt; fi
+  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements.txt | python scripts/remove_version.py | tee requirements.txt; fi
+  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then cat requirements-dev.txt | python scripts/remove_version.py | tee requirements-dev.txt; fi
   - cat requirements-dev.txt && cat requirements.txt
   - pip install --upgrade --force-reinstall -r requirements-dev.txt
   - pip uninstall -y fiona
