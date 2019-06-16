@@ -43,6 +43,7 @@ addons:
 
 python:
   - "3.7"
+  - "3.8-dev"
 
 before_install:
   - pip install -U pip
@@ -68,8 +69,10 @@ install:
   - pip install --upgrade --force-reinstall -r requirements-dev.txt
   - pip uninstall -y fiona
 
-  # Install fiona
+  # Check if the installed version of gdal is correct 
   - if [ "$GDALVERSION" = "trunk" ]; then echo "Using gdal trunk"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
+
+  # Install fiona
   - pip install --global-option=build_ext --global-option='-I$GDALINST/gdal-$GDALVERSION/include' --global-option='-L$GDALINST/gdal-$GDALVERSION/lib' --global-option='-R$GDALINST/gdal-$GDALVERSION/lib' -e .[test]
 
   # Check installation
