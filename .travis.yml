@@ -57,8 +57,8 @@ python:
 
 before_install:
   - pip install -U pip
-  - pip install --upgrade coveralls>=1.1
-
+  - pip install --upgrade coveralls>=1.1 pytest
+  
   # Export environment variables and install proj and gdal from source
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH
