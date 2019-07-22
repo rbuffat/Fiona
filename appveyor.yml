@@ -64,8 +64,8 @@ install:
   # the parent CMD process).
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET PYTHONPATH=%PYTHON%\\Lib\\site-packages"
-  - ECHO "%PATH"
-  - ECHO "%PYTHONPATH"
+  - "ECHO %PATH"
+  - "ECHO %PYTHONPATH"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"
