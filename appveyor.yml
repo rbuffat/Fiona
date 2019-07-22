@@ -18,6 +18,13 @@ environment:
         # the libraries. It does not need to match the version of MSVC used to build Python.
         # https://en.wikipedia.org/wiki/Microsoft_Visual_C%2B%2B#Internal_version_numbering
 
+        # Python 3.5, GDAL 2.2
+        - PYTHON: "C:\\Python35-x64"
+          PYTHON_VERSION: "3.5.4"
+          GDAL_VERSION: "2.2.3"
+          GIS_INTERNALS: "release-1911-x64-gdal-2-2-3-mapserver-7-0-7.zip"
+          GIS_INTERNALS_LIBS: "release-1911-x64-gdal-2-2-3-mapserver-7-0-7-libs.zip"
+        
         # Python 3.6, GDAL 2.2
         - PYTHON: "C:\\Python36-x64"
           PYTHON_VERSION: "3.6.4"
