@@ -132,6 +132,7 @@ build_script:
 test_script:
   # Run the project tests
   - cmd: SET
+
   - ps: python -m pip list
   - ps: python -c "import fiona"
 
