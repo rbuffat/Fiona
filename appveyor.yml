@@ -102,6 +102,7 @@ install:
   # about it being out of date.
   - cmd: python -m pip install --disable-pip-version-check --user --upgrade pip
   - cmd: python -m pip --version
+  - ps: python -m pip freeze
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
@@ -124,7 +125,7 @@ build_script:
 
   # install the wheel
   - ps: python -m pip install --upgrade pip
-  - ps: python -m pip install --no-deps --ignore-installed (gci dist\*.whl | % { "$_" })
+  - ps: python -m pip install --verbose (gci dist\*.whl | % { "$_" })
   - ps: python -m pip freeze
   - ps: move fiona fiona.build
 
