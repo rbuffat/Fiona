@@ -8,6 +8,7 @@ import boto3
 import fiona
 from fiona.errors import FionaDeprecationWarning
 from fiona.vfs import vsi_path, parse_paths
+from fiona.path import parse_path, vsi_path
 
 from .test_collection import TestReading
 from .test_collection_legacy import ReadingTest
@@ -207,5 +208,5 @@ def test_parse_vfs():
 def test_vsi_path():
     assert  vsi_path(parse_path("zip://foo.zip")) == '/vsizip/foo.zip'
 
-def test_vsi_path():
+def test_vsi_path2():
     assert  vsi_path(parse_path("zip:/foo.zip")) == '/vsizip/foo.zip'
