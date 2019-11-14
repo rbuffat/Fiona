@@ -203,3 +203,9 @@ def test_parse_path2():
 
 def test_parse_vfs():
     assert parse_paths("/", "zip://foo.zip") == ("/", "zip", "foo.zip")
+
+def test_vsi_path():
+    assert  vsi_path(parse_path("zip://foo.zip")) == '/vsizip/foo.zip'
+
+def test_vsi_path():
+    assert  vsi_path(parse_path("zip:/foo.zip")) == '/vsizip/foo.zip'
