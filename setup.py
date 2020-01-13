@@ -267,7 +267,7 @@ requirements = [
     'click-plugins>=1.0',
     'cligj>=0.5',
     'six>=1.7',
-    'munch>=2.0.1',
+    'munch>=2.1.0',
 ]
 
 extras_require = {
