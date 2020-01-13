@@ -45,10 +45,10 @@ matrix:
       env:
         GDALVERSION="master"
         PROJVERSION="6.2.1"
-  allow_failures:
-    - env:
-        GDALVERSION="master"
-        PROJVERSION="6.2.1"
+  #allow_failures:
+    #- env:
+        #GDALVERSION="master"
+        #PROJVERSION="6.2.1"
 
 addons:
   apt:

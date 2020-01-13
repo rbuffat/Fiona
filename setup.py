@@ -266,14 +266,14 @@ requirements = [
     'click>=4.0,<8',
     'click-plugins>=1.0',
     'cligj>=0.5',
-    'six>=1.7',
+    'six>=1.9',
     'munch>=2.2.0',
 ]
 
 extras_require = {
     'calc': ['shapely'],
     's3': ['boto3>=1.2.4'],
-    'test': ['pytest>=3', 'pytest-cov', 'boto3>=1.2.4', 'mock; python_version<"3.4"']
+    'test': ['pytest>=5', 'pytest-cov>=2.7', 'boto3>=1.2.4']
 }
 
 extras_require['all'] = list(set(it.chain(*extras_require.values())))
