@@ -85,4 +85,6 @@ after_success:
   - coveralls || echo "!! intermittent coveralls failure"
 
 before_cache:
-  - if [ "$GDALVERSION" = "master" ]; then rm -rf $GDALINST/gdal-$GDALVERSION; fi
+  - rm -rf $PROJBUILD
+  - rm -rf $GDALBUILD
+  #- if [ "$GDALVERSION" = "master" ]; then rm -rf $GDALINST/gdal-$GDALVERSION; fi

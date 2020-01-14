@@ -60,50 +60,58 @@ fi
 ls -l $GDALINST
 
 if [ "$GDALVERSION" = "master" ]; then
-    PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
-    cd $GDALBUILD
-    git clone --depth 1 https://github.com/OSGeo/gdal gdal-$GDALVERSION
-    cd gdal-$GDALVERSION/gdal
-    git rev-parse HEAD > newrev.txt
-    BUILD=no
-    # Only build if nothing cached or if the GDAL revision changed
-    if test ! -f $GDALINST/gdal-$GDALVERSION/rev.txt; then
-        BUILD=yes
-    elif ! diff newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt >/dev/null; then
-        BUILD=yes
-    fi
-    if test "$BUILD" = "yes"; then
-        mkdir -p $GDALINST/gdal-$GDALVERSION
-        cp newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt
-        ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
-        make -j 4
-        make install
+
+    DISTRIB_CODENAME=$(lsb_release -cs)
+    GDAL_ARCHIVE_NAME="gdal_${GDALVERSION}_proj_${PROJVERSION}_${DISTRIB_CODENAME}.tar.gz"
+    GDAL_ARCHIVE_URL="https://rbuffat.github.io/gdal_builder/$GDAL_ARCHIVE_NAME"
+
+    echo "$GDAL_ARCHIVE_URL"
+
+    # if prebuilt archives are availabe, we use them
+    if ( curl -o/dev/null -sfI "$GDAL_ARCHIVE_URL" ) && [ "$FORCE_GDAL_BUILD" != "yes" ]; then
+        echo "Use previously built gdal $GDALVERSION"
+        
+        cd $TRAVIS_BUILD_DIR
+
+        wget "$GDAL_ARCHIVE_URL"
+        
+        echo "tar -xzvf $GDAL_ARCHIVE_NAME -C $GDALINST"
+        tar -xzvf "$GDAL_ARCHIVE_NAME" -C "$GDALINST"
+
+        ls -l $GDALINST
+
+    # otherwise, we build them from source
+    else
+
+        PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
+        cd $GDALBUILD
+        git clone --depth 1 https://github.com/OSGeo/gdal gdal-$GDALVERSION
+        cd gdal-$GDALVERSION/gdal
+        git rev-parse HEAD > newrev.txt
+        BUILD=no
+        # Only build if nothing cached or if the GDAL revision changed
+        if test ! -f $GDALINST/gdal-$GDALVERSION/rev.txt; then
+            BUILD=yes
+        elif ! diff newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt >/dev/null; then
+            BUILD=yes
+        fi
+        if test "$BUILD" = "yes"; then
+            mkdir -p $GDALINST/gdal-$GDALVERSION
+            cp newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt
+            ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
+            make -j 2
+            make install
+        fi
     fi
 
 else
-    case "$GDALVERSION" in
-        3*)
-            PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.4*)
-            PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.3*)
-            PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.2*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.1*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.0*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        1*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-    esac
+
+    # Proj flag changed with gdal 2.3
+    if $(dpkg --compare-versions "$GDALVERSION" "lt" "2.3"); then
+        PROJOPT="--with-static-proj4=$PROJINST/proj-$PROJVERSION";
+    else
+        PROJOPT="--with-proj=${PROJINST}/proj-$PROJVERSION";
+    fi
 
     if [ ! -d "$GDALINST/gdal-$GDALVERSION/share/gdal" ]; then
         cd $GDALBUILD
@@ -112,7 +120,7 @@ else
         tar -xzf gdal-$GDALVERSION.tar.gz
         cd gdal-$gdalver
         ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
-        make -j 4
+        make -j 2
         make install
     fi
 fi
