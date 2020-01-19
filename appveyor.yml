@@ -58,7 +58,7 @@ environment:
           PYTHON_VERSION: "3.7"
           PYTHON_ARCH: "64"
           GDAL_VERSION: "3.0.0"
-          GIS_INTERNALS: "release-1911-x64-gdal-mapserver.zip"
+          GIS_INTERNALS: "release-1911-x64-gdal-3-0-mapserver-7-4.zip"
           GIS_INTERNALS_LIBS: "release-1911-x64-gdal-3-0-mapserver-7-4-libs.zip"
           PROJ_LIB: "C:\\gdal\\bin\\proj6\\share"
           PIP_UNPIN: "yes"
