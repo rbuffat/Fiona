@@ -65,8 +65,8 @@ matrix:
 
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; sudo apt-get -y libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; brew install --only-dependencies gdal@GDALVERSION; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -y libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install --only-dependencies gdal@GDALVERSION; fi
   - python -m pip install -U pip
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH
