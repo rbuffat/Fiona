@@ -10,17 +10,18 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
                 --with-expat \
                 --without-libtool \
                 --with-libz=internal \
-                --with-libtiff=internal \
-                --with-geotiff=internal \
+                --without-libtiff \
+                --without-geotiff \
                 --without-gif \
                 --without-pg \
                 --without-grass \
                 --without-libgrass \
                 --without-cfitsio \
                 --without-pcraster \
-                --with-netcdf \
-                --with-png=internal \
-                --with-jpeg=internal \
+                --without-netcdf \
+                --without-png \
+                --without-jpeg \
+                --without-openjpeg \
                 --without-gif \
                 --without-ogdi \
                 --without-fme \
@@ -56,17 +57,18 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
                 --with-expat=/usr/local/opt/expat \
                 --without-libtool \
                 --with-libz=internal \
-                --with-libtiff=internal \
-                --with-geotiff=internal \
+                --without-libtiff \
+                --without-geotiff \
                 --without-gif \
                 --without-pg \
                 --without-grass \
                 --without-libgrass \
                 --without-cfitsio \
                 --without-pcraster \
-                --with-netcdf \
-                --with-png=internal \
-                --with-jpeg=internal \
+                --without-netcdf \
+                --without-png \
+                --without-jpeg \
+                --without-openjpeg \
                 --without-gif \
                 --without-ogdi \
                 --without-fme \
