@@ -52,8 +52,8 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
 
     GDALOPTS="  --with-ogr \
-                --with-geos=/Library/Frameworks/GEOS.framework/unix/bin/geos-config \
-                --with-expat=/usr/local \
+                --with-geos=/usr/local/opt/geos \
+                --with-expat=/usr/local/opt/expat \
                 --without-libtool \
                 --with-libz=internal \
                 --with-libtiff=internal \
@@ -84,7 +84,7 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
                 --without-xerces \
                 --without-odbc \
                 --with-curl \
-                --with-sqlite3=/Library/Frameworks/SQLite3.framework/unix \
+                --with-sqlite3=/usr/local/opt/sqlite \
                 --without-idb \
                 --without-sde \
                 --without-ruby \
