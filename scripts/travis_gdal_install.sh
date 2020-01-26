@@ -19,8 +19,8 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
                 --without-cfitsio \
                 --without-pcraster \
                 --without-netcdf \
-                --without-png \
-                --without-jpeg \
+                --with-png=internal \
+                --with-jpeg=internal \
                 --without-openjpeg \
                 --without-gif \
                 --without-ogdi \
@@ -67,8 +67,8 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
                 --without-cfitsio \
                 --without-pcraster \
                 --without-netcdf \
-                --without-png \
-                --without-jpeg \
+                --with-png=internal \
+                --with-jpeg=internal \
                 --without-openjpeg \
                 --without-gif \
                 --without-ogdi \
