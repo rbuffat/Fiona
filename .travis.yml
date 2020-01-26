@@ -15,6 +15,15 @@ env:
     - PROJBUILD=$HOME/projbuild
     - MAKEFLAGS="-j 2"
 
+addons:
+  apt:
+    packages:
+      - libatlas-dev
+      - libatlas-base-dev
+      - gfortran
+      - libsqlite3-dev
+      - sqlite3
+
 matrix:
   include:
     - os: linux
@@ -60,8 +69,8 @@ matrix:
 
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -y install libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install --only-dependencies gdal; fi
+  #- if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -y install libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3; fi
+  #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install --only-dependencies gdal; fi
   - python3 -m pip install -U pip
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH
