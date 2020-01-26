@@ -1,11 +1,5 @@
 language: python
 
-os:
-    - linux
-    - osx
-
-dist: xenial
-
 cache:
   directories:
     - $GDALINST
