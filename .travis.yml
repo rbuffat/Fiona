@@ -28,6 +28,7 @@ addons:
       - expat
       - libspatialite
       - sqlite
+      - geos
 
 matrix:
   include:
