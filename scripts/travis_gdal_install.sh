@@ -48,6 +48,7 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
                 --without-python \
                 --with-oci=no \
                 --without-mrf \
+                --without-lerc \
                 --with-webp=no"
 
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
@@ -95,6 +96,7 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
                 --without-python \
                 --with-oci=no \
                 --without-mrf \
+                --without-lerc \
                 --with-webp=no"
 
 fi
