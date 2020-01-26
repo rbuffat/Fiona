@@ -53,7 +53,7 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
 
     GDALOPTS="  --with-ogr \
                 --with-geos=/Library/Frameworks/GEOS.framework/unix/bin/geos-config \
-                --with-expat \
+                --with-expat=/usr/local \
                 --without-libtool \
                 --with-libz=internal \
                 --with-libtiff=internal \
