@@ -24,7 +24,7 @@ env:
 matrix:
   include:
     - os: linux
-      dist: xenial:
+      dist: xenial
       python: "3.6"
       env:
         GDALVERSION="2.3.3"
@@ -33,6 +33,7 @@ matrix:
       python: "3.6"
       env:
         GDALVERSION="2.3.3"
+
     #- python: "3.6"
       #env:
         #GDALVERSION="2.4.4"
