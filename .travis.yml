@@ -25,6 +25,7 @@ matrix:
         PROJVERSION="4.9.3"
     - os: osx
       osx_image: xcode11.2
+      language: shell
       env:
         GDALVERSION="2.3.3"
 
@@ -61,7 +62,7 @@ matrix:
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -y install libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install --only-dependencies gdal@$GDALVERSION; fi
-  - python -m pip install -U pip
+  - python3 -m pip install -U pip
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH
   - . ./scripts/travis_proj_install.sh
@@ -69,18 +70,18 @@ before_install:
   - export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
   - export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
   - gdal-config --version
-  - python -m pip wheel -r requirements-dev.txt
-  - python -m pip install -r requirements-dev.txt
+  - python3 -m pip wheel -r requirements-dev.txt
+  - python3 -m pip install -r requirements-dev.txt
 
 install:
   - if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
-  - "GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install --no-deps --force-reinstall --no-use-pep517 -e ."
-  - python -m pip freeze
+  - "GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python3 -m pip install --no-deps --force-reinstall --no-use-pep517 -e ."
+  - python3 -m pip freeze
   - fio --version
   - fio --gdal-version
 
 script:
-  - python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+  - python3 -m pytest -m "not wheel" --cov fiona --cov-report term-missing
 
 after_success:
   - coveralls || echo "!! intermittent coveralls failure"
