@@ -10,8 +10,8 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
                 --with-expat \
                 --without-libtool \
                 --with-libz=internal \
-                --without-libtiff \
-                --without-geotiff \
+                --with-libtiff=internal \
+                --with-geotiff=internal \
                 --without-gif \
                 --without-pg \
                 --without-grass \
@@ -57,8 +57,8 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
                 --with-expat=/usr/local/opt/expat \
                 --without-libtool \
                 --with-libz=internal \
-                --without-libtiff \
-                --without-geotiff \
+                --with-libtiff=internal \
+                --with-geotiff=internal \
                 --without-gif \
                 --without-pg \
                 --without-grass \
