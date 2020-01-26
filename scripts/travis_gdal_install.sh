@@ -52,7 +52,7 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
 
     GDALOPTS="  --with-ogr \
-                --with-geos=/usr/local/opt/geos \
+                --with-geos \
                 --with-expat=/usr/local/opt/expat \
                 --without-libtool \
                 --with-libz=internal \
