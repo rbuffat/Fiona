@@ -24,7 +24,7 @@ matrix:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
     - os: osx
-      python: "3.6"
+      osx_image: xcode11.2
       env:
         GDALVERSION="2.3.3"
 
