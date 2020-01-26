@@ -23,6 +23,11 @@ addons:
       - gfortran
       - libsqlite3-dev
       - sqlite3
+  homebrew:
+    packages:
+      - expat
+      - libspatialite
+      - sqlite
 
 matrix:
   include:
@@ -37,6 +42,7 @@ matrix:
       language: shell
       env:
         GDALVERSION="2.3.3"
+        PROJVERSION="4.9.3"
 
     #- python: "3.6"
       #env:
