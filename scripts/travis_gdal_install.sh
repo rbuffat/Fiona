@@ -56,6 +56,10 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
 
+    if [ ! -d "$GDALINST/lib" ]; then
+        mkdir $GDALINST/lib;
+    fi
+
     GDALOPTS="$GDALOPTS \
                 --with-local=$GDALINST \
                 --with-expat=/usr/local/opt/expat \
@@ -137,7 +141,7 @@ else
     fi
 fi
 
-# Remove gdalbuild
+# Remove gdalbuild to emulate cache of only $GDALINST
 rm -rf $GDALBUILD
 
 # change back to travis build dir
