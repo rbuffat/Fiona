@@ -136,5 +136,8 @@ else
     fi
 fi
 
+# Remove gdalbuild
+rm -rf $GDALBUILD
+
 # change back to travis build dir
 cd $TRAVIS_BUILD_DIR
