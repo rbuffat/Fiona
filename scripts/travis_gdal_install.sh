@@ -57,6 +57,7 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
 
     GDALOPTS="$GDALOPTS \
+                --with-local=$GDALINST \
                 --with-expat=/usr/local/opt/expat \
                 --with-sqlite3=/usr/local/opt/sqlite"
 fi
