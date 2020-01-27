@@ -61,6 +61,8 @@ elif [ $TRAVIS_OS_NAME = 'osx' ]; then
     fi
 
     GDALOPTS="$GDALOPTS \
+                --with-local=$GDALINST \
+                --with-libtool \
                 --enable-shared \
                 --with-expat=/usr/local/opt/expat \
                 --with-sqlite3=/usr/local/opt/sqlite"
