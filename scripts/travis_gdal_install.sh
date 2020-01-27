@@ -3,102 +3,62 @@
 # originally contributed by @rbuffat to Toblerity/Fiona
 set -e
 
-if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+GDALOPTS="  --with-ogr \
+            --with-geos \
+            --with-expat \
+            --without-libtool \
+            --with-libz=internal \
+            --with-libtiff=internal \
+            --with-geotiff=internal \
+            --without-gif \
+            --without-pg \
+            --without-grass \
+            --without-libgrass \
+            --without-cfitsio \
+            --without-pcraster \
+            --without-netcdf \
+            --with-png=internal \
+            --with-jpeg=internal \
+            --without-openjpeg \
+            --without-gif \
+            --without-ogdi \
+            --without-fme \
+            --without-hdf4 \
+            --without-hdf5 \
+            --without-jasper \
+            --without-ecw \
+            --without-kakadu \
+            --without-mrsid \
+            --without-jp2mrsid \
+            --without-bsb \
+            --without-grib \
+            --without-mysql \
+            --without-ingres \
+            --without-xerces \
+            --without-odbc \
+            --with-curl \
+            --with-sqlite3 \
+            --without-idb \
+            --without-sde \
+            --without-ruby \
+            --without-perl \
+            --without-php \
+            --without-python \
+            --with-oci=no \
+            --without-mrf \
+            --without-lerc \
+            --with-webp=no"
 
-    GDALOPTS="  --with-ogr \
-                --with-geos \
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    GDALOPTS="$GDALOPTS \
                 --with-expat \
-                --without-libtool \
-                --with-libz=internal \
-                --with-libtiff=internal \
-                --with-geotiff=internal \
-                --without-gif \
-                --without-pg \
-                --without-grass \
-                --without-libgrass \
-                --without-cfitsio \
-                --without-pcraster \
-                --without-netcdf \
-                --with-png=internal \
-                --with-jpeg=internal \
-                --without-openjpeg \
-                --without-gif \
-                --without-ogdi \
-                --without-fme \
-                --without-hdf4 \
-                --without-hdf5 \
-                --without-jasper \
-                --without-ecw \
-                --without-kakadu \
-                --without-mrsid \
-                --without-jp2mrsid \
-                --without-bsb \
-                --without-grib \
-                --without-mysql \
-                --without-ingres \
-                --without-xerces \
-                --without-odbc \
-                --with-curl \
-                --with-sqlite3 \
-                --without-idb \
-                --without-sde \
-                --without-ruby \
-                --without-perl \
-                --without-php \
-                --without-python \
-                --with-oci=no \
-                --without-mrf \
-                --without-lerc \
-                --with-webp=no"
+                --with-sqlite3"
 
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
 
-    GDALOPTS="  --with-ogr \
-                --with-geos \
+    GDALOPTS="$GDALOPTS \
                 --with-expat=/usr/local/opt/expat \
-                --without-libtool \
-                --with-libz=internal \
-                --with-libtiff=internal \
-                --with-geotiff=internal \
-                --without-gif \
-                --without-pg \
-                --without-grass \
-                --without-libgrass \
-                --without-cfitsio \
-                --without-pcraster \
-                --without-netcdf \
-                --with-png=internal \
-                --with-jpeg=internal \
-                --without-openjpeg \
-                --without-gif \
-                --without-ogdi \
-                --without-fme \
-                --without-hdf4 \
-                --without-hdf5 \
-                --without-jasper \
-                --without-ecw \
-                --without-kakadu \
-                --without-mrsid \
-                --without-jp2mrsid \
-                --without-bsb \
-                --without-grib \
-                --without-mysql \
-                --without-ingres \
-                --without-xerces \
-                --without-odbc \
-                --with-curl \
-                --with-sqlite3=/usr/local/opt/sqlite \
-                --without-idb \
-                --without-sde \
-                --without-ruby \
-                --without-perl \
-                --without-php \
-                --without-python \
-                --with-oci=no \
-                --without-mrf \
-                --without-lerc \
-                --with-webp=no"
-
+                --with-sqlite3=/usr/local/opt/sqlite"
 fi
 
 # Create build dir if not exists
@@ -130,6 +90,7 @@ if [ "$GDALVERSION" = "master" ]; then
         mkdir -p $GDALINST/gdal-$GDALVERSION
         cp newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt
         cp newproj.txt $GDALINST/gdal-$GDALVERSION/newproj.txt
+        echo $GDALOPTS
         ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
         make
         make install
