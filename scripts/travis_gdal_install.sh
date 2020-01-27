@@ -90,7 +90,6 @@ if [ "$GDALVERSION" = "master" ]; then
         mkdir -p $GDALINST/gdal-$GDALVERSION
         cp newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt
         cp newproj.txt $GDALINST/gdal-$GDALVERSION/newproj.txt
-        echo $GDALOPTS
         ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
         make
         make install
