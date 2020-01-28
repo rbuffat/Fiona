@@ -15,8 +15,6 @@ GDALOPTS="  --with-geos \
             --without-cfitsio \
             --without-pcraster \
             --without-netcdf \
-            --with-png=internal \
-            --with-jpeg=internal \
             --without-openjpeg \
             --without-gif \
             --without-ogdi \
@@ -47,22 +45,30 @@ case "$GDALVERSION" in
         --without-php \
         --without-bsb \
         --without-mrf \
-        --without-grib"
+        --without-grib \
+        --without-png \
+        --without-jpeg"
         ;;
     2.4*)
         GDALOPTS="$GDALOPTS \
         --without-bsb \
         --without-mrf \
         --without-grib \
-        --without-lerc"
+        --without-lerc \
+        --without-png \
+        --without-jpeg"
         ;;
     3*)
         GDALOPTS="$GDALOPTS \
-        --without-lerc"
+        --without-lerc
+        --with-png=internal \
+        --with-jpeg=internal"
         ;;
     *)
         GDALOPTS="$GDALOPTS \
-        --without-lerc"
+        --without-lerc
+        --with-png=internal \
+        --with-jpeg=internal"
         ;;
 esac
 
