@@ -50,20 +50,13 @@ GDALOPTS="  --with-ogr \
             --with-webp=no"
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+
     GDALOPTS="$GDALOPTS \
                 --with-expat \
                 --with-sqlite3"
 
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
-# 
-#     if [ ! -d "$GDALINST/lib" ]; then
-#         mkdir $GDALINST/lib;
-#     fi
 
-    
-#                 --with-local=$GDALINST \
-#                 --with-libtool \
-    
     GDALOPTS="$GDALOPTS \
                 --with-expat=/usr/local/opt/expat \
                 --with-sqlite3=/usr/local/opt/sqlite"
@@ -146,7 +139,7 @@ else
     fi
 fi
 
-# Remove gdalbuild to emulate cache of only $GDALINST
+# Remove gdalbuild to emulate travis cache
 rm -rf $GDALBUILD
 
 # change back to travis build dir
