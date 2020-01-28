@@ -3,9 +3,7 @@
 # originally contributed by @rbuffat to Toblerity/Fiona
 set -e
 
-GDALOPTS="  --with-ogr \
-            --with-geos \
-            --with-expat \
+GDALOPTS="  --with-geos \
             --without-libtool \
             --with-libz=internal \
             --with-libtiff=internal \
@@ -30,25 +28,45 @@ GDALOPTS="  --with-ogr \
             --without-kakadu \
             --without-mrsid \
             --without-jp2mrsid \
-            --without-bsb \
-            --without-grib \
             --without-mysql \
             --without-ingres \
             --without-xerces \
             --without-odbc \
             --with-curl \
-            --with-sqlite3 \
             --without-idb \
             --without-sde \
-            --without-ruby \
             --without-perl \
-            --without-php \
             --without-python \
             --with-oci=no \
-            --without-mrf \
-            --without-lerc \
             --with-webp=no"
 
+# Version specific gdal build options
+case "$GDALVERSION" in
+    2.3*)
+        GDALOPTS="$GDALOPTS \
+        --without-php \
+        --without-bsb \
+        --without-mrf \
+        --without-grib"
+        ;;
+    2.4*)
+        GDALOPTS="$GDALOPTS \
+        --without-bsb \
+        --without-mrf \
+        --without-grib \
+        --without-lerc"
+        ;;
+    3*)
+        GDALOPTS="$GDALOPTS \
+        --without-lerc"
+        ;;
+    *)
+        GDALOPTS="$GDALOPTS \
+        --without-lerc"
+        ;;
+esac
+
+# OS specific gdal build options
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
 
     GDALOPTS="$GDALOPTS \
@@ -108,18 +126,6 @@ else
             ;;
         2.3*)
             PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.2*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.1*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        2.0*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
-            ;;
-        1*)
-            PROJOPT="--with-static-proj4=$GDALINST/gdal-$GDALVERSION"
             ;;
         *)
             PROJOPT="--with-proj=$GDALINST/gdal-$GDALVERSION"
