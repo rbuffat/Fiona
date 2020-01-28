@@ -55,14 +55,16 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
                 --with-sqlite3"
 
 elif [ $TRAVIS_OS_NAME = 'osx' ]; then
+# 
+#     if [ ! -d "$GDALINST/lib" ]; then
+#         mkdir $GDALINST/lib;
+#     fi
 
-    if [ ! -d "$GDALINST/lib" ]; then
-        mkdir $GDALINST/lib;
-    fi
-
+    
+#                 --with-local=$GDALINST \
+#                 --with-libtool \
+    
     GDALOPTS="$GDALOPTS \
-                --with-local=$GDALINST \
-                --with-libtool \
                 --enable-shared \
                 --with-expat=/usr/local/opt/expat \
                 --with-sqlite3=/usr/local/opt/sqlite"
@@ -97,6 +99,7 @@ if [ "$GDALVERSION" = "master" ]; then
         mkdir -p $GDALINST/gdal-$GDALVERSION
         cp newrev.txt $GDALINST/gdal-$GDALVERSION/rev.txt
         cp newproj.txt $GDALINST/gdal-$GDALVERSION/newproj.txt
+        echo "./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT"
         ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
         make
         make install
@@ -137,6 +140,7 @@ else
         wget -q http://download.osgeo.org/gdal/$gdalver/gdal-$GDALVERSION.tar.gz
         tar -xzf gdal-$GDALVERSION.tar.gz
         cd gdal-$gdalver
+        echo "./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT"
         ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
         make
         make install
