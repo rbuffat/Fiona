@@ -103,7 +103,6 @@ matrix:
 
 
 before_install:
-  #- if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew uninstall --ignore-dependencies --force gdal; fi
   - python3 -m pip install -U pip
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH; fi
