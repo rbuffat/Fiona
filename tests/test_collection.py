@@ -11,7 +11,7 @@ from fiona.collection import Collection, supported_drivers
 from fiona.env import getenv
 from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning
 from fiona.env import GDALVersion
-from .conftest import WGS84PATTERN, driver_extensions
+from .conftest import WGS84PATTERN, driver_extensions, requires_gdal2
 
 
 class TestSupportedDrivers(object):
