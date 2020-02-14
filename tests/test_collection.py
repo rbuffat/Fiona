@@ -919,8 +919,13 @@ def test_create(tmpdir, driver):
         c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
+    warn_drivers = {
+        "GeoJSON": (2, 1, 0),
+        "MapInfo File": (2, 0, 0)
+    }
 
-    if driver == 'GeoJSON' and (GDALVersion.major, GDALVersion.minor) < (2, 1):
+
+    if driver in warn_drivers and  warn_drivers[driver] < (2, 1):
         with pytest.raises(DriverError):
             with fiona.open(path, 'a',
                         driver=driver) as c:

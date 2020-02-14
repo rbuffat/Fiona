@@ -83,11 +83,20 @@ class Collection(object):
 
         # Check if append mode is supported
         if mode == 'a':
-            if (driver == "GeoJSON" and get_gdal_version_tuple() < (2, 1, 0)):
-                raise DriverError(
-                    "GeoJSON driver requires atleast GDAL 2.1.0 to append to existing files, "
-                    "Fiona was compiled against: {}".format(get_gdal_release_name()))
 
+            warn_drivers = {
+                "GeoJSON": (2, 1, 0),
+                "MapInfo File": (2, 0, 0)
+            }
+
+            if driver in warn_drivers and get_gdal_version_tuple() < warn_drivers[driver]:
+                min_gdal_version = ".".join(list(map(str, warn_drivers[driver])))
+
+                raise DriverError(
+                    "{driver} driver requires at least GDAL {min_gdal_version} to append to existing files, "
+                    "Fiona was compiled against: {gdal}".format(driver=driver,
+                                                                min_gdal_version=min_gdal_version,
+                                                                gdal=get_gdal_release_name()))
 
         self.session = None
         self.iterator = None
