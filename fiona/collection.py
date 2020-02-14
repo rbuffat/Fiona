@@ -84,15 +84,15 @@ class Collection(object):
         # Check if append mode is supported
         if mode == 'a':
 
-            warn_drivers = {
+            mingdal_drivers = {
                 "GeoJSON": (2, 1, 0),
                 "MapInfo File": (2, 0, 0),
                 "GMT": (2, 0, 0),
                 "GeoJSONSeq": (2, 0, 0)
             }
 
-            if driver in warn_drivers and get_gdal_version_tuple() < warn_drivers[driver]:
-                min_gdal_version = ".".join(list(map(str, warn_drivers[driver])))
+            if driver in mingdal_drivers and get_gdal_version_tuple() < mingdal_drivers[driver]:
+                min_gdal_version = ".".join(list(map(str, mingdal_drivers[driver])))
 
                 raise DriverError(
                     "{driver} driver requires at least GDAL {min_gdal_version} to append to existing files, "
