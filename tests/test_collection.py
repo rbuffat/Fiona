@@ -921,7 +921,8 @@ def test_append_works(tmpdir, driver):
     warn_drivers = {
         "GeoJSON": (2, 1, 0),
         "MapInfo File": (2, 0, 0),
-        "GMT": (2, 0, 0)
+        "GMT": (2, 0, 0),
+        "GeoJSONSeq": (2, 0, 0)
     }
 
 

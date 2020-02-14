@@ -87,7 +87,8 @@ class Collection(object):
             warn_drivers = {
                 "GeoJSON": (2, 1, 0),
                 "MapInfo File": (2, 0, 0),
-                "GMT": (2, 0, 0)
+                "GMT": (2, 0, 0),
+                "GeoJSONSeq": (2, 0, 0)
             }
 
             if driver in warn_drivers and get_gdal_version_tuple() < warn_drivers[driver]:
