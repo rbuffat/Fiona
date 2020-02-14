@@ -925,7 +925,7 @@ def test_create(tmpdir, driver):
     }
 
 
-    if driver in warn_drivers and  warn_drivers[driver] < (2, 1):
+    if driver in warn_drivers and GDALVersion.runtime() < GDALVersion(*warn_drivers[driver][:2]):
         with pytest.raises(DriverError):
             with fiona.open(path, 'a',
                         driver=driver) as c:
