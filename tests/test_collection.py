@@ -900,7 +900,7 @@ def test_collection_env(path_coutwildrnp_shp):
     with fiona.open(path_coutwildrnp_shp):
         assert 'FIONA_ENV' in getenv()
 
-
+# Exclude drivers that can not be tested with the following method
 blacklist_append = set(['CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'])
 append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in raw and driver not in blacklist_append]
 
@@ -918,6 +918,7 @@ def test_append_works(tmpdir, driver):
         c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
+    # Some driver gained append support over time
     warn_drivers = {
         "GeoJSON": (2, 1, 0),
         "MapInfo File": (2, 0, 0),
@@ -945,22 +946,22 @@ def test_append_works(tmpdir, driver):
 
 write_not_append_drivers = [driver for driver, raw in supported_drivers.items() if 'w' in raw and not 'a' in raw]
 
-@pytest.mark.parametrize('driver', write_not_append_drivers)
-def test_append_does_not_work(tmpdir, driver):
-    """Test if driver supports append but it is not enabled"""
-    extension = driver_extensions.get(driver, "bar")
-    path = str(tmpdir.join('foo.{}'.format(extension)))
+#@pytest.mark.parametrize('driver', write_not_append_drivers)
+#def test_append_does_not_work(tmpdir, driver):
+    #"""Test if driver supports append but it is not enabled"""
+    #extension = driver_extensions.get(driver, "bar")
+    #path = str(tmpdir.join('foo.{}'.format(extension)))
 
-    with fiona.open(path, 'w',
-                    driver=driver,
-                    schema={'geometry': 'LineString',
-                            'properties': [('title', 'str')]}) as c:
+    #with fiona.open(path, 'w',
+                    #driver=driver,
+                    #schema={'geometry': 'LineString',
+                            #'properties': [('title', 'str')]}) as c:
 
-        c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                       (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+        #c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                       #(1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
-    with pytest.raises(Exception):
-        with fiona.open(path, 'a',
-                    driver=driver) as c:
-            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                        (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
+    #with pytest.raises(Exception):
+        #with fiona.open(path, 'a',
+                    #driver=driver) as c:
+            #c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        #(2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
