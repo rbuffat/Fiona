@@ -921,7 +921,12 @@ def test_create(tmpdir, driver):
 
 
     if driver == 'GeoJSON' and (GDALVersion.major, GDALVersion.minor) < (2, 1):
-        pytest.raises(DriverError)
+        with pytest.raises(DriverError):
+            with fiona.open(path, 'a',
+                        driver=driver) as c:
+                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                            (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
+
     else:
         with fiona.open(path, 'a',
                         driver=driver) as c:
