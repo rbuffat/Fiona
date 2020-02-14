@@ -22,7 +22,8 @@ driver_extensions = {'DXF': 'dxf',
                      'MapInfo File': 'tab',
                      'DGN': 'dgn',
                      'GPKG': 'gpkg',
-                     'GeoJSON': 'json'}
+                     'GeoJSON': 'json'.
+                     'GMT': 'gmt'}
 
 def pytest_report_header(config):
     headers = []

@@ -908,9 +908,9 @@ append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in 
 @pytest.mark.parametrize('driver', append_drivers)
 def test_create(tmpdir, driver):
     """Test if driver support append"""
-    extension = driver_extensions[driver]
+    extension = driver_extensions.get(driver, "bar")
     path = str(tmpdir.join('foo.{}'.format(extension)))
-    print(path)
+
     with fiona.open(path, 'w',
                     driver=driver,
                     schema={'geometry': 'LineString',
