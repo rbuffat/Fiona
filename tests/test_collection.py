@@ -10,7 +10,7 @@ import fiona
 from fiona.collection import Collection, supported_drivers
 from fiona.env import getenv
 from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning
-
+from fiona.env import GDALVersion
 from .conftest import WGS84PATTERN, driver_extensions
 
 
@@ -919,12 +919,14 @@ def test_create(tmpdir, driver):
         c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
-    with fiona.open(path, 'a',
-                    driver=driver,
-                    schema={'geometry': 'LineString',
-                            'properties': [('title', 'str')]}) as c:
-        c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                       (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
 
-    with fiona.open(path) as c:
-        assert len(c) == 2
+    if driver == 'GeoJSON' and (GDALVersion.major, GDALVersion.minor) < (2, 1):
+        pytest.raises(DriverError)
+    else:
+        with fiona.open(path, 'a',
+                        driver=driver) as c:
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
+
+        with fiona.open(path) as c:
+            assert len(c) == 2
