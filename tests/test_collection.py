@@ -11,7 +11,7 @@ from fiona.collection import Collection, supported_drivers
 from fiona.env import getenv
 from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning
 
-from .conftest import WGS84PATTERN
+from .conftest import WGS84PATTERN, driver_extensions
 
 
 class TestSupportedDrivers(object):
@@ -899,3 +899,32 @@ def test_collection_env(path_coutwildrnp_shp):
     """We have a GDAL env within collection context"""
     with fiona.open(path_coutwildrnp_shp):
         assert 'FIONA_ENV' in getenv()
+
+
+blacklist_append = set(['CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'])
+append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in raw and driver not in blacklist_append]
+
+
+@pytest.mark.parametrize('driver', append_drivers)
+def test_create(tmpdir, driver):
+    """Test if driver support append"""
+    extension = driver_extensions[driver]
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+    print(path)
+    with fiona.open(path, 'w',
+                    driver=driver,
+                    schema={'geometry': 'LineString',
+                            'properties': [('title', 'str')]}) as c:
+
+        c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                       (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+
+    with fiona.open(path, 'a',
+                    driver=driver,
+                    schema={'geometry': 'LineString',
+                            'properties': [('title', 'str')]}) as c:
+        c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                       (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
+
+    with fiona.open(path) as c:
+        assert len(c) == 2
