@@ -906,7 +906,7 @@ append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in 
 
 
 @pytest.mark.parametrize('driver', append_drivers)
-def test_create(tmpdir, driver):
+def test_append_works(tmpdir, driver):
     """Test if driver support append"""
     extension = driver_extensions.get(driver, "bar")
     path = str(tmpdir.join('foo.{}'.format(extension)))
@@ -939,4 +939,4 @@ def test_create(tmpdir, driver):
                         (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
 
         with fiona.open(path) as c:
-            assert len(c) == 2
+            assert len(c) == len([f for f in c])
