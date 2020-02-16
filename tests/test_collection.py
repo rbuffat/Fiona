@@ -964,14 +964,16 @@ def test_append_does_not_work(tmpdir, driver):
     with fiona.open(path, 'w',
                     driver=driver,
                     schema={'geometry': 'LineString',
-                            'properties': [('title', 'str')]}) as c:
+                            'properties': [('title', 'str')]},
+                    fiona_force_driver=True) as c:
 
         c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
     with pytest.raises(Exception):
         with fiona.open(path, 'a',
-                    driver=driver) as c:
+                    driver=driver,
+                    fiona_force_driver=True) as c:
             c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                         (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
 
@@ -979,7 +981,7 @@ def test_append_does_not_work(tmpdir, driver):
 only_read_drivers = [driver for driver, raw in supported_drivers.items() if raw == 'r']
 @requires_gdal2
 @pytest.mark.parametrize('driver', only_read_drivers)
-def test_readonly_drivers_can_not_write(tmpdir, driver):
+def test_readonly_driver_cannot_write(tmpdir, driver):
     """Test if read only driver cannot write
     
     If this test fails, it should be considered to enable write support for the respective driver in drvsupport.py. 
@@ -992,7 +994,8 @@ def test_readonly_drivers_can_not_write(tmpdir, driver):
         with fiona.open(path, 'w',
                         driver=driver,
                         schema={'geometry': 'LineString',
-                                'properties': [('title', 'str')]}) as c:
+                                'properties': [('title', 'str')]},
+                        fiona_force_driver=True) as c:
 
             c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                         (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])

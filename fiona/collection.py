@@ -75,6 +75,8 @@ class Collection(object):
         if archive and not isinstance(archive, string_types):
             raise TypeError("invalid archive: %r" % archive)
 
+        self.force_mode = kwargs.pop("fiona_force_driver", False)
+
         # Check GDAL version against drivers
         if (driver == "GPKG" and get_gdal_version_tuple() < (1, 11, 0)):
             raise DriverError(
@@ -82,7 +84,7 @@ class Collection(object):
                 "against: {}".format(get_gdal_release_name()))
 
         # Check if append mode is supported
-        if mode == 'a':
+        if mode == 'a' and not self.force_mode:
 
             mingdal_drivers = {
                 "GeoJSON": (2, 1, 0),
@@ -143,10 +145,10 @@ class Collection(object):
                 driver = 'ESRI Shapefile'
             if not driver:
                 raise DriverError("no driver")
-            elif driver not in supported_drivers:
+            elif driver not in supported_drivers and not self.force_mode:
                 raise DriverError(
                     "unsupported driver: %r" % driver)
-            elif self.mode not in supported_drivers[driver]:
+            elif self.mode not in supported_drivers[driver] and not self.force_mode:
                 raise DriverError(
                     "unsupported mode: %r" % self.mode)
             self._driver = driver
@@ -195,9 +197,9 @@ class Collection(object):
 
     def guard_driver_mode(self):
         driver = self.session.get_driver()
-        if driver not in supported_drivers:
+        if driver not in supported_drivers and not self.force_mode:
             raise DriverError("unsupported driver: %r" % driver)
-        if self.mode not in supported_drivers[driver]:
+        if self.mode not in supported_drivers[driver] and not self.force_mode:
             raise DriverError("unsupported mode: %r" % self.mode)
 
     @property
