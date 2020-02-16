@@ -83,14 +83,31 @@ class Collection(object):
                 "GPKG driver requires GDAL 1.11.0, Fiona was compiled "
                 "against: {}".format(get_gdal_release_name()))
 
-        # Check if append mode is supported
-        if mode == 'a' and not self.force_mode:
+        # Check mode compatibility with gdal version
+        if mode == 'w' and not self.force_mode:
+
+            mingdal_drivers = {
+                "PCIDSK": (2, 0, 0)
+            } 
+
+            if driver in mingdal_drivers and get_gdal_version_tuple() < mingdal_drivers[driver]:
+                min_gdal_version = ".".join(list(map(str, mingdal_drivers[driver])))
+
+                raise DriverError(
+                    "{driver} driver requires at least GDAL {min_gdal_version} to write files, "
+                    "Fiona was compiled against: {gdal}".format(driver=driver,
+                                                                min_gdal_version=min_gdal_version,
+                                                                gdal=get_gdal_release_name()))
+    
+
+        elif mode == 'a' and not self.force_mode:
 
             mingdal_drivers = {
                 "GeoJSON": (2, 1, 0),
                 "MapInfo File": (2, 0, 0),
                 "GMT": (2, 0, 0),
-                "GeoJSONSeq": (2, 0, 0)
+                "GeoJSONSeq": (2, 0, 0),
+                "PCIDSK": (2, 0, 0)
             }
 
             if driver in mingdal_drivers and get_gdal_version_tuple() < mingdal_drivers[driver]:
