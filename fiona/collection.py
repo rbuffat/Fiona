@@ -86,12 +86,12 @@ class Collection(object):
         # Check mode compatibility with gdal version
         if mode == 'w' and not self.force_mode:
 
-            mingdal_drivers = {
+            mingdal_write = {
                 "PCIDSK": (2, 0, 0)
             } 
 
-            if driver in mingdal_drivers and get_gdal_version_tuple() < mingdal_drivers[driver]:
-                min_gdal_version = ".".join(list(map(str, mingdal_drivers[driver])))
+            if driver in mingdal_write and get_gdal_version_tuple() < mingdal_write[driver]:
+                min_gdal_version = ".".join(list(map(str, mingdal_write[driver])))
 
                 raise DriverError(
                     "{driver} driver requires at least GDAL {min_gdal_version} to write files, "
@@ -102,7 +102,7 @@ class Collection(object):
 
         elif mode == 'a' and not self.force_mode:
 
-            mingdal_drivers = {
+            mingdal_append = {
                 "GeoJSON": (2, 1, 0),
                 "MapInfo File": (2, 0, 0),
                 "GMT": (2, 0, 0),
@@ -110,8 +110,8 @@ class Collection(object):
                 "PCIDSK": (2, 0, 0)
             }
 
-            if driver in mingdal_drivers and get_gdal_version_tuple() < mingdal_drivers[driver]:
-                min_gdal_version = ".".join(list(map(str, mingdal_drivers[driver])))
+            if driver in mingdal_append and get_gdal_version_tuple() < mingdal_append[driver]:
+                min_gdal_version = ".".join(list(map(str, mingdal_append[driver])))
 
                 raise DriverError(
                     "{driver} driver requires at least GDAL {min_gdal_version} to append to existing files, "

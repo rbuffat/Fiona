@@ -913,6 +913,13 @@ def test_append_works(tmpdir, driver):
     extension = driver_extensions.get(driver, "bar")
     path = str(tmpdir.join('foo.{}'.format(extension)))
 
+    mingdal_write = {
+        "PCIDSK": (2, 0, 0)
+    }
+    # If driver is not able to write, we cannot test append
+    if driver in mingdal_write and GDALVersion.runtime() < GDALVersion(*mingdal_write[driver][:2]):
+        return
+
     with fiona.open(path, 'w',
                     driver=driver,
                     schema={'geometry': 'LineString',
@@ -922,7 +929,7 @@ def test_append_works(tmpdir, driver):
                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
     # Some driver gained append support over time
-    mingdal_drivers = {
+    mingdal_append = {
         "GeoJSON": (2, 1, 0),
         "MapInfo File": (2, 0, 0),
         "GMT": (2, 0, 0),
@@ -931,7 +938,7 @@ def test_append_works(tmpdir, driver):
     }
 
 
-    if driver in mingdal_drivers and GDALVersion.runtime() < GDALVersion(*mingdal_drivers[driver][:2]):
+    if driver in mingdal_append and GDALVersion.runtime() < GDALVersion(*mingdal_append[driver][:2]):
         with pytest.raises(DriverError):
             with fiona.open(path, 'a',
                         driver=driver) as c:
