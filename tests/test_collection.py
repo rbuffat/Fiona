@@ -1,7 +1,5 @@
 import pytest
 
-
-import fiona	import fiona
 from fiona.collection import Collection, supported_drivers	from fiona.collection import Collection
 from fiona.env import getenv	from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 from fiona.env import getenv, GDALVersion
