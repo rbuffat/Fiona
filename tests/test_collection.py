@@ -901,7 +901,7 @@ def test_collection_env(path_coutwildrnp_shp):
         assert 'FIONA_ENV' in getenv()
 
 
-write_not_append_drivers = [driver for driver, raw in supported_drivers.items() if 'w' in raw and not 'a' in raw]
+write_not_append_drivers = ['BNA', 'GML']
 
 @pytest.mark.parametrize('driver', write_not_append_drivers)
 def test_append_does_not_work(tmpdir, driver):
