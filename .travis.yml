@@ -64,7 +64,7 @@ install:
   - fio --gdal-version
 
 script:
-  - python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+  - python -m pytest -m "not wheel" --cov fiona --cov-report term-missing  tests/test_collection.py
 
 after_success:
   - coveralls || echo "!! intermittent coveralls failure"
