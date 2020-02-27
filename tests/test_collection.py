@@ -1,12 +1,17 @@
+# Testing collections and workspaces
+
+import datetime
+import sys
+import re
+
 import pytest
 
-from fiona.collection import Collection, supported_drivers	from fiona.collection import Collection
-from fiona.env import getenv	from fiona.drvsupport import supported_drivers, driver_mode_mingdal
+import fiona
+from fiona.collection import Collection
+from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 from fiona.env import getenv, GDALVersion
-from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning	from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning
-
+from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning
 from .conftest import WGS84PATTERN, driver_extensions, requires_gdal2
-from .conftest import WGS84PATTERN	
 
 
 #write_not_append_drivers = [driver for driver, raw in supported_drivers.items() if 'w' in raw and not 'a' in raw]
