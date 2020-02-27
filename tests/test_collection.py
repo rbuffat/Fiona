@@ -943,53 +943,32 @@ def test_append_works(tmpdir, driver):
         with fiona.open(path) as c:
             assert len([f for f in c]) == 2
 
+    def test_readonly_driver_cannot_write_AeronavFAA(tmpdir):
+        
+        driver = 'AeronavFAA'
 
+        backup_mode = supported_drivers[driver]
 
-write_not_append_drivers = [driver for driver, raw in supported_drivers.items() if 'w' in raw and not 'a' in raw]
+        supported_drivers[driver] = 'rw'
 
-# Segfault with gdal 1.11, thus only enabling test with gdal2 and above
-@requires_gdal2
-@pytest.mark.parametrize('driver', write_not_append_drivers)
-def test_append_does_not_work(tmpdir, driver):
-    """Test if driver supports append but it is not enabled
+        extension = driver_extensions.get(driver, "bar")
+        path = str(tmpdir.join('foo.{}'.format(extension)))
+
+        with pytest.raises(Exception):
+            with fiona.open(path, 'w',
+                            driver=driver,
+                            schema={'geometry': 'LineString',
+                                    'properties': [('title', 'str')]}) as c:
+
+                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                            (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+        
+        supported_drivers[driver] = backup_mode
     
-    If this test fails, it should be considered to enable append for the respective driver in drvsupport.py. 
+
+def test_readonly_driver_cannot_write_ARCGEN(tmpdir):
     
-    """
-
-    backup_mode = supported_drivers[driver]
-
-    supported_drivers[driver] = 'raw'
-
-    extension = driver_extensions.get(driver, "bar")
-    path = str(tmpdir.join('foo.{}'.format(extension)))
-
-    with fiona.open(path, 'w',
-                    driver=driver,
-                    schema={'geometry': 'LineString',
-                            'properties': [('title', 'str')]}) as c:
-
-        c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                       (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
-
-    with pytest.raises(Exception):
-        with fiona.open(path, 'a',
-                    driver=driver) as c:
-            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                        (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
-
-    supported_drivers[driver] = backup_mode
-
-
-only_read_drivers = [driver for driver, raw in supported_drivers.items() if raw == 'r']
-@requires_gdal2
-@pytest.mark.parametrize('driver', only_read_drivers)
-def test_readonly_driver_cannot_write(tmpdir, driver):
-    """Test if read only driver cannot write
-    
-    If this test fails, it should be considered to enable write support for the respective driver in drvsupport.py. 
-    
-    """
+    driver = 'ARCGEN'
 
     backup_mode = supported_drivers[driver]
 
@@ -1010,22 +989,162 @@ def test_readonly_driver_cannot_write(tmpdir, driver):
     supported_drivers[driver] = backup_mode
 
 
-@pytest.mark.parametrize('driver', driver_mode_mingdal['w'].keys())
-def test_write_mode_not_supported(tmpdir, driver):
-        """ Test if DriverError is raised when write mode is not supported for old versions of GDAL
-        """
+def test_readonly_driver_cannot_write_OpenFileGDB(tmpdir):
+    
+    driver = 'OpenFileGDB'
 
-        if GDALVersion.runtime() >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]):
-            return
+    backup_mode = supported_drivers[driver]
 
-        extension = driver_extensions.get(driver, "bar")
-        path = str(tmpdir.join('foo.{}'.format(extension)))
+    supported_drivers[driver] = 'rw'
 
-        with pytest.raises(DriverError):
-            with fiona.open(path, 'w',
-                    driver=driver,
-                    schema={'geometry': 'LineString',
-                            'properties': [('title', 'str')]}) as c:
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
 
-                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                         (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+    supported_drivers[driver] = backup_mode
+
+
+def test_readonly_driver_cannot_write_ESRIJSON(tmpdir):
+    
+    driver = 'ESRIJSON'
+
+    backup_mode = supported_drivers[driver]
+
+    supported_drivers[driver] = 'rw'
+
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+    supported_drivers[driver] = backup_mode
+
+
+def test_readonly_driver_cannot_write_Idrisi(tmpdir):
+    
+    driver = 'Idrisi'
+
+    backup_mode = supported_drivers[driver]
+
+    supported_drivers[driver] = 'rw'
+
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+    supported_drivers[driver] = backup_mode
+
+
+def test_readonly_driver_cannot_write_S57(tmpdir):
+    
+    driver = 'S57'
+
+    backup_mode = supported_drivers[driver]
+
+    supported_drivers[driver] = 'rw'
+
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+    supported_drivers[driver] = backup_mode
+
+
+def test_readonly_driver_cannot_write_SEGY(tmpdir):
+    
+    driver = 'SEGY'
+
+    backup_mode = supported_drivers[driver]
+
+    supported_drivers[driver] = 'rw'
+
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+    supported_drivers[driver] = backup_mode
+
+
+def test_readonly_driver_cannot_write_SUA(tmpdir):
+    
+    driver = 'SUA'
+
+    backup_mode = supported_drivers[driver]
+
+    supported_drivers[driver] = 'rw'
+
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+    supported_drivers[driver] = backup_mode
+
+
+def test_readonly_driver_cannot_write_TopoJSON(tmpdir):
+    
+    driver = 'TopoJSON'
+
+    backup_mode = supported_drivers[driver]
+
+    supported_drivers[driver] = 'rw'
+
+    extension = driver_extensions.get(driver, "bar")
+    path = str(tmpdir.join('foo.{}'.format(extension)))
+
+    with pytest.raises(Exception):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+    
+        supported_drivers[driver] = backup_mode
