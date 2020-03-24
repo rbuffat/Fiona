@@ -151,8 +151,7 @@ driver_mode_mingdal = {
           'PCIDSK': (2, 0, 0),
           'GeoJSONSeq': (2, 4, 0)},
 
-    'a': {'GMT': (2, 0, 0),
-          'GPKG': (1, 11, 0),
+    'a': { 'GPKG': (1, 11, 0),
           'GeoJSON': (2, 1, 0),
           'MapInfo File': (2, 0, 0),
           'PCIDSK': (2, 0, 0)}    
