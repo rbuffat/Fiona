@@ -196,7 +196,8 @@ def test_append_mingdal(tmpdir, driver):
         driver_mode_mingdal['a'] = min_version_backup
 
 
-@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if raw == 'r'])
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if
+                                    raw == 'r' and driver not in blacklist_write_drivers])
 def test_readonly_driver_cannot_write(tmpdir, driver):
     """Test if read only driver cannot write
     
@@ -224,7 +225,8 @@ def test_readonly_driver_cannot_write(tmpdir, driver):
     supported_drivers[driver] = backup_mode
 
 
-@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw])
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if
+                                    'w' in raw and driver not in blacklist_append_drivers])
 def test_write_driver_cannot_append(tmpdir, driver):
     """
     Test if a driver that supports write cannot also append
