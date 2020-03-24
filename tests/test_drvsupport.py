@@ -26,7 +26,7 @@ def test_write(tmpdir, driver):
 
     """
 
-    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+    if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
         # BNA driver segfaults with gdal 1.11
         return
 
@@ -67,7 +67,7 @@ def test_write_mingdal(tmpdir, driver):
 
     """
 
-    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+    if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
         # BNA driver segfaults with gdal 1.11
         return
 
@@ -102,7 +102,7 @@ def test_append(tmpdir, driver):
     
     """
 
-    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+    if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
         # BNA driver segfaults with gdal 1.11
         return
 
@@ -152,7 +152,7 @@ def test_append_mingdal(tmpdir, driver):
 
     """
 
-    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+    if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
         # BNA driver segfaults with gdal 1.11
         return
 
@@ -186,6 +186,10 @@ def test_append_mingdal(tmpdir, driver):
                 c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
                     (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
 
+            with fiona.open(path) as c:
+                assert c.driver == driver
+                assert len([f for f in c]) == 2
+
         driver_mode_mingdal['a'] = min_version_backup
 
 
@@ -198,7 +202,7 @@ def test_readonly_driver_cannot_write(tmpdir, driver):
     
     """
     
-    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+    if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
         # BNA driver segfaults with gdal 1.11
         return
 
