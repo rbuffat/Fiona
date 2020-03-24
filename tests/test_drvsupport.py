@@ -9,6 +9,7 @@ from fiona.env import GDALVersion
 from fiona.errors import DriverError
 
 blacklist_append_drivers = {'CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'}
+blacklist_write_drivers = {'CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'}
 
 @requires_gdal24
 @pytest.mark.parametrize('format', ['GeoJSON', 'ESRIJSON', 'TopoJSON', 'GeoJSONSeq'])
@@ -17,7 +18,8 @@ def test_geojsonseq(format):
     assert format in fiona.drvsupport.supported_drivers.keys()
 
 
-@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw])
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw
+                                    and driver not in blacklist_write_drivers])
 def test_write(tmpdir, driver):
     """
         Test if write mode works.
@@ -129,7 +131,8 @@ def test_append(tmpdir, driver):
 
 
 @pytest.mark.parametrize('driver', [driver for driver in driver_mode_mingdal['a'].keys()
-                                    if driver not in blacklist_append_drivers])
+                                    if driver not in blacklist_append_drivers
+                                    and driver in supported_drivers])
 def test_append_mingdal(tmpdir, driver):
     """ Test if driver supports append mode.
 
