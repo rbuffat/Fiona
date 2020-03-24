@@ -26,6 +26,10 @@ def test_write(tmpdir, driver):
 
     """
 
+    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+        # BNA driver segfaults with gdal 1.11
+        return
+
     path = str(tmpdir.join(get_temp_filename(driver)))
 
     if driver in driver_mode_mingdal['w'] and GDALVersion.runtime() < GDALVersion(
@@ -97,6 +101,10 @@ def test_append(tmpdir, driver):
     Some driver only allow a specific schema. These drivers can be excluded by adding them to blacklist_append_drivers.
     
     """
+
+    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
+        # BNA driver segfaults with gdal 1.11
+        return
 
     path = str(tmpdir.join(get_temp_filename(driver)))
 
