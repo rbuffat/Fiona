@@ -14,7 +14,7 @@ def test_geojsonseq(format):
     """Format is available"""
     assert format in fiona.drvsupport.supported_drivers.keys()
 
-blacklist_append_drivers = set(['CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'])
+blacklist_append_drivers = {'CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'}
 append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in raw and driver not in blacklist_append_drivers]
 
 @pytest.mark.parametrize('driver', append_drivers)
@@ -121,6 +121,7 @@ def test_readonly_driver_cannot_write(tmpdir, driver):
     
     supported_drivers[driver] = backup_mode
 
+
 @pytest.mark.parametrize('driver', driver_mode_mingdal['w'].keys())
 def test_write_mode_is_supported(tmpdir, driver):
     """
@@ -131,6 +132,23 @@ def test_write_mode_is_supported(tmpdir, driver):
     path = str(tmpdir.join(get_temp_filename(driver)))
 
     if driver in driver_mode_mingdal['w'] and GDALVersion.runtime() < GDALVersion(*driver_mode_mingdal['w'][driver][:2]):
+
+        # Test if driver really can't write for gdal < driver_mode_mingdal
+        min_version_backup = driver_mode_mingdal['w'][driver]
+        driver_mode_mingdal['w'].pop(driver)
+
+        with pytest.raises(Exception):
+            with fiona.open(path, 'w',
+                            driver=driver,
+                            schema={'geometry': 'LineString',
+                                    'properties': [('title', 'str')]}) as c:
+
+                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                                (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+
+        driver_mode_mingdal['w'][driver] = min_version_backup
+
+        # Test if DriverError is raised for gdal < driver_mode_mingdal
         with pytest.raises(DriverError):
             with fiona.open(path, 'w',
                             driver=driver,
@@ -141,6 +159,8 @@ def test_write_mode_is_supported(tmpdir, driver):
                                 (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
     else:
+
+        # Test if we can write
         with fiona.open(path, 'w',
                 driver=driver,
                 schema={'geometry': 'LineString',
