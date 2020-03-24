@@ -14,11 +14,65 @@ def test_geojsonseq(format):
     """Format is available"""
     assert format in fiona.drvsupport.supported_drivers.keys()
 
+
+@pytest.mark.parametrize('driver', driver_mode_mingdal['w'].keys())
+def test_write(tmpdir, driver):
+    """
+        Test if write mode works.
+
+    """
+
+    path = str(tmpdir.join(get_temp_filename(driver)))
+
+    if driver in driver_mode_mingdal['w'] and GDALVersion.runtime() < GDALVersion(
+            *driver_mode_mingdal['w'][driver][:2]):
+
+        # Test if driver really can't write for gdal < driver_mode_mingdal
+        min_version_backup = driver_mode_mingdal['w'][driver]
+        driver_mode_mingdal['w'].pop(driver)
+
+        with pytest.raises(Exception):
+            with fiona.open(path, 'w',
+                            driver=driver,
+                            schema={'geometry': 'LineString',
+                                    'properties': [('title', 'str')]}) as c:
+                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                    (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+
+        driver_mode_mingdal['w'][driver] = min_version_backup
+
+        # Test if DriverError is raised for gdal < driver_mode_mingdal
+        with pytest.raises(DriverError):
+            with fiona.open(path, 'w',
+                            driver=driver,
+                            schema={'geometry': 'LineString',
+                                    'properties': [('title', 'str')]}) as c:
+                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                    (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+
+    else:
+
+        # Test if we can write
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema={'geometry': 'LineString',
+                                'properties': [('title', 'str')]}) as c:
+
+            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
+
+        with fiona.open(path) as c:
+            assert c.driver == driver
+            assert len([f for f in c]) == 1
+
+
 blacklist_append_drivers = {'CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN'}
-append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in raw and driver not in blacklist_append_drivers]
+append_drivers = [driver for driver, raw in supported_drivers.items() if 'a' in raw
+                  and driver not in blacklist_append_drivers]
+
 
 @pytest.mark.parametrize('driver', append_drivers)
-def test_append_works(tmpdir, driver):
+def test_append(tmpdir, driver):
     """ Test if driver supports append mode.
     
     Some driver only allow a specific schema. These drivers can be excluded by adding them to blacklist_append_drivers.
@@ -31,6 +85,7 @@ def test_append_works(tmpdir, driver):
     if driver in driver_mode_mingdal['w'] and GDALVersion.runtime() < GDALVersion(*driver_mode_mingdal['w'][driver][:2]):
         return
 
+    # Create test file to append to
     with fiona.open(path, 'w',
                     driver=driver,
                     schema={'geometry': 'LineString',
@@ -40,6 +95,21 @@ def test_append_works(tmpdir, driver):
                        (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
 
     if driver in driver_mode_mingdal['a'] and GDALVersion.runtime() < GDALVersion(*driver_mode_mingdal['a'][driver][:2]):
+
+        # Test if driver really can't append for gdal < driver_mode_mingdal
+        # If this test fails, it should be considered to update driver_mode_mingdal in drvsupport.py.
+        min_version_backup = driver_mode_mingdal['a'][driver]
+        driver_mode_mingdal['a'].pop(driver)
+
+        with pytest.raises(Exception):
+            with fiona.open(path, 'a',
+                            driver=driver) as c:
+                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
+                    (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
+
+        driver_mode_mingdal['a'] = min_version_backup
+
+        # Test if DriverError is raised for gdal < driver_mode_mingdal
         with pytest.raises(DriverError):
             with fiona.open(path, 'a',
                         driver=driver) as c:
@@ -47,6 +117,7 @@ def test_append_works(tmpdir, driver):
                             (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
 
     else:
+        # Test if we can append
         with fiona.open(path, 'a',
                         driver=driver) as c:
             c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
@@ -55,41 +126,6 @@ def test_append_works(tmpdir, driver):
         with fiona.open(path) as c:
             assert c.driver == driver
             assert len([f for f in c]) == 2
-
-
-write_not_append_drivers = [driver for driver, raw in supported_drivers.items() if 'w' in raw and not 'a' in raw]
-@pytest.mark.parametrize('driver', write_not_append_drivers)
-def test_append_does_not_work(tmpdir, driver):
-    """Test if driver supports append but it is not enabled
-    
-    If this test fails, it should be considered to enable append for the respective driver in drvsupport.py. 
-    
-    """
-    
-    if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
-        # BNA driver segfaults with gdal 1.11
-        return
-
-    backup_mode = supported_drivers[driver]
-    supported_drivers[driver] = 'raw'
-
-    path = str(tmpdir.join(get_temp_filename(driver)))
-
-    with fiona.open(path, 'w',
-                    driver=driver,
-                    schema={'geometry': 'LineString',
-                            'properties': [('title', 'str')]}) as c:
-
-        c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                       (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
-
-    with pytest.raises(Exception):
-        with fiona.open(path, 'a',
-                    driver=driver) as c:
-            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                        (2.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'Two'}}])
-
-    supported_drivers[driver] = backup_mode
 
 
 only_read_drivers = [driver for driver, raw in supported_drivers.items() if raw == 'r']
@@ -122,58 +158,6 @@ def test_readonly_driver_cannot_write(tmpdir, driver):
     supported_drivers[driver] = backup_mode
 
 
-@pytest.mark.parametrize('driver', driver_mode_mingdal['w'].keys())
-def test_write_mode_is_supported(tmpdir, driver):
-    """
-        Test if write mode works.
-        
-    """
-    
-    path = str(tmpdir.join(get_temp_filename(driver)))
-
-    if driver in driver_mode_mingdal['w'] and GDALVersion.runtime() < GDALVersion(*driver_mode_mingdal['w'][driver][:2]):
-
-        # Test if driver really can't write for gdal < driver_mode_mingdal
-        min_version_backup = driver_mode_mingdal['w'][driver]
-        driver_mode_mingdal['w'].pop(driver)
-
-        with pytest.raises(Exception):
-            with fiona.open(path, 'w',
-                            driver=driver,
-                            schema={'geometry': 'LineString',
-                                    'properties': [('title', 'str')]}) as c:
-
-                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                                (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
-
-        driver_mode_mingdal['w'][driver] = min_version_backup
-
-        # Test if DriverError is raised for gdal < driver_mode_mingdal
-        with pytest.raises(DriverError):
-            with fiona.open(path, 'w',
-                            driver=driver,
-                            schema={'geometry': 'LineString',
-                                    'properties': [('title', 'str')]}) as c:
-
-                c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                                (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
-
-    else:
-
-        # Test if we can write
-        with fiona.open(path, 'w',
-                driver=driver,
-                schema={'geometry': 'LineString',
-                        'properties': [('title', 'str')]}) as c:
-
-            c.writerecords([{'geometry': {'type': 'LineString', 'coordinates': [
-                            (1.0, 0.0), (0.0, 0.0)]}, 'properties': {'title': 'One'}}])
-
-        with fiona.open(path) as c:
-            assert c.driver == driver
-            assert len([f for f in c]) == 1
-
-
 def test_driver_mode_mingdal():
     """
         Test if mode and driver is enabled in supported_drivers
@@ -181,5 +165,6 @@ def test_driver_mode_mingdal():
     
     for mode in driver_mode_mingdal:
         for driver in driver_mode_mingdal[mode]:
+            # we cannot test drivers that are not present in the gdal installation
             if driver in supported_drivers:
                 assert mode in supported_drivers[driver]
