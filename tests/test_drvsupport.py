@@ -67,7 +67,8 @@ def test_write(tmpdir, driver):
 def test_write_mingdal(tmpdir, driver):
     """
         Test if driver really can't write for gdal < driver_mode_mingdal
-        # If this test fails, it should be considered to update driver_mode_mingdal in drvsupport.py.
+
+        If this test fails, it should be considered to update driver_mode_mingdal in drvsupport.py.
 
     """
 
@@ -151,7 +152,8 @@ def test_append_mingdal(tmpdir, driver):
     """ Test if driver supports append mode.
 
     Some driver only allow a specific schema. These drivers can be excluded by adding them to blacklist_append_drivers.
-    # If this test fails, it should be considered to update driver_mode_mingdal in drvsupport.py.
+
+    If this test fails, it should be considered to update driver_mode_mingdal in drvsupport.py.
 
     """
 
@@ -226,6 +228,9 @@ def test_readonly_driver_cannot_write(tmpdir, driver):
 def test_write_driver_cannot_append(tmpdir, driver):
     """
     Test if a driver that supports write cannot also append
+
+    If this test fails, it should be considered to enable append support for the respective driver in drvsupport.py.
+
     """
 
     if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
