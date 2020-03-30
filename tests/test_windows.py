@@ -22,7 +22,7 @@ def test_import_gdalhome(monkeypatch):
 
     monkeypatch.setenv("PATH", os.pathsep.join(paths))
 
-    import  fiona
+    import fiona.ogrext
 
     assert True
 
