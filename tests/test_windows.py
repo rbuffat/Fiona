@@ -28,4 +28,6 @@ def test_import_gdalhome(monkeypatch):
 
     import fiona.ogrext
 
+    assert "gdal" not in os.getenv('PATH', '').lower()
+
     assert True
