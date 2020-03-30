@@ -26,6 +26,8 @@ def test_import_gdalhome(monkeypatch):
 
     assert "gdal" not in os.getenv('PATH', '').lower()
 
+    from pkg_resources import fixup_namespace_packages
+
     from importlib import invalidate_caches
     invalidate_caches()
 
