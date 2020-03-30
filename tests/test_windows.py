@@ -20,7 +20,7 @@ def test_import_gdalhome(monkeypatch):
         if 'gdal' not in path.lower():
             paths.append(path)
 
-    monkeypatch.setenv("PATH", paths.join(os.pathsep), raising=True)
+    monkeypatch.setenv("PATH", os.pathsep.join(paths), raising=True)
 
     import  fiona
 
