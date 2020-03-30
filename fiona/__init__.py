@@ -91,7 +91,7 @@ except ImportError as e:
     if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
         
         def add_dll_directory_win():
-            """ Finds and adds dll directories
+            """ Finds and adds dll directories on Windows
 
                 Checks if a */gdal/bin directory is present in PATH.
                 If none is found, GDAL_HOME is used if available.
