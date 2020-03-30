@@ -109,7 +109,7 @@ except ImportError as e:
                     break
 
             # Use GDAL_HOME if present
-            if dll_directory is None:
+            if dll_directory is not None:
                 gdal_home = os.getenv('GDAL_HOME', None)
 
                 if gdal_home is not None and os.path.exists(gdal_home):
