@@ -20,7 +20,7 @@ def test_import_gdalhome(monkeypatch):
         if 'gdal' not in path.lower():
             paths.append(path)
 
-    new_PATH = os.getenv('PATH', '').split(os.pathsep)
+    new_PATH = os.pathsep.join(paths)
     monkeypatch.setenv("PATH", new_PATH)
 
     assert "gdal" not in os.getenv('PATH', '').lower()
