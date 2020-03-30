@@ -82,18 +82,19 @@ try:
     import fiona.ogrext
 
 except ImportError as e:
-    """
-    With Python >= 3.8 on Windows directories in PATH are not automatically
-    searched for DLL dependencies and must be added manually with
-    os.add_dll_directory.
 
-    see https://github.com/Toblerity/Fiona/issues/851
-    """
+    # With Python >= 3.8 on Windows directories in PATH are not automatically
+    # searched for DLL dependencies and must be added manually with
+    # os.add_dll_directory.
+    # see https://github.com/Toblerity/Fiona/issues/851
+
     if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
         
         def add_dll_directory_win():
-            """ Check if a */gdal/bin directory is found in PATH.
-                If none is found, use GDAL_HOME if present.
+            """ Finds and adds dll directories
+
+                Checks if a */gdal/bin directory is present in PATH.
+                If none is found, GDAL_HOME is used if available.
             """
 
             dll_directory = None
@@ -107,7 +108,7 @@ except ImportError as e:
                     break
 
             # Use GDAL_HOME if present
-            if dll_directory is not None:
+            if dll_directory is None:
 
                 a = 5 / 0
 
