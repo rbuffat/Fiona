@@ -9,7 +9,7 @@ import zipfile
 import platform
 from click.testing import CliRunner
 import pytest
-
+import sys
 import fiona
 from fiona.env import GDALVersion
 
@@ -275,6 +275,10 @@ requires_gdal3 = pytest.mark.skipif(
 windows_only = pytest.mark.skipif(
     not platform.system() == 'Windows',
     reason="Requires Windows")
+
+requires_python38 = pytest.mark.skipif(
+    sys.version_info < (3, 8),
+    reason="Requires Python 3.8")
 
 
 @pytest.fixture(scope="class")

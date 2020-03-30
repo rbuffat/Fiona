@@ -1,10 +1,11 @@
 import pytest
 
-from .conftest import windows_only
+from .conftest import windows_only, requires_python38
 import os
 
 
 @windows_only
+@requires_python38
 def test_import_gdalhome(monkeypatch):
     """
     Test if fiona import works using GDAL_HOME only
@@ -28,4 +29,3 @@ def test_import_gdalhome(monkeypatch):
     import fiona.ogrext
 
     assert True
-

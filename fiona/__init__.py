@@ -89,26 +89,28 @@ except ImportError as e:
 
     see https://github.com/Toblerity/Fiona/issues/851
     """
-    if platform.system() == 'Windows':
+    if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
         
         def add_dll_directory_win():
-            """
-                Check if a */gdal/bin directory is found in PATH.
+            """ Check if a */gdal/bin directory is found in PATH.
                 If none is found, use GDAL_HOME if present.
             """
 
             dll_directory = None
 
             # Parse PATH for gdal/bin
-            for _path in os.getenv('PATH', '').split(os.pathsep):
-                p = Path(_path.lower())
+            for path in os.getenv('PATH', '').split(os.pathsep):
+                p = Path(path.lower())
 
-                if p.parts[-2:] == ('gdal', 'bin') and os.path.exists(_path):
-                    dll_directory = _path
+                if p.parts[-2:] == ('gdal', 'bin') and os.path.exists(path):
+                    dll_directory = path
                     break
 
             # Use GDAL_HOME if present
             if dll_directory is not None:
+
+                a = 5 / 0
+
                 gdal_home = os.getenv('GDAL_HOME', None)
 
                 if gdal_home is not None and os.path.exists(gdal_home):
