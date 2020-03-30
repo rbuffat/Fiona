@@ -273,7 +273,7 @@ requires_gdal3 = pytest.mark.skipif(
     reason="Requires GDAL 3.x")
 
 windows_only = pytest.mark.skipif(
-    platform.system() == 'Windows',
+    not platform.system() == 'Windows',
     reason="Requires Windows")
 
 
