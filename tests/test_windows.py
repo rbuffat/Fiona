@@ -20,9 +20,10 @@ def test_import_gdalhome(monkeypatch):
         if 'gdal' not in path.lower():
             paths.append(path)
 
-    monkeypatch.setenv("PATH", os.pathsep.join(paths))
-    for path in os.getenv('PATH', '').split(os.pathsep):
-        assert "gdal" not in path.lower()
+    new_PATH = os.getenv('PATH', '').split(os.pathsep)
+    monkeypatch.setenv("PATH", new_PATH)
+
+    assert "gdal" not in os.getenv('PATH', '').lower()
 
     import fiona.ogrext
 
