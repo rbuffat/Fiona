@@ -21,8 +21,8 @@ def test_import_gdalhome(monkeypatch):
             paths.append(path)
 
     monkeypatch.setenv("PATH", os.pathsep.join(paths))
-
-    print(fiona.__version__)
+    for path in os.getenv('PATH', '').split(os.pathsep):
+        assert "path" not in path.lower()
 
     import fiona.ogrext
 
