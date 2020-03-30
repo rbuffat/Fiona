@@ -6,7 +6,7 @@ import os.path
 import shutil
 import tarfile
 import zipfile
-
+import platform
 from click.testing import CliRunner
 import pytest
 
@@ -271,6 +271,10 @@ requires_gdal_lt_3 = pytest.mark.skipif(
 requires_gdal3 = pytest.mark.skipif(
     not gdal_version.major >= 3,
     reason="Requires GDAL 3.x")
+
+windows_only = pytest.mark.skipif(
+    platform.system() == 'Windows',
+    reason="Requires Windows")
 
 
 @pytest.fixture(scope="class")
