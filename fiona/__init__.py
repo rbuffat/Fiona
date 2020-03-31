@@ -88,7 +88,7 @@ except ImportError as e:
     # os.add_dll_directory.
     # see https://github.com/Toblerity/Fiona/issues/851
 
-    if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
+    if platform.system() == 'Windows' and sys.version_info >= (3, 8):
         
         def add_dll_directory_win():
             """ Finds and adds dll directories on Windows

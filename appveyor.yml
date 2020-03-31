@@ -75,7 +75,7 @@ environment:
           GDAL_VERSION: "3.0.2"
           GIS_INTERNALS: "release-1911-x64-gdal-3-0-2-mapserver-7-4-2.zip"
           GIS_INTERNALS_LIBS: "release-1911-x64-gdal-3-0-2-mapserver-7-4-2-libs.zip"
-#          PROJ_LIB: "C:\\gdal\\bin\\proj6\\share"
+          PROJ_LIB: "C:\\gdal\\bin\\proj6\\share"
 
 #        - PYTHON: "C:\\Python38-x64"
 #          PYTHON_VERSION: "3.8"
@@ -114,7 +114,8 @@ install:
   - 7z x gdalbin.zip -oC:\gdal
   - curl http://download.gisinternals.com/sdk/downloads/%GIS_INTERNALS_LIBS% --output gdallibs.zip
   - 7z x gdallibs.zip -oC:\gdal
-  - "SET PATH=C:\\gdal;C:\\gdal\\bin;C:\\gdal\\data;C:\\gdal\\bin\\gdal\\apps;%PATH%"
+  #- "SET PATH=C:\\gdal;C:\\gdal\\bin;C:\\gdal\\data;C:\\gdal\\bin\\gdal\\apps;%PATH%"
+  - "SET GDAL_HOME=C:\\gdal"
   - "SET GDAL_DATA=C:\\gdal\\bin\\gdal-data"
   - "SET PACKAGE_DATA=1"
 
