@@ -100,17 +100,15 @@ except ImportError as e:
             dll_directory = None
 
             # Parse PATH for gdal/bin
-            for path in os.getenv('PATH', '').split(os.pathsep):
-                p = Path(path.lower())
+            for _path in os.getenv('PATH', '').split(os.pathsep):
+                p = Path(_path.lower())
 
-                if p.parts[-2:] == ('gdal', 'bin') and os.path.exists(path):
-                    dll_directory = path
+                if p.parts[-2:] == ('gdal', 'bin') and os.path.exists(_path):
+                    dll_directory = _path
                     break
 
             # Use GDAL_HOME if present
             if dll_directory is None:
-
-                a = 5 / 0
 
                 gdal_home = os.getenv('GDAL_HOME', None)
 
