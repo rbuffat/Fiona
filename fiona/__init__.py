@@ -113,6 +113,9 @@ except ImportError as e:
                 gdal_home = os.getenv('GDAL_HOME', None)
 
                 if gdal_home is not None and os.path.exists(gdal_home):
+
+                    a = 5 / 0
+
                     dll_directory = os.path.join(gdal_home, "bin")
 
             if dll_directory is not None:
