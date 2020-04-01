@@ -127,6 +127,8 @@ test_script:
   # Our Windows GDAL doesn't have iconv and can't support certain tests.
   - "%CMD_IN_ENV% python -m pytest -m \"not iconv and not wheel\" --cov fiona --cov-report term-missing"
 
+  - "%CMD_IN_ENV% python setup.py clean"
+
 artifacts:
   - path: dist\*.whl
     name: wheel
