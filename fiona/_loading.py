@@ -2,9 +2,18 @@ import glob
 import os
 import logging
 import contextlib
+import platform
+import sys
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
+
+# With Python >= 3.8 on Windows directories in PATH are not automatically
+# searched for DLL dependencies and must be added manually with
+# os.add_dll_directory.
+# see https://github.com/Toblerity/Fiona/issues/851
+
+dll_directory = None
 
 
 def directory_contains_gdal_dll(path):
@@ -50,7 +59,8 @@ def search_gdal_dll_directory():
     return _dll_directory
 
 
-dll_directory = search_gdal_dll_directory()
+if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
+    dll_directory = search_gdal_dll_directory()
 
 
 @contextlib.contextmanager

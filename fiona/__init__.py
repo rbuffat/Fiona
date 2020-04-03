@@ -87,22 +87,12 @@ try:
 
 except ImportError as e:
 
-    # With Python >= 3.8 on Windows directories in PATH are not automatically
-    # searched for DLL dependencies and must be added manually with
-    # os.add_dll_directory.
-    # see https://github.com/Toblerity/Fiona/issues/851
+    import fiona._loading
 
-    if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
+    with fiona._loading.add_gdal_dll_directory():
 
-        import fiona._win_dll_loading
-
-        with fiona._win_dll_loading.add_gdal_dll_directory():
-
-                import fiona.ogrext
-                import fiona._env
-
-    else:
-        raise e
+            import fiona.ogrext
+            import fiona._env
 
 from fiona.ogrext import _bounds, _listlayers, FIELD_TYPES_MAP, _remove, \
     _remove_layer
