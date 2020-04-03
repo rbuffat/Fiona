@@ -44,6 +44,7 @@ def search_gdal_dll_directory():
         elif gdal_home is not None and not os.path.exists(gdal_home):
             log.warning("GDAL_HOME directory ({}) does not exist.".format(gdal_home))
 
+    dll_directory = None
     return dll_directory
 
 
@@ -53,6 +54,10 @@ dll_directory = search_gdal_dll_directory()
 @contextmanager
 def add_gdal_dll_directory():
 
-    f = os.add_dll_directory(dll_directory)
-    yield f
-    f.close()
+    if dll_directory is not None:
+        f = os.add_dll_directory(dll_directory)
+        yield f
+        f.close()
+    else:
+        log.warning("No DLL direcotry was added")
+
