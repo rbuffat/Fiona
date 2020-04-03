@@ -96,8 +96,6 @@ except ImportError as e:
 
         import fiona._win_dll_loading
 
-        # if fiona._win_dll_loading.dll_directory is not None:
-        #     with os.add_dll_directory(fiona._win_dll_loading.dll_directory):
         with fiona._win_dll_loading.add_gdal_dll_directory():
 
                 import fiona.ogrext

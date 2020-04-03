@@ -47,7 +47,6 @@ def search_gdal_dll_directory():
     if _dll_directory is None:
         log.warning("No dll directory found.")
 
-    _dll_directory = None
     return _dll_directory
 
 
