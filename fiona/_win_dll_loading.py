@@ -20,32 +20,34 @@ def search_gdal_dll_directory():
         If none is found, GDAL_HOME is used if available.
     """
 
-    dll_directory = None
+    _dll_directory = None
 
     # Parse PATH for gdal/bin
     for path in os.getenv('PATH', '').split(os.pathsep):
 
         if "gdal" in path.lower() and directory_contains_gdal_dll(path):
-            dll_directory = path
+            _dll_directory = path
             break
 
     # Use GDAL_HOME if present
-    if dll_directory is None:
+    if _dll_directory is None:
 
         gdal_home = os.getenv('GDAL_HOME', None)
 
         if gdal_home is not None and os.path.exists(gdal_home):
 
             if directory_contains_gdal_dll(gdal_home):
-                dll_directory = gdal_home
+                _dll_directory = gdal_home
             elif directory_contains_gdal_dll(os.path.join(gdal_home, "bin")):
-                dll_directory = os.path.join(gdal_home, "bin")
+                _dll_directory = os.path.join(gdal_home, "bin")
 
         elif gdal_home is not None and not os.path.exists(gdal_home):
             log.warning("GDAL_HOME directory ({}) does not exist.".format(gdal_home))
 
-    dll_directory = None
-    return dll_directory
+    if _dll_directory is None:
+        log.warning("No dll directory found.")
+
+    return _dll_directory
 
 
 dll_directory = search_gdal_dll_directory()
@@ -54,9 +56,10 @@ dll_directory = search_gdal_dll_directory()
 @contextmanager
 def add_gdal_dll_directory():
 
-    if dll_directory is None:
-        log.warning("No DLL direcotry was added")
-
+    # Fails if dll_directory is None
     f = os.add_dll_directory(dll_directory)
-    yield f
-    f.close()
+
+    try:
+        yield f
+    finally:
+        f.close()

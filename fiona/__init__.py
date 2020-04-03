@@ -83,6 +83,7 @@ if sys.platform == "win32":
 try:
 
     import fiona.ogrext
+    import fiona._env
 
 except ImportError as e:
 
@@ -95,8 +96,11 @@ except ImportError as e:
 
         import fiona._win_dll_loading
 
-        with fiona._win_dll_loading.add_gdal_dll_directory():
-            import fiona.ogrext
+        if fiona._win_dll_loading.dll_directory is not None:
+            with os.add_dll_directory(fiona._win_dll_loading.dll_directory):
+
+                import fiona.ogrext
+                import fiona._env
 
     else:
         raise e
@@ -115,6 +119,7 @@ from fiona._env import (
 from fiona.io import MemoryFile
 from fiona.path import ParsedPath, parse_path, vsi_path
 from fiona.vfs import parse_paths as vfs_parse_paths
+
 
 # These modules are imported by fiona.ogrext, but are also import here to
 # help tools like cx_Freeze find them automatically
