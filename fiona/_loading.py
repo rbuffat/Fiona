@@ -66,7 +66,8 @@ if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
 @contextlib.contextmanager
 def add_gdal_dll_directory():
 
-    cm = os.add_dll_directory(dll_directory) if dll_directory is not None else None
+    has_dll_directory = dll_directory is not None
+    cm = os.add_dll_directory(dll_directory) if has_dll_directory else None
 
     try:
 
@@ -74,5 +75,5 @@ def add_gdal_dll_directory():
 
     finally:
 
-        if dll_directory is not None:
+        if has_dll_directory:
             cm.close()
