@@ -54,10 +54,9 @@ dll_directory = search_gdal_dll_directory()
 @contextmanager
 def add_gdal_dll_directory():
 
-    if dll_directory is not None:
-        f = os.add_dll_directory(dll_directory)
-        yield f
-        f.close()
-    else:
+    if dll_directory is None:
         log.warning("No DLL direcotry was added")
 
+    f = os.add_dll_directory(dll_directory)
+    yield f
+    f.close()
