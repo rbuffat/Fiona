@@ -71,6 +71,7 @@ import platform
 from six import string_types
 from collections import OrderedDict
 from pathlib import Path
+import fiona._loading
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
