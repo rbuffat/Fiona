@@ -89,7 +89,7 @@ except ImportError as e:
 
     import fiona._loading
 
-    with fiona._loading.add_gdal_dll_directory():
+    with fiona._loading.add_gdal_dll_directories():
 
             import fiona.ogrext
             import fiona._env

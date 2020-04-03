@@ -13,7 +13,7 @@ log.addHandler(logging.NullHandler())
 # os.add_dll_directory.
 # see https://github.com/Toblerity/Fiona/issues/851
 
-dll_directory = None
+dll_directories = []
 
 
 def directory_contains_gdal_dll(path):
@@ -21,7 +21,7 @@ def directory_contains_gdal_dll(path):
     return len(glob.glob(os.path.join(path, "gdal*.dll"))) > 0
 
 
-def search_gdal_dll_directory():
+def search_gdal_dll_directories():
     """ Search for gdal dlls
 
         Checks if a */*gdal*/* directory is present in PATH
@@ -29,51 +29,47 @@ def search_gdal_dll_directory():
         If none is found, GDAL_HOME is used if available.
     """
 
-    _dll_directory = None
-
     # Parse PATH for gdal/bin
     for path in os.getenv('PATH', '').split(os.pathsep):
 
         if "gdal" in path.lower() and directory_contains_gdal_dll(path):
-            _dll_directory = path
-            break
+            dll_directories.append(path)
 
     # Use GDAL_HOME if present
-    if _dll_directory is None:
+    if len(dll_directories) == 0:
 
         gdal_home = os.getenv('GDAL_HOME', None)
 
         if gdal_home is not None and os.path.exists(gdal_home):
 
             if directory_contains_gdal_dll(gdal_home):
-                _dll_directory = gdal_home
+                dll_directories.append(gdal_home)
             elif directory_contains_gdal_dll(os.path.join(gdal_home, "bin")):
-                _dll_directory = os.path.join(gdal_home, "bin")
+                dll_directories.append(os.path.join(gdal_home, "bin"))
 
         elif gdal_home is not None and not os.path.exists(gdal_home):
             log.warning("GDAL_HOME directory ({}) does not exist.".format(gdal_home))
 
-    if _dll_directory is None:
+    if len(dll_directories) == 0:
         log.warning("No dll directory found.")
-
-    return _dll_directory
 
 
 if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
-    dll_directory = search_gdal_dll_directory()
+    search_gdal_dll_directories()
 
 
 @contextlib.contextmanager
-def add_gdal_dll_directory():
+def add_gdal_dll_directories():
 
-    has_dll_directory = dll_directory is not None
-    cm = os.add_dll_directory(dll_directory) if has_dll_directory else None
+    dll_dirs = []
+    for dll_directory in dll_directories:
+        dll_dirs.append(os.add_dll_directory(dll_directory))
 
     try:
 
-        yield cm
+        yield None
 
     finally:
 
-        if has_dll_directory:
-            cm.close()
+        for dll_dir in dll_dirs:
+            dll_dir.close()
