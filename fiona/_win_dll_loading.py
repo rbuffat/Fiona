@@ -57,13 +57,13 @@ dll_directory = search_gdal_dll_directory()
 @contextlib.contextmanager
 def add_gdal_dll_directory():
 
-    # Fails if dll_directory is None
-    if dll_directory is None:
-        f = contextlib.nullcontext()
-    else:
-        f = os.add_dll_directory(dll_directory)
+    cm = os.add_dll_directory(dll_directory) if dll_directory is not None else contextlib.nullcontext()
 
     try:
-        yield f
+
+        yield cm
+
     finally:
-        f.close()
+
+        if dll_directory is not None:
+            cm.close()
