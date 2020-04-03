@@ -71,7 +71,6 @@ import platform
 from six import string_types
 from collections import OrderedDict
 from pathlib import Path
-import glob
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
@@ -94,51 +93,10 @@ except ImportError as e:
 
     if platform.system() == 'Windows' and (3, 8) <= sys.version_info:
 
-        def directory_contains_gdal_dll(path):
-            """ Checks if a directory contains a gdal dll """
-            return len(glob.glob(os.path.join(path, "gdal*.dll"))) > 0
+        import fiona._win_dll_loading
 
-        def add_dll_directory_win():
-            """ Finds and adds dll directories on Windows
-
-                Checks if a */gdal/* directory is present in PATH
-                and contains a gdal*.dll file.
-                If none is found, GDAL_HOME is used if available.
-            """
-
-            dll_directory = None
-
-            # Parse PATH for gdal/bin
-            for path in os.getenv('PATH', '').split(os.pathsep):
-
-                if "gdal" in path.lower() and directory_contains_gdal_dll(path):
-                    dll_directory = path
-                    break
-
-            # Use GDAL_HOME if present
-            if dll_directory is None:
-
-                gdal_home = os.getenv('GDAL_HOME', None)
-
-                if gdal_home is not None and os.path.exists(gdal_home):
-
-                    if directory_contains_gdal_dll(gdal_home):
-                        dll_directory = gdal_home
-                    elif directory_contains_gdal_dll(os.path.join(gdal_home, "bin")):
-                        dll_directory = os.path.join(gdal_home, "bin")
-
-                elif gdal_home is not None and not os.path.exists(gdal_home):
-                    log.warn("GDAL_HOME directory ({}) does not exist.".format(gdal_home))
-
-            if dll_directory is not None:
-                log.info("Adding dll directory: {}".format(dll_directory))
-                os.add_dll_directory(dll_directory)
-            else:
-                log.warn("No dll directory found to add.")
-
-        add_dll_directory_win()
-
-        import fiona.ogrext
+        with fiona._win_dll_loading.add_gdal_dll_directory():
+            import fiona.ogrext
 
     else:
         raise e
