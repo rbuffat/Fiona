@@ -1,7 +1,7 @@
 import glob
 import os
 import logging
-from contextlib import contextmanager
+import contextlib
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
@@ -47,17 +47,21 @@ def search_gdal_dll_directory():
     if _dll_directory is None:
         log.warning("No dll directory found.")
 
+    _dll_directory = None
     return _dll_directory
 
 
 dll_directory = search_gdal_dll_directory()
 
 
-@contextmanager
+@contextlib.contextmanager
 def add_gdal_dll_directory():
 
     # Fails if dll_directory is None
-    f = os.add_dll_directory(dll_directory)
+    if dll_directory is None:
+        f = contextlib.nullcontext()
+    else:
+        f = os.add_dll_directory(dll_directory)
 
     try:
         yield f
