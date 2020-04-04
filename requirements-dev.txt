@@ -1,6 +1,7 @@
 -r requirements.txt
 coverage==4.5.1
 cython==0.29.14
+mock ; python_version < '3.3'
 pytest==4.6.6
 pytest-cov==2.8.1
 setuptools==41.6.0
