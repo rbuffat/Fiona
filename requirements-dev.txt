@@ -1,5 +1,5 @@
 -r requirements.txt
-coverage==4.5.4
+coverage==5.0.4
 cython==0.29.7
 mock ; python_version < '3.3'
 pytest==4.6.6
@@ -7,3 +7,4 @@ pytest-cov==2.8.1
 setuptools==39.0.1
 boto3==1.9.19
 wheel==0.31.1
+codecov==2.0.22

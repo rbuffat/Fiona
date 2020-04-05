@@ -64,13 +64,14 @@ install:
   - fio --gdal-version
 
 script:
-  - python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+  - python -m pytest -m "not wheel" --cov fiona --cov-report=term-missing --cov-report=xml
 
 after_script:
   - python setup.py clean
 
 after_success:
   - coveralls || echo "!! intermittent coveralls failure"
+  - codecov
 
 before_cache:
   - if [ "$GDALVERSION" = "trunk" ]; then rm -rf $GDALINST/gdal-$GDALVERSION; fi
