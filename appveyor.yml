@@ -131,7 +131,7 @@ test_script:
 
 after_test:
   - codecov
-  - coveralls
+  - coveralls || echo "!! intermittent coveralls failure"
 
 
 artifacts:
