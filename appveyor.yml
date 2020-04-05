@@ -130,6 +130,7 @@ test_script:
 
 after_test:
   - codecov
+  - coveralls
 
 
 artifacts:
