@@ -37,7 +37,7 @@ def test_debug_information(capsys):
     python_version = platform.python_version()
 
     msg = ("Fiona version: {fiona_version}"
-           "\nGDAL release name: {gdal_release_name}"
+           "\nGDAL version: {gdal_release_name}"
            "\nPROJ version: {proj_version}"
            "\n"
            "\nOS: {os_info}"
