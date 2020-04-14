@@ -135,7 +135,4 @@ cdef void set_proj_search_path(object path):
 
 
 cdef (int, int, int) get_proj_version():
-    cdef int major = -1
-    cdef int minor = -1
-    cdef int patch = -1
-    return (major, minor, patch)
+    return (-1, -1, -1)
