@@ -1,7 +1,7 @@
 import fiona
 from fiona.ogrext import GDALVersion
 import platform
-import sys
+import re
 import os
 from tests.conftest import travis_only
 
@@ -30,6 +30,8 @@ def test_version_comparison():
 @travis_only
 def test_debug_information(capsys):
 
+    version_pattern = re.compile(r"(\d+).(\d+).(\d+)")
+
     os_info = "{system} {release}".format(system=platform.system(),
                                           release=platform.release())
     python_version = platform.python_version()
@@ -45,9 +47,13 @@ def test_debug_information(capsys):
         proj_version = "Proj version not available"
     else:
         proj_version = os.getenv("PROJVERSION")
+        proj_version = re.match(version_pattern, proj_version).group(0)
+
+    gdal_version = os.getenv("GDALVERSION")
+    gdal_version = re.match(version_pattern, gdal_version).group(0)
 
     msg_formatted = msg.format(fiona_version=fiona.__version__,
-                               gdal_release_name=os.getenv("GDALVERSION"),
+                               gdal_release_name=gdal_version,
                                proj_version=proj_version,
                                os_info=os_info,
                                python_version=python_version)
