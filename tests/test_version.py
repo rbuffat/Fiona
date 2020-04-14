@@ -61,4 +61,4 @@ def test_debug_information(capsys):
     fiona.print_debug_information()
     captured = capsys.readouterr()
 
-    assert captured.out == msg_formatted
+    assert captured.out.strip() == msg_formatted.strip()
