@@ -20,7 +20,7 @@ matrix:
   include:
     - python: "3.6"
       env:
-        GDALVERSION="3.0.0rc2"
+        GDALVERSION="3.0.4"
         PROJVERSION="6.2.1RC1"
     - python: "2.7"
       env:
