@@ -227,7 +227,7 @@ def test_check_schema_driver_support_gpkg(tmpdir):
             pass
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
 def test_geometry_only_schema_write(tmpdir, driver):
     schema = {
         "geometry": "Polygon",
@@ -254,7 +254,7 @@ def test_geometry_only_schema_write(tmpdir, driver):
         assert data[0]['geometry'] == record['geometry']
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
 def test_geometry_only_schema_update(tmpdir, driver):
 
     # Guard unsupported drivers
@@ -296,7 +296,7 @@ def test_geometry_only_schema_update(tmpdir, driver):
         if driver not in {'ESRI Shapefile'}:
             for f in data:
                 # This will not work with all drivers, e.g. Shapefile will contain FID key.
-                assert len(f.get('properties', {}))  == 0
+                assert len(f.get('properties', {})) == 0
         assert data[0]['geometry'] == record1['geometry']
         assert data[1]['geometry'] == record2['geometry']
 
@@ -326,10 +326,10 @@ def test_property_only_schema_write(tmpdir, driver):
         assert len(data) == 1
         if driver not in {'ESRI Shapefile'}:
             assert len(data[0].get('properties', {})) == 1
-        assert data[0]['properties'] == record1['properties']
+        assert 'prop1' in data[0]['properties'] and data[0]['properties']['prop1'] == 'one'
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
 def test_property_only_schema_update(tmpdir, driver):
 
     # Guard unsupported drivers
@@ -370,5 +370,5 @@ def test_property_only_schema_update(tmpdir, driver):
             for f in data:
                 # This will not work with all drivers, e.g. Shapefile will contain FID key.
                 assert len(f.get('properties', {})) == 1
-        assert data[0]['properties'] == record1['properties']
-        assert data[1]['properties'] == record2['properties']
+        assert 'prop1' in data[0]['properties'] and data[0]['properties']['prop1'] == 'one'
+        assert 'prop1' in data[1]['properties'] and data[1]['properties']['prop1'] == 'two'
