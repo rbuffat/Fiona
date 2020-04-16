@@ -5,7 +5,8 @@ from fiona.schema import FIELD_TYPES, normalize_field_type
 import os
 import tempfile
 from .conftest import get_temp_filename
-
+from fiona.drvsupport import driver_mode_mingdal
+from fiona.env import GDALVersion
 import pytest
 
 from .conftest import requires_only_gdal1, requires_gdal2
@@ -255,6 +256,12 @@ def test_geometry_only_schema_write(tmpdir, driver):
 
 @pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
 def test_geometry_only_schema_update(tmpdir, driver):
+
+    # Guard unsupported drivers
+    if driver in driver_mode_mingdal['a'] and GDALVersion.runtime() < GDALVersion(
+            *driver_mode_mingdal['a'][driver][:2]):
+        return
+
     schema = {
         "geometry": "Polygon",
         # No properties defined here.
@@ -296,6 +303,7 @@ def test_geometry_only_schema_update(tmpdir, driver):
 
 @pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
 def test_property_only_schema_write(tmpdir, driver):
+
     schema = {
         # No geometry defined here.
         "properties": {'prop1': 'str'}
@@ -323,6 +331,12 @@ def test_property_only_schema_write(tmpdir, driver):
 
 @pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
 def test_property_only_schema_update(tmpdir, driver):
+
+    # Guard unsupported drivers
+    if driver in driver_mode_mingdal['a'] and GDALVersion.runtime() < GDALVersion(
+            *driver_mode_mingdal['a'][driver][:2]):
+        return
+
     schema = {
         # No geometry defined here.
         "properties": {'prop1': 'str'}
