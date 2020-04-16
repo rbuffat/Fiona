@@ -249,8 +249,7 @@ def test_geometry_only_schema_write(tmpdir, driver):
                     driver=driver) as c:
         data = [f for f in c]
         assert len(data) == 1
-        if driver not in {'ESRI Shapefile'}:
-            assert len(data[0].get('properties', {})) == 0
+        assert len(data[0].get('properties', {})) == 0
         assert data[0]['geometry'] == record['geometry']
 
 
@@ -293,10 +292,8 @@ def test_geometry_only_schema_update(tmpdir, driver):
         data = [f for f in c]
         assert len(data) == 2
 
-        if driver not in {'ESRI Shapefile'}:
-            for f in data:
-                # This will not work with all drivers, e.g. Shapefile will contain FID key.
-                assert len(f.get('properties', {})) == 0
+        for f in data:
+            assert len(f.get('properties', {})) == 0
         assert data[0]['geometry'] == record1['geometry']
         assert data[1]['geometry'] == record2['geometry']
 
@@ -324,8 +321,7 @@ def test_property_only_schema_write(tmpdir, driver):
                     driver=driver) as c:
         data = [f for f in c]
         assert len(data) == 1
-        if driver not in {'ESRI Shapefile'}:
-            assert len(data[0].get('properties', {})) == 1
+        assert len(data[0].get('properties', {})) == 1
         assert 'prop1' in data[0]['properties'] and data[0]['properties']['prop1'] == 'one'
 
 
@@ -365,10 +361,7 @@ def test_property_only_schema_update(tmpdir, driver):
                     driver=driver) as c:
         data = [f for f in c]
         assert len(data) == 2
-
-        if driver not in {'ESRI Shapefile'}:
-            for f in data:
-                # This will not work with all drivers, e.g. Shapefile will contain FID key.
-                assert len(f.get('properties', {})) == 1
+        for f in data:
+            assert len(f.get('properties', {})) == 1
         assert 'prop1' in data[0]['properties'] and data[0]['properties']['prop1'] == 'one'
         assert 'prop1' in data[1]['properties'] and data[1]['properties']['prop1'] == 'two'
