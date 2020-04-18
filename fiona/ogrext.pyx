@@ -1297,7 +1297,6 @@ cdef class Iterator:
                     "OLCFastSetNextByIndex, negative step size may" \
                     " be slow", RuntimeWarning)
 
-        print(start, stop, step, ftcount)
         # Check if we are outside of the range
         if ftcount >= 0:
             if start > ftcount and step > 0:
