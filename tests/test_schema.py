@@ -227,7 +227,7 @@ def test_check_schema_driver_support_gpkg(tmpdir):
             pass
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
 def test_geometry_only_schema_write(tmpdir, driver):
     schema = {
         "geometry": "Polygon",
@@ -253,7 +253,7 @@ def test_geometry_only_schema_write(tmpdir, driver):
         assert data[0]['geometry'] == record['geometry']
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
 def test_geometry_only_schema_update(tmpdir, driver):
 
     # Guard unsupported drivers
@@ -298,7 +298,7 @@ def test_geometry_only_schema_update(tmpdir, driver):
         assert data[1]['geometry'] == record2['geometry']
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
 def test_property_only_schema_write(tmpdir, driver):
 
     schema = {
@@ -325,7 +325,7 @@ def test_property_only_schema_write(tmpdir, driver):
         assert 'prop1' in data[0]['properties'] and data[0]['properties']['prop1'] == 'one'
 
 
-@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON', 'ESRI Shapefile'])
+@pytest.mark.parametrize('driver', ['GPKG', 'GeoJSON'])
 def test_property_only_schema_update(tmpdir, driver):
 
     # Guard unsupported drivers
