@@ -1297,11 +1297,16 @@ cdef class Iterator:
                     "OLCFastSetNextByIndex, negative step size may" \
                     " be slow", RuntimeWarning)
 
+        print(start, stop, step, ftcount)
         # Check if we are outside of the range
-        if start > ftcount and step > 0:
-            start = -1
-        if start > ftcount and step < 0:
-            start = ftcount - 1
+        if ftcount >= 0:
+            if start > ftcount and step > 0:
+                start = -1
+            if start > ftcount and step < 0:
+                start = ftcount - 1
+        else:
+            # TODO how should we handle the situation when OGR_L_GetFeatureCount fails?
+            pass
 
         self.stepsign = int(math.copysign(1, step))
         self.stop = stop
