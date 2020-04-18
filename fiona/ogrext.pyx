@@ -1296,6 +1296,13 @@ cdef class Iterator:
             warnings.warn("Layer does not support" \
                     "OLCFastSetNextByIndex, negative step size may" \
                     " be slow", RuntimeWarning)
+
+        # Check if we are outside of the range
+        if start > ftcount and step > 0:
+            start = -1
+        if start > ftcount and step < 0:
+            start = ftcount - 1
+
         self.stepsign = int(math.copysign(1, step))
         self.stop = stop
         self.start = start
