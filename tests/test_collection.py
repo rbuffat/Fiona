@@ -902,11 +902,20 @@ def test_collection_env(path_coutwildrnp_shp):
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw
-                                    and driver not in {'DGN', 'MapInfo File', 'GPSTrackMaker', 'GPX', 'BNA', 'DXF'}])
-def test_filter_range(tmpdir, driver):
+                                    and driver not in {'DGN', 'MapInfo File', 'GPSTrackMaker', 'GPX', 'BNA', 'DXF',
+                                                       'GML'}])
+@pytest.mark.parametrize("slice", [(0, 5, 1),
+                                   (5, 15, 1),
+                                   (15, 30, 1),
+                                   (5, 0, -1),
+                                   (15, 5, -1),
+                                   (30, 15, -1)])
+def test_filter_range(tmpdir, driver, slice):
     """ Test if c.filter(start, stop) returns the correct features.
 
     """
+
+    start, stop, step = slice
 
     min_id = 0
     max_id = 10
@@ -936,21 +945,17 @@ def test_filter_range(tmpdir, driver):
         for f in c:
             assert int(f['id']) == int(f['properties']['position']) + offset
 
-    def test_a_range(start, stop):
-        ids = [i + offset for i in range(start, stop) if i <= max_id]
-        positions = [i for i in range(start, stop) if i <= max_id]
-        with fiona.open(path, 'r') as c:
-            record_ids = [int(f['id']) for f in c.filter(start, stop)]
-            record_positions = [f['properties']['position'] for f in c.filter(start, stop)]
+    ids = [i + offset for i in range(start, stop, step) if i <= max_id]
+    positions = [i for i in range(start, stop, step) if i <= max_id]
 
-            assert len(ids) == len(record_ids)
-            for expected_id, record_id in zip(ids, record_ids):
-                assert expected_id == record_id
+    with fiona.open(path, 'r') as c:
+        record_ids = [int(f['id']) for f in c.filter(start, stop, step)]
+        record_positions = [f['properties']['position'] for f in c.filter(start, stop, step)]
 
-            assert len(positions) == len(record_positions)
-            for expected_position, record_position in zip(positions, record_positions):
-                assert expected_position == int(record_position)
+        assert len(ids) == len(record_ids)
+        for expected_id, record_id in zip(ids, record_ids):
+            assert expected_id == record_id
 
-    test_a_range(0, 5)
-    test_a_range(5, 15)
-    test_a_range(15, 30)
+        assert len(positions) == len(record_positions)
+        for expected_position, record_position in zip(positions, record_positions):
+            assert expected_position == int(record_position)
