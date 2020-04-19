@@ -1286,7 +1286,7 @@ cdef class Iterator:
             if not self.fastcount:
                 warnings.warn("Layer does not support" \
                         " OLC_FASTFEATURECOUNT, negative slices or start values other than zero" \
-                        " may be slow", RuntimeWarning)
+                        " may be slow.", RuntimeWarning)
             ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
         else:
             ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 0)
@@ -1311,8 +1311,8 @@ cdef class Iterator:
             raise ValueError("slice step cannot be zero")
         if step < 0 and not self.fastindex:
             warnings.warn("Layer does not support" \
-                    "OLCFastSetNextByIndex, negative step size may" \
-                    " be slow", RuntimeWarning)
+                    " OLCFastSetNextByIndex, negative step size may" \
+                    " be slow.", RuntimeWarning)
 
         # Check if we are outside of the range:
         if not ftcount == -1:
@@ -1321,8 +1321,8 @@ cdef class Iterator:
             if start > ftcount and step < 0:
                 start = ftcount - 1
         elif ftcount == -1 and not start == 0:
-            warnings.warn("Layer is unable to check if slice is within range of data. ",
-             RuntimeWarning, )
+            warnings.warn("Layer is unable to check if slice is within range of data.",
+             RuntimeWarning)
 
         self.stepsign = int(math.copysign(1, step))
         self.stop = stop
