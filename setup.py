@@ -189,9 +189,9 @@ ext_options = dict(
     include_dirs=include_dirs,
     library_dirs=library_dirs,
     libraries=libraries,
-    extra_link_args=extra_link_args
-)
+    extra_link_args=extra_link_args)
 
+# Enable coverage for cython pyx files.
 if os.getenv("CYTHON_TRACING", "False").lower() == "true":
     from Cython.Compiler.Options import get_directive_defaults
     directive_defaults = get_directive_defaults()
@@ -211,6 +211,7 @@ if language == "c++":
 ext_options_cpp = ext_options.copy()
 if sys.platform != "win32":
     ext_options_cpp["extra_compile_args"] = ["-std=c++11"]
+
 
 # Define the extension modules.
 ext_modules = []
