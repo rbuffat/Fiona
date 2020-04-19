@@ -1273,7 +1273,15 @@ cdef class Iterator:
         self.fastindex = OGR_L_TestCapability(
             session.cogr_layer, OLC_FASTSETNEXTBYINDEX)
 
-        ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
+        # In some cases we need to force count of all features
+        # We need to check if start is not greater ftcount: (start is not None and start > 0)
+        # If start is a negative index: (start is not None and start < 0)
+        # If stop is a negative index: (stop is not None and stop < 0)
+        if ((start is not None and not start == 0) or
+            (stop is not None and stop < 0)):
+            ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
+         else:
+            ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 0)
 
         if ftcount == -1 and ((start is not None and start < 0) or
                               (stop is not None and stop < 0)):
