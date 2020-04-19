@@ -1278,9 +1278,9 @@ cdef class Iterator:
         # If start is a negative index: (start is not None and start < 0)
         # If stop is a negative index: (stop is not None and stop < 0)
         if ((start is not None and not start == 0) or
-            (stop is not None and stop < 0)):
+                (stop is not None and stop < 0)):
             ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
-         else:
+        else:
             ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 0)
 
         if ftcount == -1 and ((start is not None and start < 0) or
@@ -1307,13 +1307,14 @@ cdef class Iterator:
                     " be slow", RuntimeWarning)
 
         # Check if we are outside of the range:
-        if start > ftcount and step > 0:
-            start = -1
-        if start > ftcount and step < 0:
-            start = ftcount - 1
+        if  not ftcount == -1:
+            if start > ftcount and step > 0:
+                start = -1
+            if start > ftcount and step < 0:
+                start = ftcount - 1
         else:
-            # TODO how should we handle the situation when OGR_L_GetFeatureCount fails?
-            pass
+            warnings.warn("Layer is unable to check if slice is within range of data. ",
+             RuntimeWarning)
 
         self.stepsign = int(math.copysign(1, step))
         self.stop = stop
