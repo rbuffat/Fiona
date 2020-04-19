@@ -1274,6 +1274,7 @@ cdef class Iterator:
             session.cogr_layer, OLC_FASTSETNEXTBYINDEX)
 
         ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
+
         if ftcount == -1 and ((start is not None and start < 0) or
                               (stop is not None and stop < 0)):
             raise IndexError(
@@ -1297,12 +1298,11 @@ cdef class Iterator:
                     "OLCFastSetNextByIndex, negative step size may" \
                     " be slow", RuntimeWarning)
 
-        # Check if we are outside of the range
-        if ftcount >= 0:
-            if start > ftcount and step > 0:
-                start = -1
-            if start > ftcount and step < 0:
-                start = ftcount - 1
+        # Check if we are outside of the range:
+        if start > ftcount and step > 0:
+            start = -1
+        if start > ftcount and step < 0:
+            start = ftcount - 1
         else:
             # TODO how should we handle the situation when OGR_L_GetFeatureCount fails?
             pass
