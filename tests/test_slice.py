@@ -90,6 +90,8 @@ def test_collection_iterator_items_slice(tmpdir, driver, args):
                     schema=schema) as c:
         c.writerecords(records)
 
+    positions = list(range(min_id, max_id + 1))[start:stop:step]
+
     if ((start and start < 0) or (stop and stop < 0)) and driver in {'GMT'}:
         with pytest.raises(IndexError):
             with fiona.open(path, 'r') as c:
@@ -99,6 +101,10 @@ def test_collection_iterator_items_slice(tmpdir, driver, args):
         with fiona.open(path, 'r') as c:
             items = list(c.items(start, stop, step))
             assert len(items) == count
+            record_positions = [int(item[1]['properties']['position']) for item in items]
+            assert len(positions) == len(record_positions)
+            for expected_position, record_position in zip(positions, record_positions):
+                assert expected_position == record_position
 
 
 def test_collection_iterator_keys_next(path_coutwildrnp_shp):
