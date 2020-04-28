@@ -95,7 +95,7 @@ before_install:
   - gdal-config --version
   - python -m pip wheel -r requirements-dev.txt
   - python -m pip install -r requirements-dev.txt
-  - python -m pip install wheel coveralls>=1.1 --upgrade
+  - python -m pip install wheel coveralls>=1.1 codecov --upgrade
 
 install:
   - if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
@@ -113,3 +113,4 @@ after_script:
 
 after_success:
   - coveralls || echo "!! intermittent coveralls failure"
+  - codecov
