@@ -4,30 +4,29 @@ See also test_rfc3339.py for datetime parser tests.
 
 import fiona
 import pytest
-import tempfile, shutil
+import tempfile
+import shutil
 import os
 from fiona.errors import DriverSupportError
-from .conftest import requires_gpkg
+from .conftest import requires_gpkg, get_temp_filename
+from fiona.env import GDALVersion
+import datetime
 
-GDAL_MAJOR_VER = fiona.get_gdal_version_num() // 1000000
+
+gdal_version = GDALVersion.runtime()
+GDAL_MAJOR_VER = gdal_version.major
 
 GEOMETRY_TYPE = "Point"
 GEOMETRY_EXAMPLE = {"type": "Point", "coordinates": [1, 2]}
-
-DRIVER_FILENAME = {
-    "ESRI Shapefile": "test.shp",
-    "GPKG": "test.gpkg",
-    "GeoJSON": "test.geojson",
-    "MapInfo File": "test.tab",
-}
 
 DATE_EXAMPLE = "2018-03-25"
 DATETIME_EXAMPLE = "2018-03-25T22:49:05"
 TIME_EXAMPLE = "22:49:05"
 
+
 class TestDateFieldSupport:
     def write_data(self, driver):
-        filename = DRIVER_FILENAME[driver]
+        filename = get_temp_filename(driver)
         temp_dir = tempfile.mkdtemp()
         path = os.path.join(temp_dir, filename)
         schema = {
@@ -49,6 +48,12 @@ class TestDateFieldSupport:
                     "date": None,
                 }
             },
+            {
+                "geometry": GEOMETRY_EXAMPLE,
+                "properties": {
+                    "date": datetime.datetime.strptime(DATE_EXAMPLE, "%Y-%m-%d").date(),
+                }
+            },
         ]
         with fiona.Env(), fiona.open(path, "w", driver=driver, schema=schema) as collection:
             collection.writerecords(records)
@@ -68,6 +73,7 @@ class TestDateFieldSupport:
         assert schema["properties"]["date"] == "date"
         assert features[0]["properties"]["date"] == DATE_EXAMPLE
         assert features[1]["properties"]["date"] is None
+        assert features[2]["properties"]["date"] == DATE_EXAMPLE
 
     @requires_gpkg
     def test_gpkg(self):
@@ -77,6 +83,7 @@ class TestDateFieldSupport:
         assert schema["properties"]["date"] == "date"
         assert features[0]["properties"]["date"] == DATE_EXAMPLE
         assert features[1]["properties"]["date"] is None
+        assert features[2]["properties"]["date"] == DATE_EXAMPLE
 
     def test_geojson(self):
         # GDAL 1: date field silently converted to string
@@ -91,6 +98,7 @@ class TestDateFieldSupport:
             assert schema["properties"]["date"] == "str"
             assert features[0]["properties"]["date"] == "2018/03/25"
         assert features[1]["properties"]["date"] is None
+        assert features[2]["properties"]["date"] == DATE_EXAMPLE
 
     def test_mapinfo(self):
         driver = "MapInfo File"
@@ -99,11 +107,12 @@ class TestDateFieldSupport:
         assert schema["properties"]["date"] == "date"
         assert features[0]["properties"]["date"] == DATE_EXAMPLE
         assert features[1]["properties"]["date"] is None
+        assert features[2]["properties"]["date"] == DATE_EXAMPLE
 
 
 class TestDatetimeFieldSupport:
     def write_data(self, driver):
-        filename = DRIVER_FILENAME[driver]
+        filename = get_temp_filename(driver)
         temp_dir = tempfile.mkdtemp()
         path = os.path.join(temp_dir, filename)
         schema = {
@@ -123,6 +132,12 @@ class TestDatetimeFieldSupport:
                 "geometry": GEOMETRY_EXAMPLE,
                 "properties": {
                     "datetime": None,
+                }
+            },
+            {
+                "geometry": GEOMETRY_EXAMPLE,
+                "properties": {
+                    "datetime": datetime.datetime.strptime(DATETIME_EXAMPLE, "%Y-%m-%dT%H:%M:%S"),
                 }
             },
         ]
@@ -158,6 +173,7 @@ class TestDatetimeFieldSupport:
             assert schema["properties"]["datetime"] == "datetime"
             assert features[0]["properties"]["datetime"] == DATETIME_EXAMPLE
             assert features[1]["properties"]["datetime"] is None
+            assert features[2]["properties"]["datetime"] == DATETIME_EXAMPLE
         else:
             with pytest.raises(DriverSupportError):
                 schema, features = self.write_data(driver)
@@ -175,6 +191,7 @@ class TestDatetimeFieldSupport:
             assert schema["properties"]["datetime"] == "str"
             assert features[0]["properties"]["datetime"] == "2018/03/25 22:49:05"
         assert features[1]["properties"]["datetime"] is None
+        assert features[2]["properties"]["datetime"] == DATETIME_EXAMPLE
 
     def test_mapinfo(self):
         driver = "MapInfo File"
@@ -183,11 +200,12 @@ class TestDatetimeFieldSupport:
         assert schema["properties"]["datetime"] == "datetime"
         assert features[0]["properties"]["datetime"] == DATETIME_EXAMPLE
         assert features[1]["properties"]["datetime"] is None
+        assert features[2]["properties"]["datetime"] == DATETIME_EXAMPLE
 
 
 class TestTimeFieldSupport:
     def write_data(self, driver):
-        filename = DRIVER_FILENAME[driver]
+        filename = get_temp_filename(driver)
         temp_dir = tempfile.mkdtemp()
         path = os.path.join(temp_dir, filename)
         schema = {
@@ -207,6 +225,12 @@ class TestTimeFieldSupport:
                 "geometry": GEOMETRY_EXAMPLE,
                 "properties": {
                     "time": None,
+                }
+            },
+            {
+                "geometry": GEOMETRY_EXAMPLE,
+                "properties": {
+                    "time": datetime.datetime.strptime(TIME_EXAMPLE, "%H:%M:%S").time(),
                 }
             },
         ]
@@ -254,6 +278,7 @@ class TestTimeFieldSupport:
             assert schema["properties"]["time"] == "str"
         assert features[0]["properties"]["time"] == TIME_EXAMPLE
         assert features[1]["properties"]["time"] is None
+        assert features[2]["properties"]["time"] == TIME_EXAMPLE
 
     def test_mapinfo(self):
         # GDAL 2: null time is converted to 00:00:00 (regression?)
@@ -266,3 +291,4 @@ class TestTimeFieldSupport:
             assert features[1]["properties"]["time"] == "00:00:00"
         else:
             assert features[1]["properties"]["time"] is None
+        assert features[2]["properties"]["time"] == TIME_EXAMPLE
