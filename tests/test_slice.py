@@ -56,6 +56,7 @@ def test_collection_iterator_next(path_coutwildrnp_shp):
                                   (-5, None, 2),
                                   (-5, -1, 2),
                                   (0, None, 2),
+                                  (1, None, 2),
                                   (5, None, 2),
                                   (5, None, -1),
                                   (5, None, -2),
@@ -109,3 +110,9 @@ def test_collection_iterator_keys_next(path_coutwildrnp_shp):
     with fiona.open(path_coutwildrnp_shp) as src:
         k = next(src.keys(5, None))
         assert k == 5
+
+
+def test_zero_step(path_coutwildrnp_shp):
+    with pytest.raises(ValueError):
+        with fiona.open(path_coutwildrnp_shp) as src:
+            keys = list(src.keys(5, None, 0))
