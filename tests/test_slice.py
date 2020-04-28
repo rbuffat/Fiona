@@ -45,30 +45,29 @@ def test_collection_iterator_next(path_coutwildrnp_shp):
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw
                                     and driver not in {'DGN', 'MapInfo File', 'GPSTrackMaker', 'GPX', 'BNA', 'DXF',
                                                        'GML'}])
-@pytest.mark.parametrize("args", [((0, 5, None), 5),
-                                  ((1, 5, None), 4),
-                                  ((-5, None, None), 5),
-                                  ((-5, -1, None), 4),
-                                  ((0, None, None), 10),
-                                  ((5, None, None), 10-5),
-                                  ((0, 5, 2), 3),
-                                  ((1, 5, 2), 2),
-                                  ((-5, None, 2), 3),
-                                  ((-5, -1, 2), 2),
-                                  ((0, None, 2), 5),
-                                  ((5, None, 2), 3),
-                                  ((5, None, -1), 6),
-                                  ((5, None, -2), 3),
-                                  ((5, None, None), 5),
-                                  ((4, None, -2), 3),
-                                  ((-1, -5, -1), 4),
-                                  ((-5, None, -1), 10 - 5 + 1)])
+@pytest.mark.parametrize("args", [(0, 5, None),
+                                  (1, 5, None),
+                                  (-5, None, None),
+                                  (-5, -1, None),
+                                  (0, None, None),
+                                  (5, None, None),
+                                  (0, 5, 2),
+                                  (1, 5, 2),
+                                  (-5, None, 2),
+                                  (-5, -1, 2),
+                                  (0, None, 2),
+                                  (5, None, 2),
+                                  (5, None, -1),
+                                  (5, None, -2),
+                                  (5, None, None),
+                                  (4, None, -2),
+                                  (-1, -5, -1),
+                                  (-5, None, -1)])
 def test_collection_iterator_items_slice(tmpdir, driver, args):
     """ Test if c.filter(start, stop) returns the correct features.
     """
 
-    arg1, count = args
-    start, stop, step = arg1
+    start, stop, step = args
 
     min_id = 0
     max_id = 9
@@ -100,7 +99,7 @@ def test_collection_iterator_items_slice(tmpdir, driver, args):
     else:
         with fiona.open(path, 'r') as c:
             items = list(c.items(start, stop, step))
-            assert len(items) == count
+            assert len(items) == len(positions)
             record_positions = [int(item[1]['properties']['position']) for item in items]
             assert len(positions) == len(record_positions)
             for expected_position, record_position in zip(positions, record_positions):
