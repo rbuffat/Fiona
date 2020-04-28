@@ -90,7 +90,7 @@ def test_collection_iterator_items_slice(tmpdir, driver, args):
                     schema=schema) as c:
         c.writerecords(records)
 
-    if step and step < 0 and driver in {'GMT'}:
+    if ((step and step < 0) or (stop and stop < 0)) and driver in {'GMT'}:
         with pytest.raises(IndexError):
             with fiona.open(path, 'r') as c:
                 items = list(c.items(start, stop, step))
