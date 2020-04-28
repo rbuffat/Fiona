@@ -94,8 +94,7 @@ def test_collection_iterator_items_slice(tmpdir, driver, args):
     if ((start and start < 0) or (stop and stop < 0)) and driver in {'GMT'}:
         with pytest.raises(IndexError):
             with fiona.open(path, 'r') as c:
-                items = list(c.items(start, stop, step))
-                assert len(items) == count
+                pass
     else:
         with fiona.open(path, 'r') as c:
             items = list(c.items(start, stop, step))
