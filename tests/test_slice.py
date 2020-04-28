@@ -90,9 +90,15 @@ def test_collection_iterator_items_slice(tmpdir, driver, args):
                     schema=schema) as c:
         c.writerecords(records)
 
-    with fiona.open(path, 'r') as c:
-        items = list(c.items(start, stop, step))
-        assert len(items) == count
+    if step and step < 0 and driver in {'GMT'}:
+        with pytest.raises(IndexError):
+            with fiona.open(path, 'r') as c:
+                items = list(c.items(start, stop, step))
+                assert len(items) == count
+    else:
+        with fiona.open(path, 'r') as c:
+            items = list(c.items(start, stop, step))
+            assert len(items) == count
 
 
 def test_collection_iterator_keys_next(path_coutwildrnp_shp):
