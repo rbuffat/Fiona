@@ -94,11 +94,12 @@ class TestDateFieldSupport:
         if GDAL_MAJOR_VER >= 2:
             assert schema["properties"]["date"] == "date"
             assert features[0]["properties"]["date"] == DATE_EXAMPLE
+            assert features[2]["properties"]["date"] == DATE_EXAMPLE
         else:
             assert schema["properties"]["date"] == "str"
             assert features[0]["properties"]["date"] == "2018/03/25"
+            assert features[2]["properties"]["date"] == "2018/03/25"
         assert features[1]["properties"]["date"] is None
-        assert features[2]["properties"]["date"] == DATE_EXAMPLE
 
     def test_mapinfo(self):
         driver = "MapInfo File"
@@ -187,11 +188,12 @@ class TestDatetimeFieldSupport:
         if GDAL_MAJOR_VER >= 2:
             assert schema["properties"]["datetime"] == "datetime"
             assert features[0]["properties"]["datetime"] == DATETIME_EXAMPLE
+            assert features[2]["properties"]["datetime"] == DATETIME_EXAMPLE
         else:
             assert schema["properties"]["datetime"] == "str"
             assert features[0]["properties"]["datetime"] == "2018/03/25 22:49:05"
+            assert features[2]["properties"]["datetime"] == "2018/03/25 22:49:05"
         assert features[1]["properties"]["datetime"] is None
-        assert features[2]["properties"]["datetime"] == DATETIME_EXAMPLE
 
     def test_mapinfo(self):
         driver = "MapInfo File"
