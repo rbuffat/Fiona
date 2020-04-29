@@ -75,3 +75,29 @@ def test_write_memoryfile_(profile_first_coutwildrnp_shp):
     with MemoryFile(data) as memfile:
         with memfile.open() as col:
             assert len(col) == 1
+
+
+def test_memoryfilebase_write():
+    """Test MemoryFileBase.write """
+
+    schema = {'geometry': 'Point', 'properties': [('position', 'int')]}
+    records = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+               range(5)]
+
+    with MemoryFile() as memfile:
+
+        with BytesIO() as fout:
+            with fiona.open(fout,
+                            'w',
+                            driver="GeoJSON",
+                            schema=schema) as c:
+                c.writerecords(records)
+            fout.seek(0)
+            data = fout.read()
+
+        memfile.write(data)
+
+        with memfile.open(driver="GeoJSON",
+                          schema=schema) as c:
+            record_positions = [int(f['properties']['position']) for f in c]
+            assert record_positions == list(range(5))
