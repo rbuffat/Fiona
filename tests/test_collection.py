@@ -231,6 +231,11 @@ class TestReading(object):
         assert f['id'] == "0"
         assert f['properties']['STATE'] == 'UT'
 
+    def test_getitem_last(self):
+        f = self.c[-1]
+        assert f['id'] == "66"
+        assert f['properties']['STATE'] == 'CO'
+
     def test_getitem_iter_combo(self):
         i = iter(self.c)
         f = next(i)
