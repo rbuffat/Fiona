@@ -95,6 +95,7 @@ def test_memoryfilebase_write():
             fout.seek(0)
             data = fout.read()
 
+        assert memfile.tell() == 0
         memfile.write(data)
 
         with memfile.open(driver="GeoJSON",
