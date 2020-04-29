@@ -946,6 +946,10 @@ def test_append_layer(tmpdir):
 
 
 def test_overwrite_geojson(tmpdir):
+    """
+    Test GeoJSON driver tells lies about it's capability to create layer
+    see https://github.com/Toblerity/Fiona/blob/20513b6859fe4de468fef2c4bfea66451fa95220/fiona/ogrext.pyx#L933-L935
+    """
     schema = {'geometry': 'Point', 'properties': [('position', 'int')]}
     path = str(tmpdir.join(get_temp_filename('GeoJSON')))
 
