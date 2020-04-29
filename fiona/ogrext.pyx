@@ -946,9 +946,9 @@ cdef class WritingSession(Session):
             # TODO: revisit the logic in the following blocks when we
             # change the assumption above.
             else:
-                if collection.driver == "GeoJSON" and os.path.exists(path):
-                    # manually remove geojson file as GDAL doesn't do this for us
-                    os.unlink(path)
+                #if collection.driver == "GeoJSON" and os.path.exists(path):
+                #    # manually remove geojson file as GDAL doesn't do this for us
+                #    os.unlink(path)
                 try:
                     # attempt to open existing dataset in write mode
                     cogr_ds = gdal_open_vector(path_c, 1, None, kwargs)
