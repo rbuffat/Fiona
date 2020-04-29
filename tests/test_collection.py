@@ -945,3 +945,25 @@ def test_append_layer(tmpdir):
         assert record_positions == list(range(0, 9))
 
 
+def test_overwrite_geojson(tmpdir):
+    schema = {'geometry': 'Point', 'properties': [('position', 'int')]}
+    path = str(tmpdir.join(get_temp_filename('GeoJSON')))
+
+    records = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+               range(3)]
+    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(3, 6)]
+
+    with fiona.open(path, 'w',
+                    driver='GeoJSON',
+                    schema=schema) as c:
+        c.writerecords(records)
+
+    with fiona.open(path, 'w',
+                    driver='GeoJSON',
+                    schema=schema) as c:
+        c.writerecords(records2)
+
+    with fiona.open(path) as c:
+        record_positions = [int(f['properties']['position']) for f in c]
+        assert record_positions == list(range(3, 6))
