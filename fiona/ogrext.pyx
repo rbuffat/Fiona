@@ -1339,7 +1339,6 @@ cdef class Iterator:
 
         elif self.step > 1 and not self.fastindex and not self.next_index == self.start:
             for _ in range(self.step - 1):
-                # TODO rbuffat add test -> OGR_L_GetNextFeature increments cursor by 1, therefore self.step - 1 as one increment was performed when feature is read
                 cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
                 if cogr_feature == NULL:
                     raise StopIteration
