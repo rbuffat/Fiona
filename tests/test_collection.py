@@ -9,9 +9,10 @@ import pytest
 import fiona
 from fiona.collection import Collection
 from fiona.drvsupport import supported_drivers
-from fiona.env import getenv
+from fiona.env import getenv, GDALVersion
 from fiona.errors import FionaValueError, DriverError, FionaDeprecationWarning
-from .conftest import WGS84PATTERN
+from .conftest import WGS84PATTERN, get_temp_filename
+from fiona.drvsupport import driver_mode_mingdal
 
 
 class TestSupportedDrivers(object):
@@ -904,4 +905,43 @@ def test_collection_env(path_coutwildrnp_shp):
     """We have a GDAL env within collection context"""
     with fiona.open(path_coutwildrnp_shp):
         assert 'FIONA_ENV' in getenv()
+
+
+def test_append_layer(tmpdir):
+    """ Test append to a layer"""
+    schema = {'geometry': 'Point', 'properties': [('position', 'int')]}
+    path = str(tmpdir.join(get_temp_filename('GPKG')))
+
+    gdal_version = GDALVersion.runtime()
+
+    if gdal_version < GDALVersion(*driver_mode_mingdal['w']['GPKG'][:2]):
+        return
+
+    records = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+               range(3)]
+    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(3, 6)]
+    records3 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(6, 9)]
+
+    with fiona.open(path, 'w',
+                    driver='GPKG',
+                    schema=schema,
+                    layer="test_layer") as c:
+        c.writerecords(records)
+
+    # Append using layer name
+    with fiona.open(path, 'a',
+                    layer="test_layer") as c:
+        c.writerecords(records2)
+
+    # Append using layer index
+    with fiona.open(path, 'a',
+                    layer=0) as c:
+        c.writerecords(records3)
+
+    with fiona.open(path) as c:
+        record_positions = [int(f['properties']['position']) for f in c]
+        assert record_positions == list(range(0, 9))
+
 
