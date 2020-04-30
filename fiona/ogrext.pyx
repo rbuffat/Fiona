@@ -1247,6 +1247,7 @@ cdef class Iterator:
     cdef step
     cdef fastindex
     cdef fastcount
+    cdef ftcount
     cdef stepsign
 
     def __cinit__(self, collection, start=None, stop=None, step=None,
@@ -1296,22 +1297,22 @@ cdef class Iterator:
                 warnings.warn("Layer does not support" \
                         " OLC_FASTFEATURECOUNT, negative slices or start values other than zero" \
                         " may be slow.", RuntimeWarning)
-            ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
+            self.ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 1)
         else:
-            ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 0)
+            self.ftcount = OGR_L_GetFeatureCount(session.cogr_layer, 0)
 
-        if ftcount == -1 and ((start is not None and start < 0) or
+        if self.ftcount == -1 and ((start is not None and start < 0) or
                               (stop is not None and stop < 0)):
             raise IndexError(
                 "collection's dataset does not support negative slice indexes")
 
         if stop is not None and stop < 0:
-            stop += ftcount
+            stop += self.ftcount
 
         if start is None:
             start = 0
         if start is not None and start < 0:
-            start += ftcount
+            start += self.ftcount
 
         # step size
         if step is None:
@@ -1324,12 +1325,12 @@ cdef class Iterator:
                     " be slow.", RuntimeWarning)
 
         # Check if we are outside of the range:
-        if not ftcount == -1:
-            if start > ftcount and step > 0:
+        if not self.ftcount == -1:
+            if start > self.ftcount and step > 0:
                 start = -1
-            if start > ftcount and step < 0:
-                start = ftcount - 1
-        elif ftcount == -1 and not start == 0:
+            if start > self.ftcount and step < 0:
+                start = self.ftcount - 1
+        elif self.ftcount == -1 and not start == 0:
             warnings.warn("Layer is unable to check if slice is within range of data.",
              RuntimeWarning)
 
@@ -1353,6 +1354,9 @@ cdef class Iterator:
 
         # Check if next_index is valid
         if self.next_index < 0:
+            raise StopIteration
+
+        if self.ftcount >= 0 and self.next_index >= self.ftcount:
             raise StopIteration
 
         if self.stepsign == 1:
