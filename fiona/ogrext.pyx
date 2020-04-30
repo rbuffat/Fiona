@@ -1339,7 +1339,7 @@ cdef class Iterator:
         self.step = step
 
         self.next_index = start
-        log.debug("Index: %d", self.next_index)
+        log.debug("Next index: %d", self.next_index)
         OGR_L_SetNextByIndex(session.cogr_layer, self.next_index)
 
     def __iter__(self):
@@ -1383,6 +1383,7 @@ cdef class Iterator:
 
         # set the next index
         self.next_index += self.step
+        log.debug("Next index: %d", self.next_index)
 
     def __next__(self):
         cdef OGRFeatureH cogr_feature = NULL
