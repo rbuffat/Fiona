@@ -1406,25 +1406,23 @@ cdef class Iterator:
         self._next()
 
         # Get the next feature.
-        log.debug("GetNextFeature: {}".format(self.next_index))
+        log.debug("GetNextFeature: {}/{}".format(self.next_index, self.ftcount))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
 
-        try:
-            return FeatureBuilder().build(
-                cogr_feature,
-                encoding=self.collection.session._get_internal_encoding(),
-                bbox=False,
-                driver=self.collection.driver,
-                ignore_fields=self.collection.ignore_fields,
-                ignore_geometry=self.collection.ignore_geometry,
-            )
-        except Exception as e:
-            log.error(str(e))
+        feature = FeatureBuilder().build(
+            cogr_feature,
+            encoding=self.collection.session._get_internal_encoding(),
+            bbox=False,
+            driver=self.collection.driver,
+            ignore_fields=self.collection.ignore_fields,
+            ignore_geometry=self.collection.ignore_geometry,
+        )
 
-        finally:
-            _deleteOgrFeature(cogr_feature)
+        _deleteOgrFeature(cogr_feature)
+
+        return feature
 
 
 cdef class ItemsIterator(Iterator):
@@ -1440,7 +1438,7 @@ cdef class ItemsIterator(Iterator):
         self._next()
 
         # Get the next feature.
-        log.debug("GetNextFeature: {}".format(self.next_index))
+        log.debug("GetNextFeature: {}/{}".format(self.next_index, self.ftcount))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
@@ -1454,6 +1452,7 @@ cdef class ItemsIterator(Iterator):
             ignore_fields=self.collection.ignore_fields,
             ignore_geometry=self.collection.ignore_geometry,
         )
+        log.debug("{}".format(feature))
         _deleteOgrFeature(cogr_feature)
 
         return fid, feature
@@ -1471,7 +1470,7 @@ cdef class KeysIterator(Iterator):
         self._next()
 
         # Get the next feature.
-        log.debug("GetNextFeature: {}".format(self.next_index))
+        log.debug("GetNextFeature: {}/{}".format(self.next_index, self.ftcount))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
