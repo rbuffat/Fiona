@@ -1280,9 +1280,11 @@ cdef class Iterator:
 
         self.fastindex = OGR_L_TestCapability(
             session.cogr_layer, OLC_FASTSETNEXTBYINDEX)
+        log.debug("OLC_FASTSETNEXTBYINDEX: {}".format(self.fastindex))
 
         self.fastcount = OGR_L_TestCapability(
             session.cogr_layer, OLC_FASTFEATURECOUNT)
+        log.debug("OLC_FASTFEATURECOUNT: {}".format(self.fastcount))
 
         # In some cases we need to force count of all features
         # We need to check if start is not greater ftcount: (start is not None and start > 0)
