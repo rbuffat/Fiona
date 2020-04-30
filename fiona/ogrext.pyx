@@ -1356,6 +1356,8 @@ cdef class Iterator:
         if self.next_index < 0:
             raise StopIteration
 
+        # GeoJSON driver with gdal 2.1 - 2.2 does not accurately
+        # check if OGR_L_SetNextByIndex is greater than ftcount
         if self.ftcount >= 0 and self.next_index >= self.ftcount:
             raise StopIteration
 
