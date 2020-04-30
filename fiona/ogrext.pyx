@@ -1358,8 +1358,8 @@ cdef class Iterator:
 
         # GeoJSON driver with gdal 2.1 - 2.2 does not accurately
         # check if OGR_L_SetNextByIndex is greater than ftcount
-        #if self.ftcount >= 0 and self.next_index >= self.ftcount:
-        #    raise StopIteration
+        if self.ftcount >= 0 and self.next_index >= self.ftcount:
+            raise StopIteration
 
         if self.stepsign == 1:
             if self.next_index < self.start or (self.stop is not None and self.next_index >= self.stop):
@@ -1406,7 +1406,6 @@ cdef class Iterator:
         self._next()
 
         # Get the next feature.
-        log.debug("GetNextFeature: {}/{}".format(self.next_index, self.ftcount))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
@@ -1438,7 +1437,6 @@ cdef class ItemsIterator(Iterator):
         self._next()
 
         # Get the next feature.
-        log.debug("GetNextFeature: {}/{}".format(self.next_index, self.ftcount))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
@@ -1470,7 +1468,6 @@ cdef class KeysIterator(Iterator):
         self._next()
 
         # Get the next feature.
-        log.debug("GetNextFeature: {}/{}".format(self.next_index, self.ftcount))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
