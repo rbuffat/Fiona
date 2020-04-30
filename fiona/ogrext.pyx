@@ -1374,6 +1374,8 @@ cdef class Iterator:
 
         elif self.step > 1 and not self.fastindex and not self.next_index == self.start:
             for _ in range(self.step - 1):
+                # GDALs default implementation of SetNextByIndex is calling ResetReading() and then
+                # calling GetNextFeature n times. We can shortcut that if we know the previous index.
                 cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
                 if cogr_feature == NULL:
                     raise StopIteration
@@ -1419,7 +1421,7 @@ cdef class Iterator:
                 ignore_geometry=self.collection.ignore_geometry,
             )
         except Exception as e:
-            log.erorr(str(e))
+            log.error(str(e))
 
         finally:
             _deleteOgrFeature(cogr_feature)
@@ -1438,6 +1440,7 @@ cdef class ItemsIterator(Iterator):
         self._next()
 
         # Get the next feature.
+        log.debug("GetNextFeature: {}".format(self.next_index))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
@@ -1468,6 +1471,7 @@ cdef class KeysIterator(Iterator):
         self._next()
 
         # Get the next feature.
+        log.debug("GetNextFeature: {}".format(self.next_index))
         cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
         if cogr_feature == NULL:
             raise StopIteration
