@@ -106,7 +106,6 @@ def generate_testdata(data_type, driver):
                                     and driver not in {'DGN', 'GPSTrackMaker', 'GPX', 'BNA', 'DXF', 'GML'}])
 @pytest.mark.parametrize("data_type", ['date', 'datetime', 'time'])
 def test_datefield(tmpdir, driver, data_type):
-
     schema = {
         "geometry": "Point",
         "properties": {
