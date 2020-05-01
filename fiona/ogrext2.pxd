@@ -246,7 +246,7 @@ cdef extern from "ogr_api.h":
     void    OGR_F_Destroy (void *feature)
     long    OGR_F_GetFID (void *feature)
     int     OGR_F_IsFieldSet (void *feature, int n)
-    int     OGR_F_GetFieldAsDateTimeEx (void *feature, int n, int *y, int *m, int *d, int *h, int *m, int *s, int *z)
+    int     OGR_F_GetFieldAsDateTimeEx (void *feature, int n, int *y, int *m, int *d, int *h, int *m, float *s, int *z)
     double  OGR_F_GetFieldAsDouble (void *feature, int n)
     int     OGR_F_GetFieldAsInteger (void *feature, int n)
     char *  OGR_F_GetFieldAsString (void *feature, int n)
