@@ -31,7 +31,6 @@ def generate_testdata(datatype, driver):
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, None)]
     if datatype == 'date' and driver == 'PCIDSK':
-
         if gdal_version < GDALVersion(2, 1):
             return [("2018-03-25", ''),
                     (datetime.date(2018, 3, 25), ''),
@@ -46,7 +45,24 @@ def generate_testdata(datatype, driver):
                 (None, None)]
 
     # Test data for 'datetime' data type
-    if datatype == 'datetime' and driver in {'CSV', 'PCIDSK'}:
+    if datatype == 'datetime' and driver == 'PCIDSK':
+        if gdal_version < GDALVersion(2, 1):
+            return [("2018-03-25T22:49:05", ''),
+                    (datetime.datetime(2018, 3, 25, 22, 49, 5), ''),
+                    ("2018-03-25T22:49:05.22", ''),
+                    (datetime.datetime(2018, 3, 25, 22, 49, 5, 220000), ''),
+                    ("2018-03-25T22:49:05.123456", ''),
+                    (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), ''),
+                    (None, '')]
+        else:
+            return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
+                    (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
+                    ("2018-03-25T22:49:05.22", "2018/03/25 22:49:05.220"),
+                    (datetime.datetime(2018, 3, 25, 22, 49, 5, 220000), "2018/03/25 22:49:05.220"),
+                    ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05.123"),
+                    (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05.123"),
+                    (None, '')]
+    elif datatype == 'datetime' and driver == 'CSV':
         if gdal_version.major < 2:
             return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
@@ -91,13 +107,22 @@ def generate_testdata(datatype, driver):
 
     # Test data for 'time' data type
     if datatype == 'time' and driver == 'PCIDSK':
-        return [("22:49:05", '0000/00/00 22:49:05'),
-                (datetime.time(22, 49, 5), '0000/00/00 22:49:05'),
-                ("22:49:05.22", '0000/00/00 22:49:05.220'),
-                (datetime.time(22, 49, 5, 220000), '0000/00/00 22:49:05.220'),
-                ("22:49:05.123456", '0000/00/00 22:49:05.123'),
-                (datetime.time(22, 49, 5, 123456), '0000/00/00 22:49:05.123'),
-                (None, '')]
+        if gdal_version < GDALVersion(2, 1):
+            return [("22:49:05", ''),
+                    (datetime.time(22, 49, 5), ''),
+                    ("22:49:05.22", ''),
+                    (datetime.time(22, 49, 5, 220000), ''),
+                    ("22:49:05.123456", ''),
+                    (datetime.time(22, 49, 5, 123456), ''),
+                    (None, '')]
+        else:
+            return [("22:49:05", '0000/00/00 22:49:05'),
+                    (datetime.time(22, 49, 5), '0000/00/00 22:49:05'),
+                    ("22:49:05.22", '0000/00/00 22:49:05.220'),
+                    (datetime.time(22, 49, 5, 220000), '0000/00/00 22:49:05.220'),
+                    ("22:49:05.123456", '0000/00/00 22:49:05.123'),
+                    (datetime.time(22, 49, 5, 123456), '0000/00/00 22:49:05.123'),
+                    (None, '')]
     elif datatype == 'time' and driver == 'MapInfo File':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
