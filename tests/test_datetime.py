@@ -14,27 +14,33 @@ from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 gdal_version = GDALVersion.runtime()
 
 
-def generate_testdata(datatype, driver):
+def converts_to_str(driver, data_type):
+    """ Returns True if the driver converts the data_type silently to str """
+    if ((driver in {'CSV', 'PCIDSK'}) or
+            (driver == 'GeoJSON' and gdal_version.major < 2) or
+            (driver == 'GMT' and gdal_version.major < 2 and data_type in {'date', 'time'})):
+        return True
+    else:
+        return False
+
+
+def generate_testdata(data_type, driver):
     """ Generate test cases for test_datefield
 
     Each testcase has the format [(in_value1, out_value1), (in_value2, out_value2), ...]
     """
 
     # Test data for 'date' data type
-    if datatype == 'date' and driver == 'CSV':
+    if data_type == 'date' and driver == 'CSV':
         return [("2018-03-25", "2018/03/25"),
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, '')]
-    elif datatype == 'date' and ((driver == 'GeoJSON' and gdal_version.major < 2) or
+    elif data_type == 'date' and ((driver == 'GeoJSON' and gdal_version.major < 2) or
                                  (driver == 'GMT' and gdal_version.major < 2)):
         return [("2018-03-25", "2018/03/25"),
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, None)]
-    # elif datatype == 'date' and driver == 'MapInfo File' and gdal_version.major < 2:
-    #     return [("2018-03-25", "2018-03-25"),
-    #             (datetime.date(2018, 3, 25), "2018-03-25"),
-    #             (None, None)]
-    if datatype == 'date' and driver == 'PCIDSK':
+    if data_type == 'date' and driver == 'PCIDSK':
         if gdal_version < GDALVersion(2, 1):
             return [("2018-03-25", ''),
                     (datetime.date(2018, 3, 25), ''),
@@ -43,13 +49,13 @@ def generate_testdata(datatype, driver):
             return [("2018-03-25", "2018/03/25 00:00:00"),
                     (datetime.date(2018, 3, 25), "2018/03/25 00:00:00"),
                     (None, '')]
-    elif datatype == 'date':
+    elif data_type == 'date':
         return [("2018-03-25", "2018-03-25"),
                 (datetime.date(2018, 3, 25), "2018-03-25"),
                 (None, None)]
 
     # Test data for 'datetime' data type
-    if datatype == 'datetime' and driver == 'PCIDSK':
+    if data_type == 'datetime' and driver == 'PCIDSK':
         if gdal_version < GDALVersion(2, 1):
             return [("2018-03-25T22:49:05", ''),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), ''),
@@ -66,7 +72,7 @@ def generate_testdata(datatype, driver):
                     ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05.123"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05.123"),
                     (None, '')]
-    elif datatype == 'datetime' and driver == 'CSV':
+    elif data_type == 'datetime' and driver == 'CSV':
         if gdal_version.major < 2:
             return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
@@ -83,7 +89,7 @@ def generate_testdata(datatype, driver):
                     ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05.123"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05.123"),
                     (None, '')]
-    if datatype == 'datetime' and driver == 'GeoJSON' and gdal_version.major < 2:
+    if data_type == 'datetime' and driver == 'GeoJSON' and gdal_version.major < 2:
         return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
                 (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
                 ("2018-03-25T22:49:05.22", "2018/03/25 22:49:05"),
@@ -91,7 +97,7 @@ def generate_testdata(datatype, driver):
                 ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05"),
                 (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05"),
                 (None, None)]
-    elif datatype == 'datetime':
+    elif data_type == 'datetime':
         if gdal_version.major < 2:
             return [("2018-03-25T22:49:05", "2018-03-25T22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018-03-25T22:49:05"),
@@ -110,7 +116,7 @@ def generate_testdata(datatype, driver):
                     (None, None)]
 
     # Test data for 'time' data type
-    if datatype == 'time' and driver == 'PCIDSK':
+    if data_type == 'time' and driver == 'PCIDSK':
         if gdal_version < GDALVersion(2, 1):
             return [("22:49:05", ''),
                     (datetime.time(22, 49, 5), ''),
@@ -127,7 +133,7 @@ def generate_testdata(datatype, driver):
                     ("22:49:05.123456", '0000/00/00 22:49:05.123'),
                     (datetime.time(22, 49, 5, 123456), '0000/00/00 22:49:05.123'),
                     (None, '')]
-    elif datatype == 'time' and driver == 'MapInfo File':
+    elif data_type == 'time' and driver == 'MapInfo File':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
@@ -144,7 +150,7 @@ def generate_testdata(datatype, driver):
                     ("22:49:05.123456", "22:49:05.123000"),
                     (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
                     (None, '00:00:00')]
-    elif datatype == 'time' and driver == 'CSV':
+    elif data_type == 'time' and driver == 'CSV':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
@@ -161,7 +167,7 @@ def generate_testdata(datatype, driver):
                     ("22:49:05.123456", "22:49:05.123"),
                     (datetime.time(22, 49, 5, 123456), "22:49:05.123"),
                     (None, '')]
-    elif datatype == 'time' and driver in {'GeoJSON', 'GeoJSONSeq'}:
+    elif data_type == 'time' and driver in {'GeoJSON', 'GeoJSONSeq'}:
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
@@ -178,7 +184,7 @@ def generate_testdata(datatype, driver):
                     ("22:49:05.123456", "22:49:05.123000"),
                     (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
                     (None, None)]
-    elif datatype == 'time':
+    elif data_type == 'time':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
@@ -239,9 +245,7 @@ def test_datefield(tmpdir, driver, data_type):
         with fiona.open(path, 'r') as c:
 
             # Some drivers convert data types to str
-            if ((driver in {'CSV', 'PCIDSK'}) or
-                    (driver == 'GeoJSON' and gdal_version.major < 2) or
-                    (driver == 'GMT' and gdal_version.major < 2 and data_type in {'date', 'time'})):
+            if converts_to_str(driver, data_type):
                 assert c.schema["properties"]["datefield"] == 'str'
             else:
                 assert c.schema["properties"]["datefield"] == data_type
