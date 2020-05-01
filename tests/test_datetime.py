@@ -21,11 +21,15 @@ def generate_testdata(datatype, driver):
     """
 
     # Test data for 'date' data type
-    if datatype == 'date' and ((driver == 'CSV') or
-                               (driver == 'GeoJSON' and gdal_version.major < 2)):
+    if datatype == 'date' and (driver == 'CSV'):
         return [("2018-03-25", "2018/03/25"),
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, '')]
+    elif datatype == 'date' and ((driver == 'GeoJSON' and gdal_version.major < 2) or
+                                 (driver == 'GMT' and gdal_version.major < 2)):
+        return [("2018-03-25", "2018/03/25"),
+                (datetime.date(2018, 3, 25), "2018/03/25"),
+                (None, None)]
     if datatype == 'date' and driver == 'PCIDSK':
 
         if gdal_version < GDALVersion(2, 1):
@@ -42,8 +46,7 @@ def generate_testdata(datatype, driver):
                 (None, None)]
 
     # Test data for 'datetime' data type
-    if datatype == 'datetime' and (driver in {'CSV', 'PCIDSK'} or
-                                   (driver =='GeoJSON' and gdal_version.major < 2)):
+    if datatype == 'datetime' and driver in {'CSV', 'PCIDSK'}:
         if gdal_version.major < 2:
             return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
@@ -60,6 +63,14 @@ def generate_testdata(datatype, driver):
                     ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05.123"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05.123"),
                     (None, '')]
+    if datatype == 'datetime' and driver == 'GeoJSON' and gdal_version.major < 2:
+        return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
+                (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
+                ("2018-03-25T22:49:05.22", "2018/03/25 22:49:05"),
+                (datetime.datetime(2018, 3, 25, 22, 49, 5, 220000), "2018/03/25 22:49:05"),
+                ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05"),
+                (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05"),
+                (None, None)]
     elif datatype == 'datetime':
         if gdal_version.major < 2:
             return [("2018-03-25T22:49:05", "2018-03-25T22:49:05"),
@@ -173,7 +184,8 @@ def test_datefield(tmpdir, driver, data_type):
 
     path = str(tmpdir.join(get_temp_filename(driver)))
     if ((driver == 'ESRI Shapefile' and data_type in {'datetime', 'time'}) or
-            (driver == 'GPKG' and data_type == 'time')):
+            (driver == 'GPKG' and data_type == 'time') or
+            (driver == 'GPKG' and gdal_version.major < 2)):
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
