@@ -185,7 +185,7 @@ def test_datefield(tmpdir, driver, data_type):
     path = str(tmpdir.join(get_temp_filename(driver)))
     if ((driver == 'ESRI Shapefile' and data_type in {'datetime', 'time'}) or
             (driver == 'GPKG' and data_type == 'time') or
-            (driver == 'GPKG' and gdal_version.major < 2)):
+            (driver == 'GPKG' and gdal_version.major < 2 and data_type in {'datetime', 'time'})):
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
@@ -221,5 +221,4 @@ def test_datefield(tmpdir, driver, data_type):
 
             assert len(items) == len(values_in)
             for val_in, val_out in zip(items, values_out):
-                print(val_in, val_out)
                 assert val_in == val_out
