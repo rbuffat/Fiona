@@ -241,7 +241,7 @@ def test_datefield(tmpdir, driver, data_type):
             # Some drivers convert data types to str
             if ((driver in {'CSV', 'PCIDSK'}) or
                     (driver == 'GeoJSON' and gdal_version.major < 2) or
-                    (driver == 'GMT' and gdal_version.major < 2 and data_type in {'date', 'datetime', 'time'})):
+                    (driver == 'GMT' and gdal_version.major < 2 and data_type in {'date', 'time'})):
                 assert c.schema["properties"]["datefield"] == 'str'
             else:
                 assert c.schema["properties"]["datefield"] == data_type
