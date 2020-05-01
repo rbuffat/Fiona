@@ -21,7 +21,7 @@ def generate_testdata(datatype, driver):
     """
 
     # Test data for 'date' data type
-    if datatype == 'date' and (driver == 'CSV'):
+    if datatype == 'date' and driver == 'CSV':
         return [("2018-03-25", "2018/03/25"),
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, '')]
@@ -30,6 +30,10 @@ def generate_testdata(datatype, driver):
         return [("2018-03-25", "2018/03/25"),
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, None)]
+    elif datatype == 'date' and driver == 'MapInfo File' and gdal_version.major < 2:
+        return [("2018-03-25", "2018/03/25"),
+                (datetime.date(2018, 3, 25), "2018/03/25"),
+                (None, '00:00:00')]
     if datatype == 'date' and driver == 'PCIDSK':
         if gdal_version < GDALVersion(2, 1):
             return [("2018-03-25", ''),
@@ -159,7 +163,7 @@ def generate_testdata(datatype, driver):
                     (None, '')]
     elif datatype == 'time' and driver in {'GeoJSON', 'GeoJSONSeq'}:
         if gdal_version.major < 2:
-            return [("22:49:05", "22/49/05"),
+            return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
                     ("22:49:05.22", "22/49/05.220000"),
                     (datetime.time(22, 49, 5, 220000), "22:49:05"),
@@ -237,7 +241,7 @@ def test_datefield(tmpdir, driver, data_type):
             # Some drivers convert data types to str
             if ((driver in {'CSV', 'PCIDSK'}) or
                     (driver == 'GeoJSON' and gdal_version.major < 2) or
-                    (driver == 'GMT' and gdal_version.major < 2)):
+                    (driver == 'GMT' and gdal_version.major < 2 and data_type in {'datetime', 'time'})):
                 assert c.schema["properties"]["datefield"] == 'str'
             else:
                 assert c.schema["properties"]["datefield"] == data_type
