@@ -127,6 +127,7 @@ def test_datefield(tmpdir, driver, data_type):
 
         return {"geometry": "Point",
                 "properties": {"datefield": data_type}}
+
     schema = get_schema()
     print(schema)
 
@@ -162,12 +163,10 @@ def test_datefield(tmpdir, driver, data_type):
                             driver=driver,
                             schema=schema) as c:
                 pass
-
     else:
         values_in, values_out = zip(*generate_testdata(data_type, driver))
 
         records = get_records(values_in)
-        # print(records)
 
         with fiona.open(path, 'w',
                         driver=driver,
@@ -175,19 +174,21 @@ def test_datefield(tmpdir, driver, data_type):
             c.writerecords(records)
 
         with fiona.open(path, 'r') as c:
-            c.schema['properties']
-            # print(c.schema)
-            # Some drivers convert data types to str
-            if converts_to_str(driver, data_type):
-                assert get_schema_field(c.schema) == 'str'
-            # GPX and GPSTrackMaker convert time and date to datetime
-            elif driver in {'GPX', 'GPSTrackMaker'}:
-                assert get_schema_field(c.schema) == 'datetime'
+            # GML driver silently ignores time field
+            if driver == 'GML' and data_type == 'time':
+                assert "datefield" not in c.schema['properties']
             else:
-                assert get_schema_field(c.schema) == data_type
+                # Some drivers convert data types to str
+                if converts_to_str(driver, data_type):
+                    assert get_schema_field(c.schema) == 'str'
+                # GPX and GPSTrackMaker convert time and date to datetime
+                elif driver in {'GPX', 'GPSTrackMaker'}:
+                    assert get_schema_field(c.schema) == 'datetime'
+                else:
+                    assert get_schema_field(c.schema) == data_type
 
-                # items = [get_field(f) for f in c]
-                #
-                # assert len(items) == len(values_in)
-                # for val_in, val_out in zip(items, values_out):
-                #     assert val_in == val_out
+                    items = [get_field(f) for f in c]
+
+                    assert len(items) == len(values_in)
+                    for val_in, val_out in zip(items, values_out):
+                        assert val_in == val_out
