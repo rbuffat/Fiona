@@ -47,23 +47,14 @@ def generate_testdata(data_type, driver):
                     (None, None)]
 
     # Test data for 'time' data type
-    if data_type == 'time' and driver == 'MapInfo File':
-        if gdal_version.major < 2:
-            return [("22:49:05", "22:49:05"),
-                    (datetime.time(22, 49, 5), "22:49:05"),
-                    ("22:49:05.22", "22:49:05"),
-                    (datetime.time(22, 49, 5, 220000), "22:49:05"),
-                    ("22:49:05.123456", "22:49:05"),
-                    (datetime.time(22, 49, 5, 123456), "22:49:05"),
-                    (None, None)]
-        else:
-            return [("22:49:05", "22:49:05"),
-                    (datetime.time(22, 49, 5), "22:49:05"),
-                    ("22:49:05.22", "22:49:05.220000"),
-                    (datetime.time(22, 49, 5, 220000), "22:49:05.220000"),
-                    ("22:49:05.123456", "22:49:05.123000"),
-                    (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
-                    (None, '00:00:00')]
+    if data_type == 'time' and driver == 'MapInfo File' and gdal_version.major > 1:
+        return [("22:49:05", "22:49:05"),
+                (datetime.time(22, 49, 5), "22:49:05"),
+                ("22:49:05.22", "22:49:05.220000"),
+                (datetime.time(22, 49, 5, 220000), "22:49:05.220000"),
+                ("22:49:05.123456", "22:49:05.123000"),
+                (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
+                (None, '00:00:00')]
     elif data_type == 'time' and driver in {'GeoJSON', 'GeoJSONSeq'}:
         return [("22:49:05", "22:49:05"),
                 (datetime.time(22, 49, 5), "22:49:05"),
@@ -147,7 +138,7 @@ def test_datefield(tmpdir, driver, data_type):
     if ((driver == 'ESRI Shapefile' and data_type in {'datetime', 'time'}) or
             (driver == 'GPKG' and data_type == 'time') or
             (driver == 'GPKG' and gdal_version.major < 2 and data_type in {'datetime', 'time'}) or
-            (driver == 'GML' and data_type == 'time')):
+            (driver == 'GML' and data_type == 'time' and gdal_version < GDALVersion(3, 1))):
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
@@ -156,7 +147,6 @@ def test_datefield(tmpdir, driver, data_type):
 
     else:
         values_in, values_out = zip(*generate_testdata(data_type, driver))
-
         records = get_records(values_in)
 
         # Some driver silently convert date / datetime / time to str
