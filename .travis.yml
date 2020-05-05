@@ -45,6 +45,11 @@ matrix:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
 
+    - python: "3.6"
+      env:
+        GDALVERSION="3.1.0rc3"
+        PROJVERSION="6.3.2"
+
     # Test all supported python versions with latest stable gdal release
     - python: "2.7"
       env:
