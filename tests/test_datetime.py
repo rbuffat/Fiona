@@ -10,20 +10,9 @@ from fiona.errors import DriverSupportError
 from .conftest import get_temp_filename
 from fiona.env import GDALVersion
 import datetime
-from fiona.drvsupport import supported_drivers, driver_mode_mingdal
+from fiona.drvsupport import supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str
 
 gdal_version = GDALVersion.runtime()
-
-
-def converts_to_str(driver, data_type):
-    """ Returns True if the driver converts the data_type silently to str """
-    if ((driver in {'CSV', 'PCIDSK'}) or
-            (driver == 'GeoJSON' and gdal_version.major < 2) or
-            (driver == 'GMT' and gdal_version.major < 2 and data_type in {'date', 'time'}) or
-            (driver == 'GML' and data_type in {'date', 'datetime'})):
-        return True
-    else:
-        return False
 
 
 def generate_testdata(data_type, driver):
@@ -157,32 +146,41 @@ def test_datefield(tmpdir, driver, data_type):
     # Some driver do not support date, datetime or time
     if ((driver == 'ESRI Shapefile' and data_type in {'datetime', 'time'}) or
             (driver == 'GPKG' and data_type == 'time') or
-            (driver == 'GPKG' and gdal_version.major < 2 and data_type in {'datetime', 'time'})):
+            (driver == 'GPKG' and gdal_version.major < 2 and data_type in {'datetime', 'time'}) or
+            (driver == 'GML' and data_type == 'time')):
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
                             schema=schema) as c:
                 pass
+
     else:
         values_in, values_out = zip(*generate_testdata(data_type, driver))
 
         records = get_records(values_in)
 
-        with fiona.open(path, 'w',
-                        driver=driver,
-                        schema=schema) as c:
-            c.writerecords(records)
+        # Some driver silently convert date / datetime / time to str
+        if driver_converts_field_type_silently_to_str(driver, data_type):
+            with pytest.warns(UserWarning) as record:
+                with fiona.open(path, 'w',
+                                driver=driver,
+                                schema=schema) as c:
+                    c.writerecords(records)
+                assert len(record) == 1
+                assert "silently converts" in record[0].message.args[0]
 
-        with fiona.open(path, 'r') as c:
-            # GML driver silently ignores time field
-            if driver == 'GML' and data_type == 'time':
-                assert "datefield" not in c.schema['properties']
-            else:
-                # Some drivers convert data types to str
-                if converts_to_str(driver, data_type):
-                    assert get_schema_field(c.schema) == 'str'
+            with fiona.open(path, 'r') as c:
+                assert get_schema_field(c.schema) == 'str'
+
+        else:
+            with fiona.open(path, 'w',
+                            driver=driver,
+                            schema=schema) as c:
+                c.writerecords(records)
+
+            with fiona.open(path, 'r') as c:
                 # GPX and GPSTrackMaker convert time and date to datetime
-                elif driver in {'GPX', 'GPSTrackMaker'}:
+                if driver in {'GPX', 'GPSTrackMaker'}:
                     assert get_schema_field(c.schema) == 'datetime'
                 else:
                     assert get_schema_field(c.schema) == data_type
