@@ -15,7 +15,9 @@ env:
     - GDALBUILD=$HOME/gdalbuild
     - PROJINST=$HOME/gdalinstall
     - PROJBUILD=$HOME/projbuild
-    - MAKEFLAGS="-j 2 -O0"
+    - MAKEFLAGS="-j 2"
+    - CPPFLAGS="-O0"
+    - CFLAGS="-O0"
 
 matrix:
   include:
