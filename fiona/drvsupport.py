@@ -186,7 +186,7 @@ def driver_converts_field_type_silently_to_str(driver, field_type):
             (driver == 'GeoJSON' and gdal_version.major < 2) or
             (driver == 'GPKG' and field_type == 'time') or
             (driver == 'GMT' and gdal_version.major < 2 and field_type in {'date', 'time'}) or
-            (driver == 'GML' and field_type in {'date', 'datetime'})):
+            (driver == 'GML' and field_type in {'date', 'datetime'} and gdal_version < GDALVersion(3, 1))):
         return True
 
     return False
@@ -198,7 +198,8 @@ def driver_supports_datetime_field(driver, field_type):
     if ((driver == 'ESRI Shapefile' and field_type in {'datetime', 'time'}) or
             (driver == 'GPKG' and field_type == 'time') or
             (driver == 'GPKG' and gdal_version.major < 2 and field_type in {'datetime', 'time'}) or
-            (driver == 'GML' and field_type == 'time' and gdal_version < GDALVersion(3, 1))):
+            (driver == 'GML' and field_type == 'time' and gdal_version < GDALVersion(3, 1)) or
+            (driver in {'GPX', 'GPSTrackMaker'} and field_type in {'date', 'time'})):
         return False
 
     return True

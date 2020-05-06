@@ -30,7 +30,7 @@ def generate_testdata(data_type, driver):
 
     # Test data for 'datetime' data type
     if data_type == 'datetime':
-        if gdal_version.major < 2:
+        if gdal_version.major < 2 or driver == 'GPSTrackMaker':
             return [("2018-03-25T22:49:05", "2018-03-25T22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018-03-25T22:49:05"),
                     ("2018-03-25T22:49:05.22", "2018-03-25T22:49:05"),
@@ -56,14 +56,6 @@ def generate_testdata(data_type, driver):
                 ("22:49:05.123456", "22:49:05.123000"),
                 (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
                 (None, '00:00:00')]
-    elif data_type == 'time' and driver in {'GeoJSON', 'GeoJSONSeq'}:
-        return [("22:49:05", "22:49:05"),
-                (datetime.time(22, 49, 5), "22:49:05"),
-                ("22:49:05.22", "22:49:05.220000"),
-                (datetime.time(22, 49, 5, 220000), "22:49:05.220000"),
-                ("22:49:05.123456", "22:49:05.123000"),
-                (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
-                (None, None)]
     elif data_type == 'time':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
@@ -76,8 +68,8 @@ def generate_testdata(data_type, driver):
         else:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
-                    ("22:49:05.22", "22:49:05.220"),
-                    (datetime.time(22, 49, 5, 220000), "22:49:05.220"),
+                    ("22:49:05.22", "22:49:05.220000"),
+                    (datetime.time(22, 49, 5, 220000), "22:49:05.220000"),
                     ("22:49:05.123456", "22:49:05.123000"),
                     (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
                     (None, None)]
@@ -103,8 +95,9 @@ def test_datefield(tmpdir, driver, data_type):
                                                ('time', data_type)]),
                     'geometry': 'Point'}
         if driver == 'GPSTrackMaker':
-            return {'properties': OrderedDict([('time', data_type)]),
-                    'geometry': 'Point'}
+            return {
+                'properties': OrderedDict([('name', 'str'), ('comment', 'str'), ('icon', 'int'), ('time', data_type)]),
+                'geometry': 'Point'}
 
         return {"geometry": "Point",
                 "properties": {"datefield": data_type}}
@@ -118,7 +111,8 @@ def test_datefield(tmpdir, driver, data_type):
                      "properties": {'ele': 0, "time": val}} for val in values]
         if driver == 'GPSTrackMaker':
             return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
-                     "properties": {"time": val}} for val in values]
+                     "properties": OrderedDict([('name', ''), ('comment', ''), ('icon', 48), ('time', val)])} for
+                    val in values]
 
         return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
                  "properties": {"datefield": val}} for val in values]
@@ -138,6 +132,7 @@ def test_datefield(tmpdir, driver, data_type):
     # Some driver do not support date, datetime or time
     print(driver, data_type, driver_supports_datetime_field(driver, data_type))
     if not driver_supports_datetime_field(driver, data_type):
+        print("not supported")
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
@@ -168,15 +163,9 @@ def test_datefield(tmpdir, driver, data_type):
                 c.writerecords(records)
 
             with fiona.open(path, 'r') as c:
-                print(c.schema)
-                # GPX and GPSTrackMaker convert time and date to datetime
-                if driver in {'GPX', 'GPSTrackMaker'}:
-                    assert get_schema_field(c.schema) == 'datetime'
-                else:
-                    assert get_schema_field(c.schema) == data_type
-
-                    items = [get_field(f) for f in c]
-
-                    assert len(items) == len(values_in)
-                    for val_in, val_out in zip(items, values_out):
-                        assert val_in == val_out
+                assert get_schema_field(c.schema) == data_type
+                items = [get_field(f) for f in c]
+                assert len(items) == len(values_in)
+                for val_in, val_out in zip(items, values_out):
+                    print(val_in, val_out)
+                    assert val_in == val_out
