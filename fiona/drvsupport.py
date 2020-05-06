@@ -2,6 +2,8 @@
 
 from fiona.env import Env, GDALVersion
 
+gdal_version = GDALVersion.runtime()
+
 # Here is the list of available drivers as (name, modes) tuples. Currently,
 # we only expose the defaults (excepting FileGDB). We also don't expose
 # the CSV or GeoJSON drivers. Use Python's csv and json modules instead.
@@ -177,15 +179,26 @@ def _filter_supported_drivers():
 _filter_supported_drivers()
 
 
-def driver_converts_field_type_silently_to_str(driver, data_type):
-    """ Returns True if the driver converts the data_type silently to str """
-
-    gdal_version = GDALVersion.runtime()
+def driver_converts_field_type_silently_to_str(driver, field_type):
+    """ Returns True if the driver converts the field_type silently to str, False otherwise """
 
     if ((driver in {'CSV', 'PCIDSK'}) or
             (driver == 'GeoJSON' and gdal_version.major < 2) or
-            (driver == 'GMT' and gdal_version.major < 2 and data_type in {'date', 'time'}) or
-            (driver == 'GML' and data_type in {'date', 'datetime'})):
+            (driver == 'GPKG' and field_type == 'time') or
+            (driver == 'GMT' and gdal_version.major < 2 and field_type in {'date', 'time'}) or
+            (driver == 'GML' and field_type in {'date', 'datetime'})):
         return True
-    else:
+
+    return False
+
+
+def driver_supports_datetime_field(driver, field_type):
+    """ Returns True if driver support the field_type, False otherwise"""
+
+    if ((driver == 'ESRI Shapefile' and field_type in {'datetime', 'time'}) or
+            (driver == 'GPKG' and field_type == 'time') or
+            (driver == 'GPKG' and gdal_version.major < 2 and field_type in {'datetime', 'time'}) or
+            (driver == 'GML' and field_type == 'time' and gdal_version < GDALVersion(3, 1))):
         return False
+
+    return True

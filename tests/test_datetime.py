@@ -10,7 +10,8 @@ from fiona.errors import DriverSupportError
 from .conftest import get_temp_filename
 from fiona.env import GDALVersion
 import datetime
-from fiona.drvsupport import supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str
+from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str,
+                              driver_supports_datetime_field)
 
 gdal_version = GDALVersion.runtime()
 
@@ -135,10 +136,8 @@ def test_datefield(tmpdir, driver, data_type):
     path = str(tmpdir.join(get_temp_filename(driver)))
 
     # Some driver do not support date, datetime or time
-    if ((driver == 'ESRI Shapefile' and data_type in {'datetime', 'time'}) or
-            (driver == 'GPKG' and data_type == 'time') or
-            (driver == 'GPKG' and gdal_version.major < 2 and data_type in {'datetime', 'time'}) or
-            (driver == 'GML' and data_type == 'time' and gdal_version < GDALVersion(3, 1))):
+    print(driver, data_type, driver_supports_datetime_field(driver, data_type))
+    if not driver_supports_datetime_field(driver, data_type):
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
@@ -169,6 +168,7 @@ def test_datefield(tmpdir, driver, data_type):
                 c.writerecords(records)
 
             with fiona.open(path, 'r') as c:
+                print(c.schema)
                 # GPX and GPSTrackMaker convert time and date to datetime
                 if driver in {'GPX', 'GPSTrackMaker'}:
                     assert get_schema_field(c.schema) == 'datetime'
