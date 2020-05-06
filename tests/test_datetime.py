@@ -176,6 +176,10 @@ def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, drive
 
     """
 
+    if driver == "BNA" and gdal_version < GDALVersion(2, 0):
+        # BNA driver segfaults with gdal 1.11
+        return
+
     # If the driver supports the field we have nothing to do here
     if driver_supports_field(driver, field_type):
         return
