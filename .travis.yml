@@ -16,7 +16,7 @@ env:
     - PROJINST=$HOME/gdalinstall
     - PROJBUILD=$HOME/projbuild
     - MAKEFLAGS="-j 2"
-    - CPPFLAGS="-O0"
+    - CXXFLAGS="-O0"
     - CFLAGS="-O0"
 
 matrix:
