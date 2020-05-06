@@ -44,14 +44,14 @@ supported_drivers = dict([
     ("OpenFileGDB", "r"),
     # ESRI Personal GeoDatabase 	PGeo 	No 	Yes 	No, needs ODBC library
     # ESRI ArcSDE 	SDE 	No 	Yes 	No, needs ESRI SDE
-    # ESRIJSON 	ESRIJSON 	No 	Yes 	Yes 
+    # ESRIJSON 	ESRIJSON 	No 	Yes 	Yes
     ("ESRIJSON", "r"),
     # ESRI Shapefile 	ESRI Shapefile 	Yes 	Yes 	Yes
     ("ESRI Shapefile", "raw"),
     # FMEObjects Gateway 	FMEObjects Gateway 	No 	Yes 	No, needs FME
     # GeoJSON 	GeoJSON 	Yes 	Yes 	Yes
     ("GeoJSON", "raw"),
-    # GeoJSONSeq 	GeoJSON sequences 	Yes 	Yes 	Yes 
+    # GeoJSONSeq 	GeoJSON sequences 	Yes 	Yes 	Yes
     ("GeoJSONSeq", "rw"),
     # Géoconcept Export 	Geoconcept 	Yes 	Yes 	Yes
     # multi-layers
@@ -119,7 +119,7 @@ supported_drivers = dict([
     # SUA 	SUA 	No 	Yes 	Yes
     ("SUA", "r"),
     # SVG 	SVG 	No 	Yes 	No, needs libexpat
-    # TopoJSON 	TopoJSON 	No 	Yes 	Yes 
+    # TopoJSON 	TopoJSON 	No 	Yes 	Yes
     ("TopoJSON", "r"),
     # UK .NTF 	UK. NTF 	No 	Yes 	Yes
     # multi-layer
@@ -156,7 +156,7 @@ driver_mode_mingdal = {
           'GPKG': (1, 11, 0),
           'GeoJSON': (2, 1, 0),
           'MapInfo File': (2, 0, 0),
-          'PCIDSK': (2, 0, 0)}    
+          'PCIDSK': (2, 0, 0)}
 }
 
 
@@ -192,14 +192,42 @@ def driver_converts_field_type_silently_to_str(driver, field_type):
     return False
 
 
-def driver_supports_datetime_field(driver, field_type):
+# None: field type is never supported, GDALVersion(2, 0) field type is supported starting with gdal 2.0
+driver_field_type_unsupported = {
+    'time': {
+        'ESRI Shapefile': None,
+        'GPKG': GDALVersion(2, 0),
+        'GPX': None,
+        'GPSTrackMaker': None,
+        'GML': GDALVersion(3, 1),
+        'DGN': None,
+        'BNA': None,
+        'DXF': None
+    },
+    'datetime': {
+        'ESRI Shapefile': None,
+        'GPKG': GDALVersion(2, 0),
+        'DGN': None,
+        'BNA': None,
+        'DXF': None
+    },
+    'date': {
+        'GPX': None,
+        'GPSTrackMaker': None,
+        'DGN': None,
+        'BNA': None,
+        'DXF': None
+    }
+}
+
+
+def driver_supports_field(driver, field_type):
     """ Returns True if driver support the field_type, False otherwise"""
 
-    if ((driver == 'ESRI Shapefile' and field_type in {'datetime', 'time'}) or
-            (driver == 'GPKG' and field_type == 'time') or
-            (driver == 'GPKG' and gdal_version.major < 2 and field_type in {'datetime', 'time'}) or
-            (driver == 'GML' and field_type == 'time' and gdal_version < GDALVersion(3, 1)) or
-            (driver in {'GPX', 'GPSTrackMaker'} and field_type in {'date', 'time'})):
-        return False
+    if field_type in driver_field_type_unsupported and driver in driver_field_type_unsupported[field_type]:
+        if driver_field_type_unsupported[field_type][driver] is None:
+            return False
+        elif driver_field_type_unsupported[field_type][driver] > gdal_version:
+            return False
 
     return True

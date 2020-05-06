@@ -11,25 +11,64 @@ from .conftest import get_temp_filename
 from fiona.env import GDALVersion
 import datetime
 from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str,
-                              driver_supports_datetime_field)
+                              driver_supports_field)
 
 gdal_version = GDALVersion.runtime()
 
 
-def generate_testdata(data_type, driver):
+def get_schema(driver, field_type):
+    if driver == 'GPX':
+        return {'properties': OrderedDict([('ele', 'float'),
+                                           ('time', field_type)]),
+                'geometry': 'Point'}
+    if driver == 'GPSTrackMaker':
+        return {
+            'properties': OrderedDict([('name', 'str'), ('comment', 'str'), ('icon', 'int'), ('time', field_type)]),
+            'geometry': 'Point'}
+
+    return {"geometry": "Point",
+            "properties": {"datefield": field_type}}
+
+
+def get_records(driver, values):
+    if driver == 'GPX':
+        return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
+                 "properties": {'ele': 0, "time": val}} for val in values]
+    if driver == 'GPSTrackMaker':
+        return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
+                 "properties": OrderedDict([('name', ''), ('comment', ''), ('icon', 48), ('time', val)])} for
+                val in values]
+
+    return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
+             "properties": {"datefield": val}} for val in values]
+
+
+def get_schema_field(driver, schema):
+    if driver in {'GPX', 'GPSTrackMaker'}:
+        return schema["properties"]["time"]
+    return schema["properties"]["datefield"]
+
+
+def get_field(driver, f):
+    if driver in {'GPX', 'GPSTrackMaker'}:
+        return f["properties"]["time"]
+    return f['properties']['datefield']
+
+
+def generate_testdata(field_type, driver):
     """ Generate test cases for test_datefield
 
     Each test case has the format [(in_value1, out_value1), (in_value2, out_value2), ...]
     """
 
     # Test data for 'date' data type
-    if data_type == 'date':
+    if field_type == 'date':
         return [("2018-03-25", "2018-03-25"),
                 (datetime.date(2018, 3, 25), "2018-03-25"),
                 (None, None)]
 
     # Test data for 'datetime' data type
-    if data_type == 'datetime':
+    if field_type == 'datetime':
         if gdal_version.major < 2 or driver == 'GPSTrackMaker':
             return [("2018-03-25T22:49:05", "2018-03-25T22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018-03-25T22:49:05"),
@@ -48,7 +87,7 @@ def generate_testdata(data_type, driver):
                     (None, None)]
 
     # Test data for 'time' data type
-    if data_type == 'time' and driver == 'MapInfo File' and gdal_version.major > 1:
+    if field_type == 'time' and driver == 'MapInfo File' and gdal_version.major > 1:
         return [("22:49:05", "22:49:05"),
                 (datetime.time(22, 49, 5), "22:49:05"),
                 ("22:49:05.22", "22:49:05.220000"),
@@ -56,7 +95,7 @@ def generate_testdata(data_type, driver):
                 ("22:49:05.123456", "22:49:05.123000"),
                 (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
                 (None, '00:00:00')]
-    elif data_type == 'time':
+    elif field_type == 'time':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
@@ -75,64 +114,19 @@ def generate_testdata(data_type, driver):
                     (None, None)]
 
 
-# DGN: DGN schema contains no date/time fields
-# BNA: It only contains geometry and a few identifiers per record. Attributes must be stored into external files.
-# DXF: DXF schema contains no date/time fields
 @pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
                                     and (driver not in driver_mode_mingdal['w'] or
-                                         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
-                                    and driver not in {'DGN', 'BNA', 'DXF'}])
-@pytest.mark.parametrize("data_type", ['date', 'datetime', 'time'])
-def test_datefield(tmpdir, driver, data_type):
+                                         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
+@pytest.mark.parametrize("field_type", ['date', 'datetime', 'time'])
+def test_datefield(tmpdir, driver, field_type):
     """
     Test handling of date, time, datetime types for write capable drivers
     """
 
-    def get_schema():
-
-        if driver == 'GPX':
-            return {'properties': OrderedDict([('ele', 'float'),
-                                               ('time', data_type)]),
-                    'geometry': 'Point'}
-        if driver == 'GPSTrackMaker':
-            return {
-                'properties': OrderedDict([('name', 'str'), ('comment', 'str'), ('icon', 'int'), ('time', data_type)]),
-                'geometry': 'Point'}
-
-        return {"geometry": "Point",
-                "properties": {"datefield": data_type}}
-
-    schema = get_schema()
-    print(schema)
-
-    def get_records(values):
-        if driver == 'GPX':
-            return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
-                     "properties": {'ele': 0, "time": val}} for val in values]
-        if driver == 'GPSTrackMaker':
-            return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
-                     "properties": OrderedDict([('name', ''), ('comment', ''), ('icon', 48), ('time', val)])} for
-                    val in values]
-
-        return [{"geometry": {"type": "Point", "coordinates": [1, 2]},
-                 "properties": {"datefield": val}} for val in values]
-
-    def get_schema_field(schema):
-        if driver in {'GPX', 'GPSTrackMaker'}:
-            return schema["properties"]["time"]
-        return schema["properties"]["datefield"]
-
-    def get_field(f):
-        if driver in {'GPX', 'GPSTrackMaker'}:
-            return f["properties"]["time"]
-        return f['properties']['datefield']
-
+    schema = get_schema(driver, field_type)
     path = str(tmpdir.join(get_temp_filename(driver)))
-
     # Some driver do not support date, datetime or time
-    print(driver, data_type, driver_supports_datetime_field(driver, data_type))
-    if not driver_supports_datetime_field(driver, data_type):
-        print("not supported")
+    if not driver_supports_field(driver, field_type):
         with pytest.raises(DriverSupportError):
             with fiona.open(path, 'w',
                             driver=driver,
@@ -140,11 +134,11 @@ def test_datefield(tmpdir, driver, data_type):
                 pass
 
     else:
-        values_in, values_out = zip(*generate_testdata(data_type, driver))
-        records = get_records(values_in)
+        values_in, values_out = zip(*generate_testdata(field_type, driver))
+        records = get_records(driver, values_in)
 
         # Some driver silently convert date / datetime / time to str
-        if driver_converts_field_type_silently_to_str(driver, data_type):
+        if driver_converts_field_type_silently_to_str(driver, field_type):
             with pytest.warns(UserWarning) as record:
                 with fiona.open(path, 'w',
                                 driver=driver,
@@ -154,7 +148,7 @@ def test_datefield(tmpdir, driver, data_type):
                 assert "silently converts" in record[0].message.args[0]
 
             with fiona.open(path, 'r') as c:
-                assert get_schema_field(c.schema) == 'str'
+                assert get_schema_field(driver, c.schema) == 'str'
 
         else:
             with fiona.open(path, 'w',
@@ -163,9 +157,50 @@ def test_datefield(tmpdir, driver, data_type):
                 c.writerecords(records)
 
             with fiona.open(path, 'r') as c:
-                assert get_schema_field(c.schema) == data_type
-                items = [get_field(f) for f in c]
+                assert get_schema_field(driver, c.schema) == field_type
+                items = [get_field(driver, f) for f in c]
                 assert len(items) == len(values_in)
                 for val_in, val_out in zip(items, values_out):
-                    print(val_in, val_out)
                     assert val_in == val_out
+
+
+@pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
+                                    and (driver not in driver_mode_mingdal['w'] or
+                                         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
+@pytest.mark.parametrize("field_type", ['date', 'datetime', 'time'])
+def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, driver, field_type, monkeypatch):
+    """ Test if a date/datetime/time field type marked as not not supported is really not supported
+
+    Warning: Success of this test does not necessary mean that a field is not supported. E.g. errors can occour due to
+    special schema requirements of drivers. It only covers the standard case.
+
+    """
+
+    # If the driver supports the field we have nothing to do here
+    if driver_supports_field(driver, field_type):
+        return
+
+    monkeypatch.delitem(fiona.drvsupport.driver_field_type_unsupported[field_type], driver)
+
+    schema = get_schema(driver, field_type)
+    path = str(tmpdir.join(get_temp_filename(driver)))
+    values_in, values_out = zip(*generate_testdata(field_type, driver))
+    records = get_records(driver, values_in)
+
+    is_good = True
+    try:
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema=schema) as c:
+            c.writerecords(records)
+
+        with fiona.open(path, 'r') as c:
+            if not get_schema_field(driver, c.schema) == field_type:
+                is_good = False
+            items = [get_field(driver, f) for f in c]
+            for val_in, val_out in zip(items, values_out):
+                if not val_in == val_out:
+                    is_good = False
+    except:
+        is_good = False
+    assert not is_good
