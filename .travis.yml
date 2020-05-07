@@ -69,9 +69,21 @@ matrix:
         GDALVERSION="master"
         PROJVERSION="6.3.1"
 
+    # Test pythen dev
+    - python: "3.9-dev"
+      env:
+        GDALVERSION="3.0.4"
+        PROJVERSION="6.3.1"
+
+
   allow_failures:
     - env:
         GDALVERSION="master"
+        PROJVERSION="6.3.1"
+
+    - python: "3.9-dev"
+      env:
+        GDALVERSION="3.0.4"
         PROJVERSION="6.3.1"
 
 addons:
