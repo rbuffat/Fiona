@@ -230,7 +230,7 @@ def generate_tostr_testcases():
 
 @pytest.mark.parametrize("field_type,driver", generate_tostr_testcases())
 def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpdir, driver, field_type, monkeypatch):
-    """ Test if a driver and field_type is marked in fiona.drvsupport.driver_coverts_to_str to convert to str really
+    """ Test if a driver and field_type is marked in fiona.drvsupport.driver_converts_to_str to convert to str really
       silently converts to str
 
       If this test fails, it should be considered to replace the respective None value in
