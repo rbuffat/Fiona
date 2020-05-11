@@ -141,7 +141,6 @@ supported_drivers = dict([
     #   ("XPLANE", "r")
 ])
 
-
 # Minimal gdal version for different modes
 driver_mode_mingdal = {
 
@@ -178,27 +177,26 @@ def _filter_supported_drivers():
 
 _filter_supported_drivers()
 
-
 driver_coverts_to_str = {
     'time': {
-        'CSV': (None, True),
-        'PCIDSK': (None, True),
-        'GeoJSON': (GDALVersion(2, 0), True),
-        'GPKG': (None, True),
-        'GMT': (None, True),
+        'CSV': None,
+        'PCIDSK': None,
+        'GeoJSON': GDALVersion(2, 0),
+        'GPKG': None,
+        'GMT': None,
     },
     'datetime': {
-        'CSV': (None, True),
-        'PCIDSK': (None, True),
-        'GeoJSON': (GDALVersion(2, 0), True),
-        'GML': (GDALVersion(3, 1), True),
+        'CSV': None,
+        'PCIDSK': None,
+        'GeoJSON': GDALVersion(2, 0),
+        'GML': GDALVersion(3, 1),
     },
     'date': {
-        'CSV': (None, True),
-        'PCIDSK': (None, True),
-        'GeoJSON': (GDALVersion(2, 0), True),
-        'GMT': (None, True),
-        'GML': (GDALVersion(3, 1), True),
+        'CSV': None,
+        'PCIDSK': None,
+        'GeoJSON': GDALVersion(2, 0),
+        'GMT': None,
+        'GML': GDALVersion(3, 1),
     }
 }
 
@@ -207,21 +205,10 @@ def driver_converts_field_type_silently_to_str(driver, field_type):
     """ Returns True if the driver converts the field_type silently to str, False otherwise """
 
     if field_type in driver_coverts_to_str and driver in driver_coverts_to_str[field_type]:
-        if driver_coverts_to_str[field_type][driver][0] is None:
+        if driver_coverts_to_str[field_type][driver] is None:
             return True
-        elif gdal_version < driver_coverts_to_str[field_type][driver][0]:
+        elif gdal_version < driver_coverts_to_str[field_type][driver]:
             return True
-    return False, None
-
-
-def driver_converts_field_type_to_str_in_non_standard_format(driver, field_type):
-    """ Returns True if the driver converts the field_type to a non standard string representation. False otherwise """
-
-    if field_type in driver_coverts_to_str and driver in driver_coverts_to_str[field_type]:
-        if driver_coverts_to_str[field_type][driver][0] is None:
-            return not driver_coverts_to_str[field_type][driver][1]
-        elif gdal_version < driver_coverts_to_str[field_type][driver][0]:
-            return not driver_coverts_to_str[field_type][driver][1]
     return False
 
 

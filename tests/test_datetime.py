@@ -7,11 +7,12 @@ import fiona
 import pytest
 
 from fiona.errors import DriverSupportError
+from fiona.rfc3339 import parse_time, parse_datetime, parse_date
 from .conftest import get_temp_filename
 from fiona.env import GDALVersion
 import datetime
 from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str,
-                              driver_supports_field, driver_converts_field_type_to_str_in_non_standard_format)
+                              driver_supports_field)
 
 gdal_version = GDALVersion.runtime()
 drivers_not_supporting_milliseconds = {'GPSTrackMaker'}
@@ -153,13 +154,10 @@ def test_datefield(tmpdir, driver, field_type):
 
                 items = [get_field(driver, f) for f in c]
                 assert len(items) == len(values_in)
-                if driver_converts_field_type_to_str_in_non_standard_format(driver, field_type):
-                    for val_in, val_out in zip(items, values_out):
-                        assert not (val_in == val_out)
-                else:
-                    for val_in, val_out in zip(items, values_out):
-                        assert (val_in == val_out)
 
+                for val_in, val_out in zip(items, values_out):
+                    if val_out is not None:
+                        assert val_in == val_out
         else:
             with fiona.open(path, 'w',
                             driver=driver,

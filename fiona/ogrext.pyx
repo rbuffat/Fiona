@@ -20,7 +20,6 @@ from fiona._geometry cimport (
     GeomBuilder, OGRGeomBuilder, geometry_type_code,
     normalize_geometry_type_code, base_geometry_type_code)
 from fiona._err cimport exc_wrap_int, exc_wrap_pointer, exc_wrap_vsilfile
-
 import fiona
 from fiona._env import GDALVersion, get_gdal_version_num
 from fiona._err import cpl_errs, FionaNullPointerError, CPLE_BaseError, CPLE_OpenFailedError
@@ -35,7 +34,7 @@ from fiona.rfc3339 import parse_date, parse_datetime, parse_time
 from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
 from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
 from fiona.path import vsi_path
-
+from fiona.drvsupport import driver_converts_field_type_silently_to_str
 from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
 
 from libc.stdlib cimport malloc, free
@@ -358,31 +357,41 @@ cdef class OGRFeatureBuilder:
 
             elif isinstance(value, float):
                 OGR_F_SetFieldDouble(cogr_feature, i, value)
-            elif (isinstance(value, string_types)
-            and schema_type in ['date', 'time', 'datetime']):
-                if schema_type == 'date':
-                    y, m, d, hh, mm, ss, ff = parse_date(value)
-                elif schema_type == 'time':
-                    y, m, d, hh, mm, ss, ff = parse_time(value)
-                else:
-                    y, m, d, hh, mm, ss, ff = parse_datetime(value)
+            elif schema_type in ['date', 'time', 'datetime'] and value is not None:
 
-                set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, ff, 0)
-            elif (isinstance(value, datetime.date)
-            and schema_type == 'date'):
-                y, m, d = value.year, value.month, value.day
-                set_field_datetime(cogr_feature, i, y, m, d, 0, 0, 0, 0, 0)
-            elif (isinstance(value, datetime.datetime)
-            and schema_type == 'datetime'):
-                y, m, d = value.year, value.month, value.day
-                hh, mm, ss = value.hour, value.minute, value.second
-                ff = value.microsecond
-                set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, ff, 0)
-            elif (isinstance(value, datetime.time)
-            and schema_type == 'time'):
-                hh, mm, ss = value.hour, value.minute, value.second
-                ff = value.microsecond
-                set_field_datetime(cogr_feature, i, 0, 0, 0, hh, mm, ss, ff, 0)
+                if isinstance(value, string_types):
+                    if schema_type == 'date':
+                        y, m, d, hh, mm, ss, ms = parse_date(value)
+                    elif schema_type == 'time':
+                        y, m, d, hh, mm, ss, ms = parse_time(value)
+                    else:
+                        y, m, d, hh, mm, ss, ms = parse_datetime(value)
+                elif (isinstance(value, datetime.date) and schema_type == 'date'):
+                        y, m, d = value.year, value.month, value.day
+                        hh = mm = ss = ms = 0
+                elif (isinstance(value, datetime.datetime) and schema_type == 'datetime'):
+                        y, m, d = value.year, value.month, value.day
+                        hh, mm, ss, ms = value.hour, value.minute, value.second, value.microsecond
+                elif (isinstance(value, datetime.time) and schema_type == 'time'):
+                        y = m = d = 0
+                        hh, mm, ss, ms = value.hour, value.minute, value.second, value.microsecond
+
+                if driver_converts_field_type_silently_to_str(collection.driver, schema_type):
+                    if schema_type == 'date':
+                        d = datetime.date(y, m, d)
+                    elif schema_type == 'time':
+                        ms = int(ms / 1000) * 1000
+                        d = datetime.time(hh, mm, ss, ms)
+                    else:
+                        ms = int(ms / 1000) * 1000
+                        d = datetime.datetime(y, m, d, hh, mm, ss, ms)
+
+                    value_bytes = d.isoformat().encode(encoding)
+                    string_c = value_bytes
+                    OGR_F_SetFieldString(cogr_feature, i, string_c)
+                else:
+                    set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, ms, 0)
+
             elif isinstance(value, bytes) and schema_type == "bytes":
                 string_c = value
                 OGR_F_SetFieldBinary(cogr_feature, i, len(value),
@@ -1108,6 +1117,8 @@ cdef class WritingSession(Session):
                         else:
                             value = 'int32'
 
+                if driver_converts_field_type_silently_to_str(collection.driver, value):
+                    value = 'str'
                 field_type = FIELD_TYPES.index(value)
 
                 try:
