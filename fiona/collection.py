@@ -407,27 +407,19 @@ class Collection(object):
 
         See GH#572 for discussion.
         """
-        gdal_version_major = get_gdal_version_tuple().major
 
         for field in self._schema["properties"].values():
             field_type = field.split(":")[0]
 
             if not driver_supports_field(self.driver, field_type):
-                if self.driver == 'GPKG' and gdal_version_major < 2 and field_type == "datetime":
-                    raise DriverSupportError("GDAL 1.x GPKG driver does not support datetime fields")
-                else:
-                    raise DriverSupportError("{driver} does not support {field_type} "
-                                             "fields".format(driver=self.driver,
-                                                             field_type=field_type))
+                raise DriverSupportError("{driver} does not support {field_type} "
+                                         "fields".format(driver=self.driver,
+                                                         field_type=field_type))
             elif field_type in {'time', 'datetime', 'date'} and driver_converts_field_type_silently_to_str(self.driver,
                                                                                                            field_type):
-                if self._driver == "GeoJSON" and gdal_version_major < 2 and field_type in {'datetime', 'date'}:
-                    warnings.warn("GeoJSON driver in GDAL 1.x silently converts {} to string"
-                                  " in non-standard format".format(field_type))
-                else:
-                    warnings.warn("{driver} driver silently converts {field_type} "
-                                  "to string".format(driver=self.driver,
-                                                     field_type=field_type))
+                warnings.warn("{driver} driver silently converts {field_type} "
+                              "to string".format(driver=self.driver,
+                                                 field_type=field_type))
 
     def flush(self):
         """Flush the buffer."""

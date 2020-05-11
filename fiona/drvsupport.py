@@ -178,7 +178,7 @@ def _filter_supported_drivers():
 _filter_supported_drivers()
 
 # None: field type is always converted to str, GDALVersion(2, 0) field type is converted to str until gdal 2.0
-driver_coverts_to_str = {
+driver_converts_to_str = {
     'time': {
         'CSV': None,
         'PCIDSK': None,
@@ -205,10 +205,10 @@ driver_coverts_to_str = {
 def driver_converts_field_type_silently_to_str(driver, field_type):
     """ Returns True if the driver converts the field_type silently to str, False otherwise """
 
-    if field_type in driver_coverts_to_str and driver in driver_coverts_to_str[field_type]:
-        if driver_coverts_to_str[field_type][driver] is None:
+    if field_type in driver_converts_to_str and driver in driver_converts_to_str[field_type]:
+        if driver_converts_to_str[field_type][driver] is None:
             return True
-        elif gdal_version < driver_coverts_to_str[field_type][driver]:
+        elif gdal_version < driver_converts_to_str[field_type][driver]:
             return True
     return False
 
