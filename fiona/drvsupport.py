@@ -219,9 +219,9 @@ def driver_converts_field_type_to_str_in_non_standard_format(driver, field_type)
 
     if field_type in driver_coverts_to_str and driver in driver_coverts_to_str[field_type]:
         if driver_coverts_to_str[field_type][driver][0] is None:
-            return driver_coverts_to_str[field_type][driver][1]
+            return not driver_coverts_to_str[field_type][driver][1]
         elif gdal_version < driver_coverts_to_str[field_type][driver][0]:
-            return driver_coverts_to_str[field_type][driver][1]
+            return not driver_coverts_to_str[field_type][driver][1]
     return False
 
 
