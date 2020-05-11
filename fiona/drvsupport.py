@@ -177,7 +177,8 @@ def _filter_supported_drivers():
 
 _filter_supported_drivers()
 
-# None: field type is always converted to str, GDALVersion(2, 0) field type is converted to str until gdal 2.0
+# None: field type is always converted to str
+# GDALVersion(2, 0): starting from gdal 2.0 field type is not converted to str
 driver_converts_to_str = {
     'time': {
         'CSV': None,
@@ -213,7 +214,7 @@ def driver_converts_field_type_silently_to_str(driver, field_type):
     return False
 
 
-# None: field type is never supported, GDALVersion(2, 0) field type is supported starting with gdal 2.0
+# None: field type is never supported, GDALVersion(2, 0): field type is supported starting with gdal 2.0
 driver_field_type_unsupported = {
     'time': {
         'ESRI Shapefile': None,
