@@ -21,7 +21,7 @@ from fiona._geometry cimport (
     normalize_geometry_type_code, base_geometry_type_code)
 from fiona._err cimport exc_wrap_int, exc_wrap_pointer, exc_wrap_vsilfile
 import fiona
-from fiona._env import GDALVersion, get_gdal_version_num
+from fiona._env import GDALVersion, get_gdal_version_num, calc_gdal_version_num
 from fiona._err import cpl_errs, FionaNullPointerError, CPLE_BaseError, CPLE_OpenFailedError
 from fiona._geometry import GEOMETRY_TYPES
 from fiona import compat
@@ -378,11 +378,11 @@ cdef class OGRFeatureBuilder:
 
                 if driver_converts_field_type_silently_to_str(collection.driver, schema_type):
                     # GDAL 1.x does not support milliseconds
-                    if GDALVersion.runtime() < GDALVersion(2, 0):
+                    if GDAL_VERSION_NUM < calc_gdal_version_num(2, 0, 0):
                         ms = 0
                     else:
                         # Convert microseconds to milliseconds
-                        ms = int(ms / 1000) * 1000
+                        ms = int(ms / 1000.0) * 1000
                     if schema_type == 'date':
                         d = datetime.date(y, m, d)
                     elif schema_type == 'time':
