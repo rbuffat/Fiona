@@ -155,10 +155,10 @@ def test_datefield(tmpdir, driver, field_type):
                 assert len(items) == len(values_in)
                 if driver_converts_field_type_to_str_in_non_standard_format(driver, field_type):
                     for val_in, val_out in zip(items, values_out):
-                        assert not val_in == val_out
+                        assert not (val_in == val_out)
                 else:
                     for val_in, val_out in zip(items, values_out):
-                        assert val_in == val_out
+                        assert (val_in == val_out)
 
         else:
             with fiona.open(path, 'w',
