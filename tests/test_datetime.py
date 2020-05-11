@@ -11,7 +11,7 @@ from .conftest import get_temp_filename
 from fiona.env import GDALVersion
 import datetime
 from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str,
-                              driver_supports_field)
+                              driver_supports_field, driver_converts_field_type_to_str_in_non_standard_format)
 
 gdal_version = GDALVersion.runtime()
 drivers_not_supporting_milliseconds = {'GPSTrackMaker'}
@@ -150,6 +150,15 @@ def test_datefield(tmpdir, driver, field_type):
 
             with fiona.open(path, 'r') as c:
                 assert get_schema_field(driver, c.schema) == 'str'
+
+                items = [get_field(driver, f) for f in c]
+                assert len(items) == len(values_in)
+                if driver_converts_field_type_to_str_in_non_standard_format(driver, field_type):
+                    for val_in, val_out in zip(items, values_out):
+                        assert not val_in == val_out
+                else:
+                    for val_in, val_out in zip(items, values_out):
+                        assert val_in == val_out
 
         else:
             with fiona.open(path, 'w',
