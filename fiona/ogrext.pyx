@@ -377,13 +377,17 @@ cdef class OGRFeatureBuilder:
                         hh, mm, ss, ms = value.hour, value.minute, value.second, value.microsecond
 
                 if driver_converts_field_type_silently_to_str(collection.driver, schema_type):
+                    # GDAL 1.x does not support milliseconds
+                    if GDALVersion.runtime() < GDALVersion(2, 0):
+                        ms = 0
+                    else:
+                        # Convert microseconds to milliseconds
+                        ms = int(ms / 1000) * 1000
                     if schema_type == 'date':
                         d = datetime.date(y, m, d)
                     elif schema_type == 'time':
-                        ms = int(ms / 1000) * 1000
                         d = datetime.time(hh, mm, ss, ms)
                     else:
-                        ms = int(ms / 1000) * 1000
                         d = datetime.datetime(y, m, d, hh, mm, ss, ms)
 
                     value_bytes = d.isoformat().encode(encoding)
