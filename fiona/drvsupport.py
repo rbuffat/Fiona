@@ -177,6 +177,7 @@ def _filter_supported_drivers():
 
 _filter_supported_drivers()
 
+# None: field type is always converted to str, GDALVersion(2, 0) field type is converted to str until gdal 2.0
 driver_coverts_to_str = {
     'time': {
         'CSV': None,
