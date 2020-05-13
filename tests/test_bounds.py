@@ -39,30 +39,28 @@ def test_bounds(tmpdir, driver):
         # BNA driver segfaults with gdal 1.11
         return
 
-
     extension = driver_extensions.get(driver, "bar")
     path = str(tmpdir.join('foo.{}'.format(extension)))
 
     with fiona.open(path, 'w',
                     driver=driver,
                     schema={'geometry': 'Point',
-                            'properties': [('title', 'str')]},
-                    fiona_force_driver=True) as c:
+                            'properties': [('title', 'str')]}) as c:
 
         c.writerecords([{'geometry': {'type': 'Point', 'coordinates': (1.0, 10.0)},
-                            'properties': {'title': 'One'}}])
+                         'properties': {'title': 'One'}}])
 
-        try: 
+        try:
             bounds = c.bounds
             assert bounds == (1.0, 10.0, 1.0, 10.0)
         except Exception as e:
-            assert isinstance(e, DriverError) 
+            assert isinstance(e, DriverError)
 
         c.writerecords([{'geometry': {'type': 'Point', 'coordinates': (2.0, 20.0)},
-                            'properties': {'title': 'Two'}}])
-        
-        try: 
+                         'properties': {'title': 'Two'}}])
+
+        try:
             bounds = c.bounds
             assert bounds == (1.0, 10.0, 2.0, 20.0)
         except Exception as e:
-            assert isinstance(e, DriverError) 
+            assert isinstance(e, DriverError)
