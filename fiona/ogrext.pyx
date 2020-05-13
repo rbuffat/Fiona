@@ -953,7 +953,7 @@ cdef class WritingSession(Session):
 
         if collection.mode == 'a':
 
-            if not os.path.exists(path):
+            if not path.startswith('/vsimem') and not os.path.exists(path):
                 raise OSError("No such file or directory %s" % path)
             path_b = strencode(path)
             path_c = path_b
