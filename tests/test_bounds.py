@@ -1,9 +1,12 @@
 import pytest
 import fiona
-from fiona.drvsupport import supported_drivers
 from fiona.errors import DriverError
 from .conftest import driver_extensions
 from fiona.env import GDALVersion
+
+from fiona.drvsupport import supported_drivers, driver_mode_mingdal
+
+gdal_version = GDALVersion.runtime()
 
 def test_bounds_point():
     g = {'type': 'Point', 'coordinates': [10, 10]}
@@ -21,18 +24,15 @@ def test_bounds_polygon():
 
 
 def test_bounds_z():
-    g = {'type': 'Point', 'coordinates': [10,10,10]}
+    g = {'type': 'Point', 'coordinates': [10, 10, 10]}
     assert fiona.bounds(g) == (10, 10, 10, 10)
 
 
-blacklist_write_drivers = set(['CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN', 'MapInfo File'])
-write_drivers = [driver for driver, raw in supported_drivers.items() if 'w' in raw and driver not in blacklist_write_drivers]
-
-
-@pytest.mark.parametrize('driver', write_drivers)
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw and (
+        driver not in driver_mode_mingdal['w'] or gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
+                                    and driver not in {'CSV', 'GPX', 'GPSTrackMaker', 'DXF', 'DGN', 'MapInfo File'}])
 def test_bounds(tmpdir, driver):
     """Test if bounds are correctly calculated after writing
-    
     """
 
     if driver == 'BNA' and GDALVersion.runtime() < GDALVersion(2, 0):
