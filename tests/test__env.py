@@ -31,7 +31,6 @@ def mock_fhs(tmpdir):
 
 
 @pytest.fixture
-@pytest.fixture
 def mock_debian(tmpdir):
     """A fake Debian multi-install system"""
     tmpdir.ensure("share/gdal/{}.{}/header.dxf".format(gdal_version.major,
