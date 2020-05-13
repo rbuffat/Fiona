@@ -62,10 +62,11 @@ def test_append_memoryfile(driver):
                 range(5, 10)]
     positions = list(range(0, 10))
 
-    if gdal_version < GDALVersion(2, 0):
-        # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
-        return
+    # if gdal_version < GDALVersion(2, 0):
+    #     # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
+    #     return
 
+    # TODO: Shp needs extensions that exists() returns True, GPKG returns extensions for gdal 2.0, otherwise sqlite driver is used
     with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
         with memfile.open(driver=driver, schema=schema) as c:
             c.writerecords(records1)
