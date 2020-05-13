@@ -48,9 +48,10 @@ def test_write_memoryfile(profile_first_coutwildrnp_shp):
             assert len(col) == 1
 
 
-@pytest.mark.parametrize('driver', [driver for driver in ['GeoJSON', 'GPKG', 'ESRI Shapefile'] if (
-        'a' in supported_drivers[driver] and driver not in driver_mode_mingdal['a'] or
-        gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
+@pytest.mark.parametrize('driver', [driver for driver in ['GeoJSON', 'GPKG', 'ESRI Shapefile'] if
+                                    'a' in supported_drivers[driver] and (
+        driver not in driver_mode_mingdal['a'] or
+        gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
 def test_append_memoryfile(driver):
     """In-memory Shapefile can be appended"""
     schema = {'geometry': 'Point', 'properties': [('position', 'int')]}
