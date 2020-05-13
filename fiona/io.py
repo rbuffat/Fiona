@@ -28,7 +28,7 @@ class MemoryFile(MemoryFileBase):
         super(MemoryFile, self).__init__(
             file_or_bytes=file_or_bytes, filename=filename, ext=ext)
 
-    def open(self, driver=None, schema=None, crs=None, encoding=None,
+    def open(self, mode=None, driver=None, schema=None, crs=None, encoding=None,
              layer=None, vfs=None, enabled_drivers=None, crs_wkt=None,
              **kwargs):
         """Open the file and return a Fiona collection object.
@@ -50,9 +50,14 @@ class MemoryFile(MemoryFileBase):
         if self.closed:
             raise IOError("I/O operation on closed file.")
         if self.exists():
-            return Collection(vsi_path, 'r', driver=driver, encoding=encoding,
-                              layer=layer, enabled_drivers=enabled_drivers,
-                              **kwargs)
+            if mode is None or mode == 'r':
+                return Collection(vsi_path, 'r', driver=driver, encoding=encoding,
+                                  layer=layer, enabled_drivers=enabled_drivers,
+                                  **kwargs)
+            else:
+                return Collection(vsi_path, 'a', crs=crs, driver=driver, encoding=encoding,
+                                  layer=layer, enabled_drivers=enabled_drivers,
+                                  crs_wkt=crs_wkt, **kwargs)
         else:
             if schema:
                 # Make an ordered dict of schema properties.

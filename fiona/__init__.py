@@ -321,7 +321,7 @@ def listlayers(fp, vfs=None):
     if hasattr(fp, 'read'):
 
         with MemoryFile(fp.read()) as memfile:
-            return  _listlayers(memfile.name)
+            return _listlayers(memfile.name)
 
     else:
 

@@ -35,7 +35,6 @@ from fiona.compat import OrderedDict, strencode
 from fiona.rfc3339 import parse_date, parse_datetime, parse_time
 from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
 from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
-from fiona.path import vsi_path
 
 from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
 
@@ -953,7 +952,7 @@ cdef class WritingSession(Session):
 
         if collection.mode == 'a':
 
-            if not os.path.exists(path):
+            if not path.startswith('/vsimem') and not os.path.exists(path):
                 raise OSError("No such file or directory %s" % path)
             path_b = strencode(path)
             path_c = path_b
@@ -1744,7 +1743,6 @@ cdef class MemoryFileBase(object):
         """
         cdef VSILFILE *fp = NULL
         cdef const char *cypath = self.path
-
         with nogil:
             fp = VSIFOpenL(cypath, 'r')
 
