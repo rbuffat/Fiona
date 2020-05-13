@@ -3,6 +3,24 @@ Changes
 
 All issue numbers are relative to https://github.com/Toblerity/Fiona/issues.
 
+1.8.13.post1 (2020-02-21)
+-------------------------
+
+- This release is being made to improve binary wheel compatibility with shapely
+  1.7.0. There have been no changes to the fiona package code since 1.8.13.
+
+1.8.13 (2019-12-05)
+-------------------
+
+- The Python version specs for argparse and ordereddict in 1.8.12 were wrong
+  and have been corrected (#843).
+
+1.8.12 (2019-12-04)
+-------------------
+
+- Specify Python versions for argparse, enum34, and ordereddict requirements
+  (#842).
+
 1.8.11 (2019-11-07)
 -------------------
 

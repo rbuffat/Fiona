@@ -23,7 +23,9 @@ driver_extensions = {'DXF': 'dxf',
                      'DGN': 'dgn',
                      'GPKG': 'gpkg',
                      'GeoJSON': 'json',
-                     'GMT': 'gmt'}
+                     'GeoJSONSeq': 'geojsons',
+                     'GMT': 'gmt',
+                     'BNA': 'bna'}
 
 
 def pytest_report_header(config):
@@ -35,6 +37,19 @@ def pytest_report_header(config):
     # supported drivers
     headers.append("Supported drivers: {}".format(supported_drivers))
     return '\n'.join(headers)
+
+
+def get_temp_filename(driver):
+
+    basename = "foo"
+    extension = driver_extensions.get(driver, "bar")
+    prefix = ""
+    if driver == 'GeoJSONSeq':
+        prefix = "GeoJSONSeq:"
+
+    return "{prefix}{basename}.{extension}".format(prefix=prefix,
+                                                   basename=basename,
+                                                   extension=extension)
 
 
 _COUTWILDRNP_FILES = [
@@ -284,6 +299,11 @@ requires_gdal3 = pytest.mark.skipif(
     not gdal_version.major >= 3,
     reason="Requires GDAL 3.x")
 
+travis_only = pytest.mark.skipif(
+    not os.getenv("TRAVIS", "false") == "true",
+    reason="Requires travis CI environment"
+)
+
 
 @pytest.fixture(scope="class")
 def unittest_data_dir(data_dir, request):
@@ -295,3 +315,4 @@ def unittest_data_dir(data_dir, request):
 def unittest_path_coutwildrnp_shp(path_coutwildrnp_shp, request):
     """Makes shapefile path available to unittest tests"""
     request.cls.path_coutwildrnp_shp = path_coutwildrnp_shp
+
