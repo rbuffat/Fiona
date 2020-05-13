@@ -7,6 +7,7 @@ import fiona
 from fiona.io import MemoryFile, ZipMemoryFile
 from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 from fiona.env import GDALVersion
+from tests.conftest import driver_extensions
 
 gdal_version = GDALVersion.runtime()
 
@@ -65,12 +66,7 @@ def test_append_memoryfile(driver):
         # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
         return
 
-    filename = None
-    # TODO ESRI Shapefile needs extension, otherwise MemoryFile.exists() is always False
-    if driver == 'ESRI Shapefile':
-        filename = "inmemory.shp"
-
-    with MemoryFile(filename=filename) as memfile:
+    with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
         with memfile.open(driver=driver, schema=schema) as c:
             c.writerecords(records1)
         with memfile.open(driver=driver, schema=schema, mode='a') as c:
