@@ -328,7 +328,7 @@ cdef class OGRFeatureBuilder:
         if feature['geometry'] is not None:
             cogr_geometry = OGRGeomBuilder().build(
                                 feature['geometry'])
-        exc_wrap_int(OGR_F_SetGeometryDirectly(cogr_feature, cogr_geometry))
+            exc_wrap_int(OGR_F_SetGeometryDirectly(cogr_feature, cogr_geometry))
 
         # OGR_F_SetFieldString takes encoded strings ('bytes' in Python 3).
         encoding = session._get_internal_encoding()
