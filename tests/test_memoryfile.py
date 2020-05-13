@@ -61,6 +61,10 @@ def test_append_memoryfile(driver):
                 range(5, 10)]
     positions = list(range(0, 10))
 
+    if gdal_version < GDALVersion(2, 0):
+        # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
+        return
+
     filename = None
     # TODO ESRI Shapefile needs extension, otherwise MemoryFile.exists() is always False
     if driver == 'ESRI Shapefile':
