@@ -7,7 +7,6 @@ cache:
     - $GDALINST
     - ~/.cache/pip
 
-
 env:
   global:
     - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
@@ -19,7 +18,6 @@ env:
     - MAKEFLAGS="-j 2"
     - CXXFLAGS="-O0"
     - CFLAGS="-O0"
-
 
 matrix:
   include:
@@ -89,6 +87,9 @@ addons:
 
 before_install:
   - python -m pip install -U pip
+  - python -m pip wheel -r requirements-dev.txt
+  - python -m pip install -r requirements-dev.txt
+  - python -m pip install wheel coveralls>=1.1 --upgrade
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH
   - . ./scripts/travis_proj_install.sh
@@ -96,12 +97,6 @@ before_install:
   - export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
   - export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
   - gdal-config --version
-  - python -m pip wheel -r requirements-dev.txt
-  - python -m pip install -r requirements-dev.txt
-<<<<<<< HEAD
-=======
-  - python -m pip install wheel coveralls>=1.1 --upgrade
->>>>>>> maint-1.8
 
 install:
   - if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
@@ -119,9 +114,3 @@ after_script:
 
 after_success:
   - coveralls || echo "!! intermittent coveralls failure"
-<<<<<<< HEAD
-
-before_cache:
-  - if [ "$GDALVERSION" = "master" ]; then rm -rf $GDALINST/gdal-$GDALVERSION; fi
-=======
->>>>>>> maint-1.8
