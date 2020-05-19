@@ -190,7 +190,7 @@ zip_memoryfile_not_supported = {
             'DGN': None,
             'GPKG': None,
             'DXF': None,
-            'ESRI Shapefile': None,
+            'ESRI Shapefile': GDALVersion(2, 3),
             'GPX': None,
             'MapInfo File': None,
             'PCIDSK': None,
