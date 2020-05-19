@@ -230,8 +230,8 @@ def test_write_memoryfile(driver):
                     assert val_in == int(get_pos(val_out, driver))
 
 
-@pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['w'].items()
-                                    if mingdal is None or mingdal < gdal_version])
+@pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['w'].items() if
+                                    mingdal is None or gdal_version < mingdal])
 def test_write_memoryfile_notsupported(driver, monkeypatch):
 
     monkeypatch.delitem(fiona.drvsupport.memoryfile_not_supported['w'], driver)
@@ -255,7 +255,7 @@ def test_write_memoryfile_notsupported(driver, monkeypatch):
     except Exception as e:
         is_good = False
 
-    assert not is_good
+    assert is_good == False
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (

@@ -197,7 +197,7 @@ memoryfile_not_supported = {
     'w': {
         'DGN': GDALVersion(2, 3),
         'GPKG': GDALVersion(2, 0),
-        'MapInfo File': None
+        'MapInfo File': GDALVersion(2, 0)
     },
     'a': {
         'DGN': GDALVersion(2, 3),
