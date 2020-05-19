@@ -61,13 +61,14 @@ class MemoryFile(MemoryFileBase):
                 if driver == 'GPKG' and gdal_version < gdal_version < GDALVersion(2, 0):
                     raise DriverError("GPKG driver does not support append mode with GDAL 1.x")
                 if driver in {'PCIDSK', 'MapInfo File'}:
-                    raise DriverError("{driver} driver does not support append mode.".format(driver))
+                    raise DriverError("{driver} driver does not support append mode.".format(driver=driver))
                 mode = 'a'
 
             return Collection(vsi_path, mode=mode, driver=driver, schema=schema, crs=crs,
                               encoding=encoding, layer=layer, enabled_drivers=enabled_drivers,
                               crs_wkt=crs_wkt, **kwargs)
         else:
+
             if schema:
                 # Make an ordered dict of schema properties.
                 this_schema = schema.copy()
@@ -129,6 +130,14 @@ class ZipMemoryFile(MemoryFile):
                 (mode == 'a')):
             raise FionaValueError("GDAL Virtual File System {vsi} does not support mode '{mode}'.".format(vsi=self.vsi,
                                                                                                           mode=mode))
+
+        # DGN: segfault with gdal 3.0.4
+        # GPKG,DXF,ESRI Shapefile,GPX,MapInfo File,PCIDSK': Random access not supported for writable file in /vsizip
+        # GPSTrackMaker: VSIFSeekL() is not supported on writable Zip files
+        if mode == 'w' and driver in {'DGN', 'GPKG', 'DXF', 'ESRI Shapefile', 'GPX', 'MapInfo File', 'PCIDSK',
+                                      'GPSTrackMaker'}:
+            raise FionaValueError("Driver {driver} does not support mode '{mode}' for ZipMemoryFile.".format(
+                driver=driver, mode=mode))
 
         if self.closed:
             raise IOError("I/O operation on closed file.")

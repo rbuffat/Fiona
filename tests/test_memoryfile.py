@@ -8,10 +8,66 @@ from fiona.io import MemoryFile, ZipMemoryFile
 from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 from fiona.env import GDALVersion
 from fiona.path import ARCHIVESCHEMES
-from tests.conftest import driver_extensions
+from tests.conftest import driver_extensions, get_temp_filename
 import pprint
 
 gdal_version = GDALVersion.runtime()
+
+
+def get_schema(driver):
+    special_schemas = {'CSV': {'geometry': None, 'properties': OrderedDict([('position', 'int')])},
+                       'BNA': {'geometry': 'Point', 'properties': {}},
+                       'DXF': {'properties': OrderedDict(
+                           [('Layer', 'str'),
+                            ('SubClasses', 'str'),
+                            ('Linetype', 'str'),
+                            ('EntityHandle', 'str'),
+                            ('Text', 'str')]),
+                           'geometry': 'Point'},
+                       'GPX': {'geometry': 'Point',
+                               'properties': OrderedDict([('ele', 'float'), ('time', 'datetime')])},
+                       'GPSTrackMaker': {'properties': OrderedDict([]), 'geometry': 'Point'},
+                       'DGN': {'properties': OrderedDict([]), 'geometry': 'LineString'},
+                       'MapInfo File': {'properties': OrderedDict([]), 'geometry': 'Point'}}
+
+    return special_schemas.get(driver, {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])})
+
+
+def get_records(driver, range):
+    special_records1 = {'CSV': [{'geometry': None, 'properties': {'position': i}} for i in range],
+                        'BNA': [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {}} for i
+                                in range],
+                        'DXF': [
+                            {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': OrderedDict(
+                                [('Layer', '0'),
+                                 ('SubClasses', 'AcDbEntity:AcDbPoint'),
+                                 ('Linetype', None),
+                                 ('EntityHandle', '20000'),
+                                 ('Text', None)])} for i in range],
+                        'GPX': [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
+                                 'properties': {'ele': 0.0, 'time': '2020-03-24T16:08:40'}} for i
+                                in range],
+                        'GPSTrackMaker': [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
+                                           'properties': {}} for i in range],
+                        'DGN': [
+                            {'geometry': {'type': 'LineString', 'coordinates': [(float(i), 0.0), (0.0, 0.0)]},
+                             'properties': {}} for i in range],
+                        'MapInfo File': [
+                            {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
+                             'properties': {}} for i in range],
+                        }
+    return special_records1.get(driver, [
+        {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+        range])
+
+
+def get_pos(f, driver):
+    if driver in {'DXF', 'BNA', 'GPX', 'GPSTrackMaker', 'MapInfo File'}:
+        return f['geometry']['coordinates'][1]
+    elif driver == 'DGN':
+        return f['geometry']['coordinates'][0][0]
+    else:
+        return f['properties']['position']
 
 
 @pytest.fixture(scope='session')
@@ -50,72 +106,51 @@ def test_tar_memoryfile_listdir(bytes_coutwildrnp_tar):
         assert set(memfile.listdir('/testing')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf', 'coutwildrnp.prj'}
 
 
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw and (
+                                            driver not in driver_mode_mingdal['w'] or
+                                            gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
+                                    and driver not in {}])
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
-def test_zip_memoryfile_write(ext):
-    schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
-    records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-                range(0, 5)]
-    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-                range(5, 10)]
+def test_zip_memoryfile_write(ext, driver):
+
+    schema = get_schema(driver)
+    range1 = list(range(0, 5))
+    range2 = list(range(5, 10))
+    records1 = get_records(driver, range1)
+    records2 = get_records(driver, range2)
+    file1_path = "/{}".format(get_temp_filename(driver))
+    file2_path = "/directory/{}".format(get_temp_filename(driver))
 
     # \vsitar\ does not allow write mode
     if ARCHIVESCHEMES[ext] == 'tar':
         with pytest.raises(FionaValueError):
             with ZipMemoryFile(ext=ext) as memfile:
-                with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
-                    c.writerecords(records1)
-    else:
-        with ZipMemoryFile(ext=ext) as memfile:
-            with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
-                c.writerecords(records1)
-            with memfile.open(path="/test2.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
-                c.writerecords(records2)
-
-            with memfile.open(path="/test1.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
-                items = list(c)
-                assert len(items) == len(range(0, 5))
-                for val_in, val_out in zip(range(0, 5), items):
-                    assert val_in == int(val_out['properties']['position'])
-
-            with memfile.open(path="/test2.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
-                items = list(c)
-                assert len(items) == len(range(5, 10))
-                for val_in, val_out in zip(range(5, 10), items):
-                    assert val_in == int(val_out['properties']['position'])
-
-
-@pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
-def test_zip_memoryfile_write_directory(ext):
-    schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
-    records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-                range(0, 5)]
-    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-                range(5, 10)]
-
-    # \vsitar\ does not allow write mode
-    if ARCHIVESCHEMES[ext] == 'tar':
+                with memfile.open(path=file1_path, mode='w', driver=driver, schema=schema) as c:
+                    pass
+    elif ARCHIVESCHEMES[ext] == 'zip' and driver in {'DGN', 'GPKG', 'DXF', 'ESRI Shapefile', 'GPX', 'MapInfo File',
+                                                     'PCIDSK', 'GPSTrackMaker'}:
         with pytest.raises(FionaValueError):
             with ZipMemoryFile(ext=ext) as memfile:
-                with memfile.open(path="/dir1/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
-                    c.writerecords(records1)
+                with memfile.open(path=file1_path, mode='w', driver=driver, schema=schema) as c:
+                    pass
     else:
         with ZipMemoryFile(ext=ext) as memfile:
-            with memfile.open(path="/dir1/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+            with memfile.open(path=file1_path, mode='w', driver=driver, schema=schema) as c:
                 c.writerecords(records1)
-            with memfile.open(path="/dir2/test2.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+            with memfile.open(path=file2_path, mode='w', driver=driver, schema=schema) as c:
                 c.writerecords(records2)
 
-            with memfile.open(path="/dir1/test1.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+            with memfile.open(path=file1_path, mode='r', driver=driver, schema=schema) as c:
                 items = list(c)
-                assert len(items) == len(range(0, 5))
-                for val_in, val_out in zip(range(0, 5), items):
-                    assert val_in == int(val_out['properties']['position'])
+                assert len(items) == len(range1)
+                for val_in, val_out in zip(range1, items):
+                    assert val_in == int(get_pos(val_out, driver))
 
-            with memfile.open(path="/dir2/test2.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+            with memfile.open(path=file2_path, mode='r') as c:
                 items = list(c)
-                assert len(items) == len(range(5, 10))
-                for val_in, val_out in zip(range(5, 10), items):
-                    assert val_in == int(val_out['properties']['position'])
+                assert len(items) == len(range2)
+                for val_in, val_out in zip(range2, items):
+                    assert val_in == int(get_pos(val_out, driver))
 
 
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
@@ -141,19 +176,27 @@ def test_zip_memoryfile_append(ext):
                     assert val_in == int(val_out['properties']['position'])
 
 
-def test_write_memoryfile(profile_first_coutwildrnp_shp):
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw and (
+                                            driver not in driver_mode_mingdal['w'] or
+                                            gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
+                                    and driver not in {}])
+def test_write_memoryfile(driver):
     """In-memory Shapefile can be written"""
-    profile, first = profile_first_coutwildrnp_shp
-    profile['driver'] = 'GeoJSON'
-    with MemoryFile() as memfile:
-        with memfile.open(**profile) as col:
-            col.write(first)
-        memfile.seek(0)
-        data = memfile.read()
 
-    with MemoryFile(data) as memfile:
-        with memfile.open() as col:
-            assert len(col) == 1
+    schema = get_schema(driver)
+    positions = list(range(0, 5))
+    records1 = get_records(driver, positions)
+
+    with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+        with memfile.open(driver=driver, schema=schema) as c:
+            c.writerecords(records1)
+
+        with memfile.open(driver=driver) as c:
+            items = list(c)
+            pprint.pprint(items)
+            assert len(items) == len(positions)
+            for val_in, val_out in zip(positions, items):
+                assert val_in == int(get_pos(val_out, driver))
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (
@@ -163,21 +206,11 @@ def test_write_memoryfile(profile_first_coutwildrnp_shp):
 def test_append_memoryfile(driver):
     """In-memory Shapefile can be appended"""
 
-    special_schemas = {'CSV': {'geometry': None, 'properties': OrderedDict([('position', 'int')])}}
-    schema = special_schemas.get(driver, {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])})
-
+    schema = get_schema(driver)
     range1 = list(range(0, 5))
-    special_records1 = {'CSV': [{'geometry': None, 'properties': {'position': i}} for i in range1]}
-    records1 = special_records1.get(driver, [
-        {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-        range1])
-
     range2 = list(range(5, 10))
-    special_records2 = {'CSV': [{'geometry': None, 'properties': {'position': i}} for i in range2]}
-    records2 = special_records2.get(driver, [
-        {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-        range2])
-
+    records1 = get_records(driver, range1)
+    records2 = get_records(driver, range2)
     positions = range1 + range2
 
     if (driver == 'GPKG' and gdal_version < GDALVersion(2, 0) or
@@ -202,7 +235,7 @@ def test_append_memoryfile(driver):
                 pprint.pprint(items)
                 assert len(items) == len(positions)
                 for val_in, val_out in zip(positions, items):
-                    assert val_in == int(val_out['properties']['position'])
+                    assert val_in == int(get_pos(val_out, driver))
 
 
 def test_memoryfile_bytesio(path_coutwildrnp_json):
