@@ -61,6 +61,26 @@ def get_records(driver, range):
         range])
 
 
+def get_records2(driver, range):
+    special_records2 = {'DGN': [
+                            {'geometry': {'type': 'LineString', 'coordinates': [(float(i), 0.0), (0.0, 0.0)]},
+                             'properties': OrderedDict(
+                                 [('Type', 3),
+                                  ('Level', 0),
+                                  ('GraphicGroup', 0),
+                                  ('ColorIndex', 0),
+                                  ('Weight', 0),
+                                  ('Style', 0),
+                                  ('EntityNum', None),
+                                  ('MSLink', None),
+                                  ('Text', None)])} for i in range],
+                        'MapInfo File': [
+                            {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
+                             'properties': {}} for i in range],
+                        }
+    return special_records2.get(driver, get_records(driver, range))
+
+
 def get_pos(f, driver):
     if driver in {'DXF', 'BNA', 'GPX', 'GPSTrackMaker', 'MapInfo File'}:
         return f['geometry']['coordinates'][1]
@@ -212,7 +232,8 @@ def test_write_memoryfile(driver):
                     assert val_in == int(get_pos(val_out, driver))
 
 
-@pytest.mark.parametrize('driver', [driver for driver in memoryfile_not_supported['w'].keys()])
+@pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['w'].items()
+                                    if mingdal is None or mingdal < gdal_version])
 def test_write_memoryfile_notsupported(driver, monkeypatch):
 
     schema = get_schema(driver)
@@ -233,8 +254,7 @@ def test_write_memoryfile_notsupported(driver, monkeypatch):
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (
                                             driver not in driver_mode_mingdal['a'] or
-                                            gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))
-                                    and driver not in {'DGN'}])
+                                            gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
 def test_append_memoryfile(driver):
     """In-memory Shapefile can be appended"""
 
@@ -242,12 +262,10 @@ def test_append_memoryfile(driver):
     range1 = list(range(0, 5))
     range2 = list(range(5, 10))
     records1 = get_records(driver, range1)
-    records2 = get_records(driver, range2)
+    records2 = get_records2(driver, range2)
     positions = range1 + range2
 
-    if (driver == 'GPKG' and gdal_version < GDALVersion(2, 0) or
-            driver in {'PCIDSK', 'MapInfo File'}):
-        # Test fails with sqlite3_open(/vsimem/...) failed: out of memory for gdal 1.x
+    if not memoryfile_supports_mode(driver, 'a'):
         with pytest.raises(FionaValueError):
             with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
                 with memfile.open(driver=driver, schema=schema) as c:
