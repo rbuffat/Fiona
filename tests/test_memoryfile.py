@@ -2,7 +2,6 @@
 from collections import OrderedDict
 from io import BytesIO
 import pytest
-import uuid
 import fiona
 from fiona.errors import FionaValueError
 from fiona.io import MemoryFile, ZipMemoryFile
@@ -10,6 +9,7 @@ from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 from fiona.env import GDALVersion
 from fiona.path import ARCHIVESCHEMES
 from tests.conftest import driver_extensions
+import pprint
 
 gdal_version = GDALVersion.runtime()
 
@@ -85,7 +85,7 @@ def test_zip_memoryfile_write(ext):
 
 
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
-def test_zip_memoryfile_write(ext):
+def test_zip_memoryfile_write_directory(ext):
     schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
     records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
                 range(0, 5)]
@@ -156,21 +156,32 @@ def test_write_memoryfile(profile_first_coutwildrnp_shp):
             assert len(col) == 1
 
 
-@pytest.mark.parametrize('driver', [driver for driver in ['GeoJSON', 'GPKG', 'ESRI Shapefile'] if
-                                    'a' in supported_drivers[driver] and (
+@pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (
                                             driver not in driver_mode_mingdal['a'] or
-                                            gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
+                                            gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))
+                                    and driver not in {'DGN'}])
 def test_append_memoryfile(driver):
     """In-memory Shapefile can be appended"""
-    schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
-    records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-                range(0, 5)]
-    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
-                range(5, 10)]
-    positions = list(range(0, 10))
+
+    special_schemas = {'CSV': {'geometry': None, 'properties': OrderedDict([('position', 'int')])}}
+    schema = special_schemas.get(driver, {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])})
+
+    range1 = list(range(0, 5))
+    special_records1 = {'CSV': [{'geometry': None, 'properties': {'position': i}} for i in range1]}
+    records1 = special_records1.get(driver, [
+        {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+        range1])
+
+    range2 = list(range(5, 10))
+    special_records2 = {'CSV': [{'geometry': None, 'properties': {'position': i}} for i in range2]}
+    records2 = special_records2.get(driver, [
+        {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+        range2])
+
+    positions = range1 + range2
 
     if driver == 'GPKG' and gdal_version < GDALVersion(2, 0):
-        # Test fails with sqlite3_open(/vsimem/...) failed: out of memory
+        # Test fails with sqlite3_open(/vsimem/...) failed: out of memory for gdal 1.x
         with pytest.raises(FionaValueError):
             with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
                 with memfile.open(driver=driver, schema=schema) as c:
@@ -187,6 +198,7 @@ def test_append_memoryfile(driver):
                 c.writerecords(records2)
             with memfile.open(driver=driver) as c:
                 items = list(c)
+                pprint.pprint(items)
                 assert len(items) == len(positions)
                 for val_in, val_out in zip(positions, items):
                     assert val_in == int(val_out['properties']['position'])
