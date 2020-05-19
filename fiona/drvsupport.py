@@ -186,11 +186,11 @@ _filter_supported_drivers()
 zip_memoryfile_not_supported = {
     '/vsizip/': {
         'w': {
-            'GMT': GDALVersion(2, 0),
+            'GMT': None, # GDALVersion(2, 0)
             'DGN': None,
             'GPKG': None,
             'DXF': None,
-            'ESRI Shapefile': GDALVersion(2, 3),
+            'ESRI Shapefile': None,
             'GPX': None,
             'MapInfo File': None,
             'PCIDSK': None,
