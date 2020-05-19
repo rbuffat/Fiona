@@ -180,7 +180,8 @@ def test_append_memoryfile(driver):
 
     positions = range1 + range2
 
-    if driver == 'GPKG' and gdal_version < GDALVersion(2, 0):
+    if (driver == 'GPKG' and gdal_version < GDALVersion(2, 0) or
+            driver in {'PCIDSK', 'MapInfo File'}):
         # Test fails with sqlite3_open(/vsimem/...) failed: out of memory for gdal 1.x
         with pytest.raises(FionaValueError):
             with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:

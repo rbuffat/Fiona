@@ -60,6 +60,8 @@ class MemoryFile(MemoryFileBase):
             else:
                 if driver == 'GPKG' and gdal_version < gdal_version < GDALVersion(2, 0):
                     raise DriverError("GPKG driver does not support append mode with GDAL 1.x")
+                if driver in {'PCIDSK', 'MapInfo File'}:
+                    raise DriverError("{driver} driver does not support append mode.".format(driver))
                 mode = 'a'
 
             return Collection(vsi_path, mode=mode, driver=driver, schema=schema, crs=crs,
