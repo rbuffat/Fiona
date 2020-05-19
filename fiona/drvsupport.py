@@ -179,18 +179,37 @@ def _filter_supported_drivers():
 _filter_supported_drivers()
 
 
+# DGN: segfault with gdal 3.0.4
+# GPKG,DXF,ESRI Shapefile,GPX,MapInfo File,PCIDSK': Random access not supported for writable file in /vsizip
+# GMT: Random access not supported for /vsizip for gdal 1.x
+# GPSTrackMaker: VSIFSeekL() is not supported on writable Zip files
 zip_memoryfile_not_supported = {
-    'w': {
-        'DGN': None,
-        'GPKG': None,
-        'DXF': None,
-        'ESRI Shapefile': None,
-        'GPX': None,
-        'MapInfo File': None,
-        'PCIDSK': None,
-        'GPSTrackMaker': None
+    '/vsizip/': {
+        'w': {
+            'GMT': GDALVersion(2, 0),
+            'DGN': None,
+            'GPKG': None,
+            'DXF': None,
+            'ESRI Shapefile': None,
+            'GPX': None,
+            'MapInfo File': None,
+            'PCIDSK': None,
+            'GPSTrackMaker': None
+        }
     }
 }
+
+
+def zip_memoryfile_supports_mode(vsi, driver, mode):
+
+    if (vsi in zip_memoryfile_not_supported and mode in zip_memoryfile_not_supported[vsi] and driver in
+            zip_memoryfile_not_supported[vsi][mode]):
+        if zip_memoryfile_not_supported[vsi][mode][driver] is None:
+            return False
+        elif gdal_version < zip_memoryfile_not_supported[vsi][mode][driver]:
+            return False
+
+    return True
 
 
 memoryfile_not_supported = {

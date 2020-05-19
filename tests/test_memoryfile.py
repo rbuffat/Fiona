@@ -5,7 +5,8 @@ import pytest
 import fiona
 from fiona.errors import FionaValueError, DriverError
 from fiona.io import MemoryFile, ZipMemoryFile
-from fiona.drvsupport import supported_drivers, driver_mode_mingdal, memoryfile_supports_mode, memoryfile_not_supported
+from fiona.drvsupport import supported_drivers, driver_mode_mingdal, memoryfile_supports_mode, memoryfile_not_supported, \
+    zip_memoryfile_supports_mode
 from fiona.env import GDALVersion
 from fiona.path import ARCHIVESCHEMES
 from tests.conftest import driver_extensions, get_temp_filename
@@ -145,8 +146,7 @@ def test_zip_memoryfile_write(ext, driver):
             with ZipMemoryFile(ext=ext) as memfile:
                 with memfile.open(path=file1_path, mode='w', driver=driver, schema=schema) as c:
                     pass
-    elif ARCHIVESCHEMES[ext] == 'zip' and driver in {'DGN', 'GPKG', 'DXF', 'ESRI Shapefile', 'GPX', 'MapInfo File',
-                                                     'PCIDSK', 'GPSTrackMaker'}:
+    elif ARCHIVESCHEMES[ext] == 'zip' and not zip_memoryfile_supports_mode('/vsizip/', driver, 'w'):
         with pytest.raises(FionaValueError):
             with ZipMemoryFile(ext=ext) as memfile:
                 with memfile.open(path=file1_path, mode='w', driver=driver, schema=schema) as c:

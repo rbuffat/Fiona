@@ -8,7 +8,7 @@ from fiona.ogrext import MemoryFileBase
 from fiona.collection import Collection
 from fiona.ogrext import _listdir
 
-from fiona.drvsupport import memoryfile_supports_mode
+from fiona.drvsupport import memoryfile_supports_mode, zip_memoryfile_supports_mode
 from fiona.errors import FionaValueError, DriverError
 from fiona.path import ARCHIVESCHEMES
 from fiona.env import GDALVersion
@@ -127,19 +127,14 @@ class ZipMemoryFile(MemoryFile):
         if mode is None:
             mode = 'r'
 
-        if ((mode == 'w' and self.vsi == '/vsitar/') or
-                (mode == 'a')):
+        if (mode == 'w' and self.vsi == '/vsitar/') or mode == 'a':
             raise FionaValueError("GDAL Virtual File System {vsi} does not support mode '{mode}'.".format(vsi=self.vsi,
                                                                                                           mode=mode))
 
-        # DGN: segfault with gdal 3.0.4
-        # GPKG,DXF,ESRI Shapefile,GPX,MapInfo File,PCIDSK': Random access not supported for writable file in /vsizip
-        # GMT: Random access not supported for /vsizip for gdal 1.x
-        # GPSTrackMaker: VSIFSeekL() is not supported on writable Zip files
-        if mode == 'w' and driver in {'DGN', 'GPKG', 'DXF', 'ESRI Shapefile', 'GPX', 'MapInfo File', 'PCIDSK',
-                                      'GPSTrackMaker'}:
-            raise FionaValueError("Driver {driver} does not support mode '{mode}' for ZipMemoryFile.".format(
-                driver=driver, mode=mode))
+        if not zip_memoryfile_supports_mode(self.vsi, driver, mode):
+            raise FionaValueError(
+                "Driver {driver} does not support mode '{mode}' using {vsi} GDAL Virtual File System.".format(
+                    driver=driver, mode=mode, vsi=self.vsi))
 
         if self.closed:
             raise IOError("I/O operation on closed file.")
