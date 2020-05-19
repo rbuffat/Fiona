@@ -173,7 +173,7 @@ def test_zip_memoryfile_write(ext, driver):
 
 @pytest.mark.parametrize('driver', [driver for driver, mingdal in zip_memoryfile_not_supported['/vsizip/']['w'].items()
                                     if mingdal is None or gdal_version < mingdal])
-def test_zip_memoryfile_write_not_supported(driver, monkeypatch):
+def test_zip_memoryfile_write_notsupported(driver, monkeypatch):
 
     # DGN driver segfaults with gdal 3.0.4
     if driver == 'DGN':
@@ -210,7 +210,7 @@ def test_zip_memoryfile_write_not_supported(driver, monkeypatch):
                 is_good = is_good and (len(items) == len(range2))
                 for val_in, val_out in zip(range2, items):
                     is_good = is_good and val_in == int(get_pos(val_out, driver))
-    except:
+    except Exception as e:
         is_good = False
 
     assert not is_good

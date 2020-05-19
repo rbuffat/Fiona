@@ -76,7 +76,6 @@ class MemoryFile(MemoryFileBase):
         if not memoryfile_supports_mode(driver, mode):
             raise DriverError("{driver} driver does not support mode '{mode}'.".format(driver=driver,
                                                                                        mode=mode))
-
         return Collection(vsi_path, mode=mode, driver=driver, schema=schema, crs=crs,
                           encoding=encoding, layer=layer, enabled_drivers=enabled_drivers,
                           crs_wkt=crs_wkt, **kwargs)

@@ -186,7 +186,7 @@ _filter_supported_drivers()
 zip_memoryfile_not_supported = {
     '/vsizip/': {
         'w': {
-            'GMT': None, # GDALVersion(2, 0)
+            'GMT': GDALVersion(2, 0),
             'DGN': None,
             'GPKG': None,
             'DXF': None,
@@ -194,7 +194,7 @@ zip_memoryfile_not_supported = {
             'GPX': None,
             'MapInfo File': None,
             'PCIDSK': None,
-            'GPSTrackMaker': None
+            'GPSTrackMaker': None,
         }
     }
 }
