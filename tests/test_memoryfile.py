@@ -28,7 +28,8 @@ def get_schema(driver):
                                'properties': OrderedDict([('ele', 'float'), ('time', 'datetime')])},
                        'GPSTrackMaker': {'properties': OrderedDict([]), 'geometry': 'Point'},
                        'DGN': {'properties': OrderedDict([]), 'geometry': 'LineString'},
-                       'MapInfo File': {'properties': OrderedDict([]), 'geometry': 'Point'}}
+                       'MapInfo File': {'geometry': 'Point', 'properties': OrderedDict([('position', 'str')])}
+                       }
 
     return special_schemas.get(driver, {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])})
 
@@ -54,7 +55,7 @@ def get_records(driver, range):
                              'properties': {}} for i in range],
                         'MapInfo File': [
                             {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
-                             'properties': {}} for i in range],
+                             'properties': {'position': str(i)}} for i in range],
                         }
     return special_records1.get(driver, [
         {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
@@ -63,26 +64,23 @@ def get_records(driver, range):
 
 def get_records2(driver, range):
     special_records2 = {'DGN': [
-                            {'geometry': {'type': 'LineString', 'coordinates': [(float(i), 0.0), (0.0, 0.0)]},
-                             'properties': OrderedDict(
-                                 [('Type', 3),
-                                  ('Level', 0),
-                                  ('GraphicGroup', 0),
-                                  ('ColorIndex', 0),
-                                  ('Weight', 0),
-                                  ('Style', 0),
-                                  ('EntityNum', None),
-                                  ('MSLink', None),
-                                  ('Text', None)])} for i in range],
-                        'MapInfo File': [
-                            {'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
-                             'properties': {}} for i in range],
-                        }
+        {'geometry': {'type': 'LineString', 'coordinates': [(float(i), 0.0), (0.0, 0.0)]},
+         'properties': OrderedDict(
+             [('Type', 3),
+              ('Level', 0),
+              ('GraphicGroup', 0),
+              ('ColorIndex', 0),
+              ('Weight', 0),
+              ('Style', 0),
+              ('EntityNum', None),
+              ('MSLink', None),
+              ('Text', None)])} for i in range],
+    }
     return special_records2.get(driver, get_records(driver, range))
 
 
 def get_pos(f, driver):
-    if driver in {'DXF', 'BNA', 'GPX', 'GPSTrackMaker', 'MapInfo File'}:
+    if driver in {'DXF', 'BNA', 'GPX', 'GPSTrackMaker'}:
         return f['geometry']['coordinates'][1]
     elif driver == 'DGN':
         return f['geometry']['coordinates'][0][0]
@@ -123,16 +121,16 @@ def test_tar_memoryfile_listdir(bytes_coutwildrnp_tar):
     """In-memory zipped Shapefile can be read"""
 
     with ZipMemoryFile(bytes_coutwildrnp_tar, ext='tar') as memfile:
-        assert set(memfile.listdir('/testing')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf', 'coutwildrnp.prj'}
+        assert set(memfile.listdir('/testing')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf',
+                                                    'coutwildrnp.prj'}
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw and (
-                                            driver not in driver_mode_mingdal['w'] or
-                                            gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
+        driver not in driver_mode_mingdal['w'] or
+        gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
                                     and driver not in {}])
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
 def test_zip_memoryfile_write(ext, driver):
-
     schema = get_schema(driver)
     range1 = list(range(0, 5))
     range2 = list(range(5, 10))
@@ -175,12 +173,13 @@ def test_zip_memoryfile_write(ext, driver):
 
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
 def test_zip_memoryfile_append(ext):
-
     with pytest.raises(FionaValueError):
         schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
-        records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+        records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i
+                    in
                     range(0, 5)]
-        records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+        records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i
+                    in
                     range(5, 10)]
         with ZipMemoryFile(ext=ext) as memfile:
             with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
@@ -197,8 +196,8 @@ def test_zip_memoryfile_append(ext):
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw and (
-                                            driver not in driver_mode_mingdal['w'] or
-                                            gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
+        driver not in driver_mode_mingdal['w'] or
+        gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
                                     and driver not in {}])
 def test_write_memoryfile(driver):
     """In-memory Shapefile can be written"""
@@ -233,7 +232,8 @@ def test_write_memoryfile(driver):
 @pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['w'].items() if
                                     mingdal is None or gdal_version < mingdal])
 def test_write_memoryfile_notsupported(driver, monkeypatch):
-
+    """ If this test fails, it should be considered to add GDALVersion(major, minor) to
+    drvsupport.memoryfile_not_supported['w'] for the respective driver"""
     monkeypatch.delitem(fiona.drvsupport.memoryfile_not_supported['w'], driver)
 
     schema = get_schema(driver)
@@ -255,12 +255,12 @@ def test_write_memoryfile_notsupported(driver, monkeypatch):
     except Exception as e:
         is_good = False
 
-    assert is_good == False
+    assert not is_good
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (
-                                            driver not in driver_mode_mingdal['a'] or
-                                            gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
+        driver not in driver_mode_mingdal['a'] or
+        gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
 def test_append_memoryfile(driver):
     """In-memory Shapefile can be appended"""
 
@@ -272,6 +272,7 @@ def test_append_memoryfile(driver):
     positions = range1 + range2
 
     if not memoryfile_supports_mode(driver, 'a'):
+        print("1", driver, memoryfile_supports_mode(driver, 'a'))
         with pytest.raises(FionaValueError):
             with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
                 with memfile.open(driver=driver, schema=schema) as c:
@@ -294,6 +295,44 @@ def test_append_memoryfile(driver):
                     assert val_in == int(get_pos(val_out, driver))
 
 
+@pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['a'].items() if
+                                    mingdal is None or gdal_version < mingdal])
+def test_append_memoryfile_notsupported(driver, monkeypatch):
+    """In-memory Shapefile can be appended
+
+    If this test fails, it should be considered to add GDALVersion(major, minor) to
+    drvsupport.memoryfile_not_supported['a']  for the respective driver
+    """
+
+    monkeypatch.delitem(fiona.drvsupport.memoryfile_not_supported['a'], driver)
+
+    schema = get_schema(driver)
+    range1 = list(range(0, 5))
+    range2 = list(range(5, 10))
+    records1 = get_records(driver, range1)
+    records2 = get_records2(driver, range2)
+    positions = range1 + range2
+
+    is_good = True
+
+    try:
+        with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+            with memfile.open(driver=driver, schema=schema) as c:
+                c.writerecords(records1)
+            with memfile.open(driver=driver, schema=schema, mode='a') as c:
+                c.writerecords(records2)
+            with memfile.open(driver=driver) as c:
+                items = list(c)
+
+                is_good = is_good and (len(items) == len(positions))
+                for val_in, val_out in zip(positions, items):
+                    is_good = is_good and (val_in == int(get_pos(val_out, driver)))
+    except:
+        is_good = False
+
+    assert not is_good
+
+
 def test_memoryfile_bytesio(path_coutwildrnp_json):
     """In-memory GeoJSON file can be read"""
     with open(path_coutwildrnp_json, 'rb') as f:
@@ -306,7 +345,6 @@ def test_memoryfile_bytesio(path_coutwildrnp_json):
 def test_memoryfile_fileobj(path_coutwildrnp_json):
     """In-memory GeoJSON file can be read"""
     with open(path_coutwildrnp_json, 'rb') as f:
-
         with fiona.open(f) as collection:
             assert len(collection) == 67
 
@@ -319,7 +357,6 @@ def test_memoryfilebase_write():
                range(5)]
 
     with MemoryFile() as memfile:
-
         with BytesIO() as fout:
             with fiona.open(fout,
                             'w',
