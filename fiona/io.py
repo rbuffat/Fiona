@@ -7,6 +7,8 @@ import logging
 from fiona.ogrext import MemoryFileBase
 from fiona.collection import Collection
 from fiona.ogrext import _listdir
+
+from fiona.drvsupport import memoryfile_supports_mode
 from fiona.errors import FionaValueError, DriverError
 from fiona.path import ARCHIVESCHEMES
 from fiona.env import GDALVersion
@@ -58,15 +60,7 @@ class MemoryFile(MemoryFileBase):
             if mode is None or mode == 'r':
                 mode = 'r'
             else:
-                if driver == 'GPKG' and gdal_version < gdal_version < GDALVersion(2, 0):
-                    raise DriverError("GPKG driver does not support append mode with GDAL 1.x")
-                if driver in {'PCIDSK', 'MapInfo File'}:
-                    raise DriverError("{driver} driver does not support append mode.".format(driver=driver))
                 mode = 'a'
-
-            return Collection(vsi_path, mode=mode, driver=driver, schema=schema, crs=crs,
-                              encoding=encoding, layer=layer, enabled_drivers=enabled_drivers,
-                              crs_wkt=crs_wkt, **kwargs)
         else:
 
             if schema:
@@ -75,10 +69,17 @@ class MemoryFile(MemoryFileBase):
                 this_schema['properties'] = OrderedDict(schema['properties'])
             else:
                 this_schema = None
-            return Collection(vsi_path, 'w', crs=crs, driver=driver,
-                              schema=this_schema, encoding=encoding,
-                              layer=layer, enabled_drivers=enabled_drivers,
-                              crs_wkt=crs_wkt, **kwargs)
+            schema = this_schema
+
+            mode = 'w'
+
+        if not memoryfile_supports_mode(driver, mode):
+            raise DriverError("{driver} driver does not support mode '{mode}'.".format(driver=driver,
+                                                                                       mode=mode))
+
+        return Collection(vsi_path, mode=mode, driver=driver, schema=schema, crs=crs,
+                          encoding=encoding, layer=layer, enabled_drivers=enabled_drivers,
+                          crs_wkt=crs_wkt, **kwargs)
 
     def __enter__(self):
         return self
@@ -133,6 +134,7 @@ class ZipMemoryFile(MemoryFile):
 
         # DGN: segfault with gdal 3.0.4
         # GPKG,DXF,ESRI Shapefile,GPX,MapInfo File,PCIDSK': Random access not supported for writable file in /vsizip
+        # GMT: Random access not supported for /vsizip for gdal 1.x
         # GPSTrackMaker: VSIFSeekL() is not supported on writable Zip files
         if mode == 'w' and driver in {'DGN', 'GPKG', 'DXF', 'ESRI Shapefile', 'GPX', 'MapInfo File', 'PCIDSK',
                                       'GPSTrackMaker'}:

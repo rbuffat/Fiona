@@ -3,9 +3,9 @@ from collections import OrderedDict
 from io import BytesIO
 import pytest
 import fiona
-from fiona.errors import FionaValueError
+from fiona.errors import FionaValueError, DriverError
 from fiona.io import MemoryFile, ZipMemoryFile
-from fiona.drvsupport import supported_drivers, driver_mode_mingdal
+from fiona.drvsupport import supported_drivers, driver_mode_mingdal, memoryfile_supports_mode, memoryfile_not_supported
 from fiona.env import GDALVersion
 from fiona.path import ARCHIVESCHEMES
 from tests.conftest import driver_extensions, get_temp_filename
@@ -182,6 +182,38 @@ def test_zip_memoryfile_append(ext):
                                     and driver not in {}])
 def test_write_memoryfile(driver):
     """In-memory Shapefile can be written"""
+
+    schema = get_schema(driver)
+    positions = list(range(0, 5))
+    records1 = get_records(driver, positions)
+
+    if not memoryfile_supports_mode(driver, 'w'):
+        with pytest.raises(DriverError):
+            with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+                with memfile.open(driver=driver, schema=schema) as c:
+                    c.writerecords(records1)
+
+                with memfile.open(driver=driver) as c:
+                    items = list(c)
+                    pprint.pprint(items)
+                    assert len(items) == len(positions)
+                    for val_in, val_out in zip(positions, items):
+                        assert val_in == int(get_pos(val_out, driver))
+    else:
+        with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+            with memfile.open(driver=driver, schema=schema) as c:
+                c.writerecords(records1)
+
+            with memfile.open(driver=driver) as c:
+                items = list(c)
+                pprint.pprint(items)
+                assert len(items) == len(positions)
+                for val_in, val_out in zip(positions, items):
+                    assert val_in == int(get_pos(val_out, driver))
+
+
+@pytest.mark.parametrize('driver', [driver for driver in memoryfile_not_supported['w'].keys()])
+def test_write_memoryfile_notsupported(driver, monkeypatch):
 
     schema = get_schema(driver)
     positions = list(range(0, 5))

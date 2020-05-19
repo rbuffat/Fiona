@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from fiona.env import Env
+from fiona.env import Env, GDALVersion
 
+gdal_version = GDALVersion.runtime()
 
 # Here is the list of available drivers as (name, modes) tuples. Currently,
 # we only expose the defaults (excepting FileGDB). We also don't expose
@@ -176,3 +177,38 @@ def _filter_supported_drivers():
 
 
 _filter_supported_drivers()
+
+
+zip_memoryfile_not_supported = {
+    'w': {
+        'DGN': None,
+        'GPKG': None,
+        'DXF': None,
+        'ESRI Shapefile': None,
+        'GPX': None,
+        'MapInfo File': None,
+        'PCIDSK': None,
+        'GPSTrackMaker': None
+    }
+}
+
+
+memoryfile_not_supported = {
+    'w': {
+        'DGN': GDALVersion(2, 3)
+    },
+    'a': {
+        'GPKG': GDALVersion(2, 0),
+        'PCIDSK': None,
+        'MapInfo File': None
+    }
+}
+
+
+def memoryfile_supports_mode(driver, mode):
+    if mode in memoryfile_not_supported and driver in memoryfile_not_supported[mode]:
+        if memoryfile_not_supported[mode][driver] is None:
+            return False
+        elif gdal_version < memoryfile_not_supported[mode][driver]:
+            return False
+    return True
