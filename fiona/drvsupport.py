@@ -195,7 +195,9 @@ zip_memoryfile_not_supported = {
 
 memoryfile_not_supported = {
     'w': {
-        'DGN': GDALVersion(2, 3)
+        'DGN': GDALVersion(2, 3),
+        'GPKG': GDALVersion(2, 0),
+        'MapInfo File': None
     },
     'a': {
         'DGN': GDALVersion(2, 3),
