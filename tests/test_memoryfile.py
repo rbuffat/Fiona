@@ -6,7 +6,7 @@ import fiona
 from fiona.errors import FionaValueError, DriverError
 from fiona.io import MemoryFile, ZipMemoryFile
 from fiona.drvsupport import supported_drivers, driver_mode_mingdal, memoryfile_supports_mode, memoryfile_not_supported, \
-    zip_memoryfile_supports_mode
+    zip_memoryfile_supports_mode, zip_memoryfile_not_supported
 from fiona.env import GDALVersion
 from fiona.path import ARCHIVESCHEMES
 from tests.conftest import driver_extensions, get_temp_filename
@@ -171,6 +171,51 @@ def test_zip_memoryfile_write(ext, driver):
                     assert val_in == int(get_pos(val_out, driver))
 
 
+@pytest.mark.parametrize('driver', [driver for driver, mingdal in zip_memoryfile_not_supported['/vsizip/']['w'].items()
+                                    if mingdal is None or gdal_version < mingdal])
+def test_zip_memoryfile_write_not_supported(driver, monkeypatch):
+
+    # DGN driver segfaults with gdal 3.0.4
+    if driver == 'DGN':
+        return
+
+    monkeypatch.delitem(fiona.drvsupport.zip_memoryfile_not_supported['/vsizip/']['w'], driver)
+
+    ext = 'zip'
+    schema = get_schema(driver)
+    range1 = list(range(0, 5))
+    range2 = list(range(5, 10))
+    records1 = get_records(driver, range1)
+    records2 = get_records(driver, range2)
+    file1_path = "/{}".format(get_temp_filename(driver))
+    file2_path = "/directory/{}".format(get_temp_filename(driver))
+
+    is_good = True
+
+    try:
+        with ZipMemoryFile(ext=ext) as memfile:
+            with memfile.open(path=file1_path, mode='w', driver=driver, schema=schema) as c:
+                c.writerecords(records1)
+            with memfile.open(path=file2_path, mode='w', driver=driver, schema=schema) as c:
+                c.writerecords(records2)
+
+            with memfile.open(path=file1_path, mode='r', driver=driver, schema=schema) as c:
+                items = list(c)
+                is_good = is_good and (len(items) == len(range1))
+                for val_in, val_out in zip(range1, items):
+                    is_good = is_good and val_in == int(get_pos(val_out, driver))
+
+            with memfile.open(path=file2_path, mode='r') as c:
+                items = list(c)
+                is_good = is_good and (len(items) == len(range2))
+                for val_in, val_out in zip(range2, items):
+                    is_good = is_good and val_in == int(get_pos(val_out, driver))
+    except:
+        is_good = False
+
+    assert not is_good
+
+
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
 def test_zip_memoryfile_append(ext):
     with pytest.raises(FionaValueError):
@@ -289,7 +334,6 @@ def test_append_memoryfile(driver):
                 c.writerecords(records2)
             with memfile.open(driver=driver) as c:
                 items = list(c)
-                pprint.pprint(items)
                 assert len(items) == len(positions)
                 for val_in, val_out in zip(positions, items):
                     assert val_in == int(get_pos(val_out, driver))
