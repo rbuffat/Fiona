@@ -54,22 +54,22 @@ matrix:
         PROJVERSION="6.2.1"
 
     # Test all supported python versions with latest stable gdal release
-    - python: "2.7"
-      env:
-        GDALVERSION="3.1.0"
-        PROJVERSION="6.2.1"
-    - python: "3.6"
-      env:
-        GDALVERSION="3.1.0"
-        PROJVERSION="6.2.1"
-    - python: "3.7"
-      env:
-        GDALVERSION="3.1.0"
-        PROJVERSION="6.2.1"
-    - python: "3.8"
-      env:
-        GDALVERSION="3.1.0"
-        PROJVERSION="6.2.1"
+#    - python: "2.7"
+#      env:
+#        GDALVERSION="3.1.0"
+#        PROJVERSION="6.2.1"
+#    - python: "3.6"
+#      env:
+#        GDALVERSION="3.1.0"
+#        PROJVERSION="6.2.1"
+#    - python: "3.7"
+#      env:
+#        GDALVERSION="3.1.0"
+#        PROJVERSION="6.2.1"
+#    - python: "3.8"
+#      env:
+#        GDALVERSION="3.1.0"
+#        PROJVERSION="6.2.1"
 
     # Test master
     - python: "3.8"
