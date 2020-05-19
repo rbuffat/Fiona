@@ -234,6 +234,8 @@ def test_write_memoryfile(driver):
                                     if mingdal is None or mingdal < gdal_version])
 def test_write_memoryfile_notsupported(driver, monkeypatch):
 
+    monkeypatch.delitem(fiona.drvsupport.memoryfile_not_supported['w'], driver)
+
     schema = get_schema(driver)
     positions = list(range(0, 5))
     records1 = get_records(driver, positions)
@@ -251,10 +253,9 @@ def test_write_memoryfile_notsupported(driver, monkeypatch):
                 for val_in, val_out in zip(positions, items):
                     is_good = is_good and (val_in == int(get_pos(val_out, driver)))
     except Exception as e:
-        print(str(e))
         is_good = False
 
-    assert is_good
+    assert not is_good
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (
