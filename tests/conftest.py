@@ -152,6 +152,12 @@ def path_coutwildrnp_tar(data_dir):
     return path
 
 
+@pytest.fixture(scope='session')
+def bytes_coutwildrnp_tar(path_coutwildrnp_tar):
+    """The zip file's bytes"""
+    with open(path_coutwildrnp_tar, 'rb') as src:
+        return src.read()
+
 
 @pytest.fixture(scope='session')
 def path_coutwildrnp_json(data_dir):

@@ -43,6 +43,13 @@ def test_zip_memoryfile_listdir(bytes_coutwildrnp_zip):
         assert set(memfile.listdir('/')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf', 'coutwildrnp.prj'}
 
 
+def test_tar_memoryfile_listdir(bytes_coutwildrnp_tar):
+    """In-memory zipped Shapefile can be read"""
+
+    with ZipMemoryFile(bytes_coutwildrnp_tar, ext='tar') as memfile:
+        assert set(memfile.listdir('/testing')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf', 'coutwildrnp.prj'}
+
+
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
 def test_zip_memoryfile_write(ext):
     schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
@@ -123,7 +130,7 @@ def test_zip_memoryfile_append(ext):
         with ZipMemoryFile(ext=ext) as memfile:
             with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
                 c.writerecords(records1)
-            print(memfile.listdir('/'))
+
             with memfile.open(path="/test1.geojson", mode='a', driver='GeoJSON', schema=schema) as c:
                 c.writerecords(records2)
 
@@ -162,9 +169,9 @@ def test_append_memoryfile(driver):
                 range(5, 10)]
     positions = list(range(0, 10))
 
-    if gdal_version < GDALVersion(2, 0):
-        # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
-        return
+    # if gdal_version < GDALVersion(2, 0):
+    #     # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
+    #     return
 
     # TODO: Shp needs file extensions so that exists() returns True, GPKG returns extensions for gdal 2.0, otherwise
     #  sqlite driver is used
