@@ -152,6 +152,7 @@ def path_coutwildrnp_tar(data_dir):
     return path
 
 
+
 @pytest.fixture(scope='session')
 def path_coutwildrnp_json(data_dir):
     """Creates ``coutwildrnp.json`` if it does not exist and returns the absolute

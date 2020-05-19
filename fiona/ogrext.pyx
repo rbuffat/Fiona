@@ -35,8 +35,7 @@ from fiona.compat import OrderedDict, strencode
 from fiona.rfc3339 import parse_date, parse_datetime, parse_time
 from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
 from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
-from fiona.path import vsi_path
-
+from fiona.path import vsi_path, ARCHIVESCHEMES
 from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
 
 from libc.stdlib cimport malloc, free
@@ -953,7 +952,7 @@ cdef class WritingSession(Session):
 
         if collection.mode == 'a':
 
-            if not path.startswith('/vsimem') and not os.path.exists(path):
+            if not path.startswith('/vsi') and not os.path.exists(path):
                 raise OSError("No such file or directory %s" % path)
             path_b = strencode(path)
             path_c = path_b
@@ -1665,6 +1664,27 @@ def _listlayers(path, **kwargs):
 
     return layer_names
 
+def _listdir(path):
+    """List all files in path, if path points to a directory"""
+    cdef const char *path_c
+    cdef int n
+    cdef char** papszFiles
+
+    path_b = strencode(path)
+    path_c = path_b
+
+    if not CPLCheckForFile(path_c, NULL):
+        raise FionaValueError("Path '{}' does not exist.".format(path))
+
+    papszFiles = VSIReadDir(path_c)
+    n = CSLCount(papszFiles)
+    files = []
+    for i in range(n):
+        files.append(papszFiles[i].decode("utf-8"))
+    CSLDestroy(papszFiles)
+
+    return files
+
 
 def buffer_to_virtual_file(bytesbuf, ext=''):
     """Maps a bytes buffer to a virtual file.
@@ -1705,6 +1725,7 @@ cdef class MemoryFileBase(object):
         ext : str
             A file extension for the in-memory file under /vsimem. Ignored if
             filename was provided.
+
         """
         cdef VSILFILE *vsi_handle = NULL
 
@@ -1869,3 +1890,4 @@ cdef class MemoryFileBase(object):
         self._len = max(self._len, self._pos)
 
         return result
+

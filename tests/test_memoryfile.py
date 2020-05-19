@@ -1,12 +1,14 @@
 """Tests of MemoryFile and ZippedMemoryFile"""
-
+from collections import OrderedDict
 from io import BytesIO
 import pytest
 import uuid
 import fiona
+from fiona.errors import FionaValueError
 from fiona.io import MemoryFile, ZipMemoryFile
 from fiona.drvsupport import supported_drivers, driver_mode_mingdal
 from fiona.env import GDALVersion
+from fiona.path import ARCHIVESCHEMES
 from tests.conftest import driver_extensions
 
 gdal_version = GDALVersion.runtime()
@@ -34,6 +36,104 @@ def test_zip_memoryfile(bytes_coutwildrnp_zip):
             assert len(collection) == 67
 
 
+def test_zip_memoryfile_listdir(bytes_coutwildrnp_zip):
+    """In-memory zipped Shapefile can be read"""
+
+    with ZipMemoryFile(bytes_coutwildrnp_zip) as memfile:
+        assert set(memfile.listdir('/')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf', 'coutwildrnp.prj'}
+
+
+@pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
+def test_zip_memoryfile_write(ext):
+    schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
+    records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(0, 5)]
+    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(5, 10)]
+
+    # \vsitar\ does not allow write mode
+    if ARCHIVESCHEMES[ext] == 'tar':
+        with pytest.raises(FionaValueError):
+            with ZipMemoryFile(ext=ext) as memfile:
+                with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                    c.writerecords(records1)
+    else:
+        with ZipMemoryFile(ext=ext) as memfile:
+            with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                c.writerecords(records1)
+            with memfile.open(path="/test2.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                c.writerecords(records2)
+
+            with memfile.open(path="/test1.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+                items = list(c)
+                assert len(items) == len(range(0, 5))
+                for val_in, val_out in zip(range(0, 5), items):
+                    assert val_in == int(val_out['properties']['position'])
+
+            with memfile.open(path="/test2.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+                items = list(c)
+                assert len(items) == len(range(5, 10))
+                for val_in, val_out in zip(range(5, 10), items):
+                    assert val_in == int(val_out['properties']['position'])
+
+
+@pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
+def test_zip_memoryfile_write(ext):
+    schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
+    records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(0, 5)]
+    records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                range(5, 10)]
+
+    # \vsitar\ does not allow write mode
+    if ARCHIVESCHEMES[ext] == 'tar':
+        with pytest.raises(FionaValueError):
+            with ZipMemoryFile(ext=ext) as memfile:
+                with memfile.open(path="/dir1/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                    c.writerecords(records1)
+    else:
+        with ZipMemoryFile(ext=ext) as memfile:
+            with memfile.open(path="/dir1/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                c.writerecords(records1)
+            with memfile.open(path="/dir2/test2.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                c.writerecords(records2)
+
+            with memfile.open(path="/dir1/test1.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+                items = list(c)
+                assert len(items) == len(range(0, 5))
+                for val_in, val_out in zip(range(0, 5), items):
+                    assert val_in == int(val_out['properties']['position'])
+
+            with memfile.open(path="/dir2/test2.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+                items = list(c)
+                assert len(items) == len(range(5, 10))
+                for val_in, val_out in zip(range(5, 10), items):
+                    assert val_in == int(val_out['properties']['position'])
+
+
+@pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
+def test_zip_memoryfile_append(ext):
+
+    with pytest.raises(FionaValueError):
+        schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
+        records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                    range(0, 5)]
+        records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
+                    range(5, 10)]
+        with ZipMemoryFile(ext=ext) as memfile:
+            with memfile.open(path="/test1.geojson", mode='w', driver='GeoJSON', schema=schema) as c:
+                c.writerecords(records1)
+            print(memfile.listdir('/'))
+            with memfile.open(path="/test1.geojson", mode='a', driver='GeoJSON', schema=schema) as c:
+                c.writerecords(records2)
+
+            with memfile.open(path="/test1.geojson", mode='r', driver='GeoJSON', schema=schema) as c:
+                items = list(c)
+                assert len(items) == len(range(0, 10))
+                for val_in, val_out in zip(range(0, 10), items):
+                    assert val_in == int(val_out['properties']['position'])
+
+
 def test_write_memoryfile(profile_first_coutwildrnp_shp):
     """In-memory Shapefile can be written"""
     profile, first = profile_first_coutwildrnp_shp
@@ -51,22 +151,23 @@ def test_write_memoryfile(profile_first_coutwildrnp_shp):
 
 @pytest.mark.parametrize('driver', [driver for driver in ['GeoJSON', 'GPKG', 'ESRI Shapefile'] if
                                     'a' in supported_drivers[driver] and (
-        driver not in driver_mode_mingdal['a'] or
-        gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
+                                            driver not in driver_mode_mingdal['a'] or
+                                            gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
 def test_append_memoryfile(driver):
     """In-memory Shapefile can be appended"""
-    schema = {'geometry': 'Point', 'properties': [('position', 'int')]}
+    schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
     records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
                 range(0, 5)]
     records2 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i in
                 range(5, 10)]
     positions = list(range(0, 10))
 
-    # if gdal_version < GDALVersion(2, 0):
-    #     # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
-    #     return
+    if gdal_version < GDALVersion(2, 0):
+        # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
+        return
 
-    # TODO: Shp needs extensions that exists() returns True, GPKG returns extensions for gdal 2.0, otherwise sqlite driver is used
+    # TODO: Shp needs file extensions so that exists() returns True, GPKG returns extensions for gdal 2.0, otherwise
+    #  sqlite driver is used
     with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
         with memfile.open(driver=driver, schema=schema) as c:
             c.writerecords(records1)
