@@ -7,10 +7,12 @@ import logging
 from fiona.ogrext import MemoryFileBase
 from fiona.collection import Collection
 from fiona.ogrext import _listdir
-from fiona.errors import FionaValueError
+from fiona.errors import FionaValueError, DriverError
 from fiona.path import ARCHIVESCHEMES
+from fiona.env import GDALVersion
 
 log = logging.getLogger(__name__)
+gdal_version = GDALVersion.runtime()
 
 
 class MemoryFile(MemoryFileBase):
@@ -51,15 +53,18 @@ class MemoryFile(MemoryFileBase):
 
         if self.closed:
             raise IOError("I/O operation on closed file.")
+
         if self.exists():
             if mode is None or mode == 'r':
-                return Collection(vsi_path, 'r', driver=driver, encoding=encoding,
-                                  layer=layer, enabled_drivers=enabled_drivers,
-                                  **kwargs)
+                mode = 'r'
             else:
-                return Collection(vsi_path, 'a', crs=crs, driver=driver, encoding=encoding,
-                                  layer=layer, enabled_drivers=enabled_drivers,
-                                  crs_wkt=crs_wkt, **kwargs)
+                if driver == 'GPKG' and gdal_version < gdal_version < GDALVersion(2, 0):
+                    raise DriverError("GPKG driver does not support append mode with GDAL 1.x")
+                mode = 'a'
+
+            return Collection(vsi_path, mode=mode, driver=driver, schema=schema, crs=crs,
+                              encoding=encoding, layer=layer, enabled_drivers=enabled_drivers,
+                              crs_wkt=crs_wkt, **kwargs)
         else:
             if schema:
                 # Make an ordered dict of schema properties.

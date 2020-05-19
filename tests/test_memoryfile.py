@@ -169,22 +169,27 @@ def test_append_memoryfile(driver):
                 range(5, 10)]
     positions = list(range(0, 10))
 
-    # if gdal_version < GDALVersion(2, 0):
-    #     # TODO test fails with sqlite3_open(/vsimem/...) failed: out of memory
-    #     return
-
-    # TODO: Shp needs file extensions so that exists() returns True, GPKG returns extensions for gdal 2.0, otherwise
-    #  sqlite driver is used
-    with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
-        with memfile.open(driver=driver, schema=schema) as c:
-            c.writerecords(records1)
-        with memfile.open(driver=driver, schema=schema, mode='a') as c:
-            c.writerecords(records2)
-        with memfile.open(driver=driver) as c:
-            items = list(c)
-            assert len(items) == len(positions)
-            for val_in, val_out in zip(positions, items):
-                assert val_in == int(val_out['properties']['position'])
+    if driver == 'GPKG' and gdal_version < GDALVersion(2, 0):
+        # Test fails with sqlite3_open(/vsimem/...) failed: out of memory
+        with pytest.raises(FionaValueError):
+            with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+                with memfile.open(driver=driver, schema=schema) as c:
+                    c.writerecords(records1)
+                with memfile.open(driver=driver, schema=schema, mode='a') as c:
+                    c.writerecords(records2)
+    else:
+        #  Shapfile needs file extensions so that exists() returns True
+        #  GPKG requires extensions for gdal 2.0, otherwise sqlite driver is used
+        with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+            with memfile.open(driver=driver, schema=schema) as c:
+                c.writerecords(records1)
+            with memfile.open(driver=driver, schema=schema, mode='a') as c:
+                c.writerecords(records2)
+            with memfile.open(driver=driver) as c:
+                items = list(c)
+                assert len(items) == len(positions)
+                for val_in, val_out in zip(positions, items):
+                    assert val_in == int(val_out['properties']['position'])
 
 
 def test_memoryfile_bytesio(path_coutwildrnp_json):
