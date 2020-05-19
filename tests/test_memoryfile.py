@@ -215,7 +215,6 @@ def test_write_memoryfile(driver):
 
                 with memfile.open(driver=driver) as c:
                     items = list(c)
-                    pprint.pprint(items)
                     assert len(items) == len(positions)
                     for val_in, val_out in zip(positions, items):
                         assert val_in == int(get_pos(val_out, driver))
@@ -226,7 +225,6 @@ def test_write_memoryfile(driver):
 
             with memfile.open(driver=driver) as c:
                 items = list(c)
-                pprint.pprint(items)
                 assert len(items) == len(positions)
                 for val_in, val_out in zip(positions, items):
                     assert val_in == int(get_pos(val_out, driver))
@@ -240,16 +238,23 @@ def test_write_memoryfile_notsupported(driver, monkeypatch):
     positions = list(range(0, 5))
     records1 = get_records(driver, positions)
 
-    with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
-        with memfile.open(driver=driver, schema=schema) as c:
-            c.writerecords(records1)
+    is_good = True
 
-        with memfile.open(driver=driver) as c:
-            items = list(c)
-            pprint.pprint(items)
-            assert len(items) == len(positions)
-            for val_in, val_out in zip(positions, items):
-                assert val_in == int(get_pos(val_out, driver))
+    try:
+        with MemoryFile(ext=driver_extensions.get(driver, '')) as memfile:
+            with memfile.open(driver=driver, schema=schema) as c:
+                c.writerecords(records1)
+
+            with memfile.open(driver=driver) as c:
+                items = list(c)
+                is_good = is_good and (len(items) == len(positions))
+                for val_in, val_out in zip(positions, items):
+                    is_good = is_good and (val_in == int(get_pos(val_out, driver)))
+    except Exception as e:
+        print(str(e))
+        is_good = False
+
+    assert is_good
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'a' in raw and (
