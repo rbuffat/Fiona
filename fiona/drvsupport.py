@@ -179,6 +179,12 @@ def _filter_supported_drivers():
 _filter_supported_drivers()
 
 
+# zip_memoryfile_not_supported['/vsizip/']['w']['GMT'] = GDALVersion(2, 0): write mode is not supported for '/vsizip/'
+# before GDAL 2.0
+# zip_memoryfile_not_supported['/vsizip/']['w']['GPKG'] = None: write mode is not supported for '/vsizip/' for all
+# versions of GDAL
+#
+# Reasons for missing support:
 # DGN: segfault with gdal 3.0.4
 # GPKG,DXF,ESRI Shapefile,GPX,MapInfo File,PCIDSK': Random access not supported for writable file in /vsizip
 # GMT: Random access not supported for /vsizip for gdal 1.x
@@ -187,7 +193,7 @@ zip_memoryfile_not_supported = {
     '/vsizip/': {
         'w': {
             'GMT': GDALVersion(2, 0),
-            'DGN': None,
+            # 'DGN': None,
             'GPKG': None,
             'DXF': None,
             'ESRI Shapefile': None,
@@ -201,6 +207,7 @@ zip_memoryfile_not_supported = {
 
 
 def zip_memoryfile_supports_mode(vsi, driver, mode):
+    """ Returns True if mode is supported for /vsizip/vsimem/"""
 
     if (vsi in zip_memoryfile_not_supported and mode in zip_memoryfile_not_supported[vsi] and driver in
             zip_memoryfile_not_supported[vsi][mode]):
@@ -229,6 +236,7 @@ memoryfile_not_supported = {
 
 
 def memoryfile_supports_mode(driver, mode):
+    """ Returns True if mode is supported for /vsimem/"""
     if mode in memoryfile_not_supported and driver in memoryfile_not_supported[mode]:
         if memoryfile_not_supported[mode][driver] is None:
             return False

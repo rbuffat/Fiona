@@ -112,14 +112,14 @@ def test_zip_memoryfile(bytes_coutwildrnp_zip):
 
 
 def test_zip_memoryfile_listdir(bytes_coutwildrnp_zip):
-    """In-memory zipped Shapefile can be read"""
+    """In-memory /vsizip/ can list directories"""
 
     with ZipMemoryFile(bytes_coutwildrnp_zip) as memfile:
         assert set(memfile.listdir('/')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf', 'coutwildrnp.prj'}
 
 
 def test_tar_memoryfile_listdir(bytes_coutwildrnp_tar):
-    """In-memory zipped Shapefile can be read"""
+    """In-memory /vsitar/ can list directories"""
 
     with ZipMemoryFile(bytes_coutwildrnp_tar, ext='tar') as memfile:
         assert set(memfile.listdir('/testing')) == {'coutwildrnp.shp', 'coutwildrnp.shx', 'coutwildrnp.dbf',
@@ -132,6 +132,7 @@ def test_tar_memoryfile_listdir(bytes_coutwildrnp_tar):
                                     and driver not in {}])
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
 def test_zip_memoryfile_write(ext, driver):
+    """In-memory zipped Shapefile can be written to"""
     schema = get_schema(driver)
     range1 = list(range(0, 5))
     range2 = list(range(5, 10))
@@ -174,6 +175,14 @@ def test_zip_memoryfile_write(ext, driver):
 @pytest.mark.parametrize('driver', [driver for driver, mingdal in zip_memoryfile_not_supported['/vsizip/']['w'].items()
                                     if mingdal is None or gdal_version < mingdal])
 def test_zip_memoryfile_write_notsupported(driver, monkeypatch):
+    """In-memory zipped Shapefile, driver that are marked as not supporting write, can not write
+
+    Note: This driver tests only the "standard case". Success of this test does not necessarily mean that driver
+          does not allow to write. (e.g. requiring a special schema)
+
+          If this test fails, it should be considered to update
+          fiona.drvsupport.zip_memoryfile_not_supported['/vsizip/']['w'][driver] = GDALVersion(major, minor)
+    """
 
     # DGN driver segfaults with gdal 3.0.4
     if driver == 'DGN':
@@ -218,6 +227,7 @@ def test_zip_memoryfile_write_notsupported(driver, monkeypatch):
 
 @pytest.mark.parametrize('ext', ARCHIVESCHEMES.keys())
 def test_zip_memoryfile_append(ext):
+    """ In-memory zip file cannot be appended to"""
     with pytest.raises(FionaValueError):
         schema = {'geometry': 'Point', 'properties': OrderedDict([('position', 'int')])}
         records1 = [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))}, 'properties': {'position': i}} for i
@@ -245,7 +255,7 @@ def test_zip_memoryfile_append(ext):
         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
                                     and driver not in {}])
 def test_write_memoryfile(driver):
-    """In-memory Shapefile can be written"""
+    """In-memory can be written"""
 
     schema = get_schema(driver)
     positions = list(range(0, 5))
@@ -277,8 +287,15 @@ def test_write_memoryfile(driver):
 @pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['w'].items() if
                                     mingdal is None or gdal_version < mingdal])
 def test_write_memoryfile_notsupported(driver, monkeypatch):
-    """ If this test fails, it should be considered to add GDALVersion(major, minor) to
-    drvsupport.memoryfile_not_supported['w'] for the respective driver"""
+    """In-memory, driver that are marked as not supporting write, can not write
+
+    Note: This driver tests only the "standard case". Success of this test does not necessarily mean that driver
+          does not allow to write. (e.g. requiring a special schema)
+
+          If this test fails, it should be considered to update
+          fiona.drvsupport.memoryfile_not_supported['w'][driver] = GDALVersion(major, minor)
+    """
+
     monkeypatch.delitem(fiona.drvsupport.memoryfile_not_supported['w'], driver)
 
     schema = get_schema(driver)
@@ -307,7 +324,7 @@ def test_write_memoryfile_notsupported(driver, monkeypatch):
         driver not in driver_mode_mingdal['a'] or
         gdal_version >= GDALVersion(*driver_mode_mingdal['a'][driver][:2]))])
 def test_append_memoryfile(driver):
-    """In-memory Shapefile can be appended"""
+    """In-memory can be appended"""
 
     schema = get_schema(driver)
     range1 = list(range(0, 5))
@@ -342,10 +359,13 @@ def test_append_memoryfile(driver):
 @pytest.mark.parametrize('driver', [driver for driver, mingdal in memoryfile_not_supported['a'].items() if
                                     mingdal is None or gdal_version < mingdal])
 def test_append_memoryfile_notsupported(driver, monkeypatch):
-    """In-memory Shapefile can be appended
+    """In-memory, driver that are marked as not supporting appended, can not appended
 
-    If this test fails, it should be considered to add GDALVersion(major, minor) to
-    drvsupport.memoryfile_not_supported['a']  for the respective driver
+    Note: This driver tests only the "standard case". Success of this test does not necessarily mean that driver
+          does not allow to appended. (e.g. requiring a special schema)
+
+          If this test fails, it should be considered to update
+          fiona.drvsupport.memoryfile_not_supported['a'][driver] = GDALVersion(major, minor)
     """
 
     monkeypatch.delitem(fiona.drvsupport.memoryfile_not_supported['a'], driver)
