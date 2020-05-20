@@ -126,6 +126,19 @@ def test_tar_memoryfile_listdir(bytes_coutwildrnp_tar):
                                                     'coutwildrnp.prj'}
 
 
+def test_zip_memoryfile_listlayers(bytes_coutwildrnp_zip):
+    """Test list layers of ZipMemoryFile"""
+
+    with ZipMemoryFile(bytes_coutwildrnp_zip) as memfile:
+        assert memfile.listlayers('/coutwildrnp.shp') == ['coutwildrnp']
+
+
+def test_tar_memoryfile_listlayers(bytes_coutwildrnp_tar):
+    """Test list layers of ZipMemoryFile"""
+    with ZipMemoryFile(bytes_coutwildrnp_tar, ext='tar') as memfile:
+        assert memfile.listlayers('/testing/coutwildrnp.shp') == ['coutwildrnp']
+
+
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw and (
         driver not in driver_mode_mingdal['w'] or
         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))

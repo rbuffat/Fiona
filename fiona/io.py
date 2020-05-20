@@ -6,7 +6,7 @@ import logging
 
 from fiona.ogrext import MemoryFileBase
 from fiona.collection import Collection
-from fiona.ogrext import _listdir
+from fiona.ogrext import _listdir, _listlayers
 
 from fiona.drvsupport import memoryfile_supports_mode, zip_memoryfile_supports_mode
 from fiona.errors import FionaValueError, DriverError
@@ -132,7 +132,7 @@ class ZipMemoryFile(MemoryFile):
 
         if not zip_memoryfile_supports_mode(self.vsi, driver, mode):
             raise FionaValueError(
-                "Driver {driver} does not support mode '{mode}' using {vsi} GDAL Virtual File System.".format(
+                "Driver {driver} does not support mode '{mode}' using GDAL Virtual File System {vsi}.".format(
                     driver=driver, mode=mode, vsi=self.vsi))
 
         if self.closed:
@@ -142,8 +142,37 @@ class ZipMemoryFile(MemoryFile):
                           layer=layer, enabled_drivers=enabled_drivers, crs_wkt=crs_wkt, **kwargs)
 
     def listdir(self, path='/'):
-        """ List all files in a directory"""
+        """List layer names in their index order
+
+        Parameters
+        ----------
+        path: str
+            Absolute path to a directory within ZipMemoryFile.
+
+        Returns
+        -------
+        list
+            A list of file names.
+        """
         vsi_path = '{vsi}{vsipath}/{path}'.format(vsi=self.vsi,
                                                   vsipath=self.name,
                                                   path=path.lstrip('/'))
         return _listdir(vsi_path)
+
+    def listlayers(self, path):
+        """List layer names in their index order
+
+        Parameters
+        ----------
+        path: str
+            Absolute path to a file within ZipMemoryFile.
+
+        Returns
+        -------
+        list
+            A list of layer name strings.
+        """
+        vsi_path = '{vsi}{vsipath}/{path}'.format(vsi=self.vsi,
+                                                  vsipath=self.name,
+                                                  path=path.lstrip('/'))
+        return _listlayers(vsi_path)
