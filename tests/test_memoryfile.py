@@ -10,7 +10,7 @@ from fiona.drvsupport import supported_drivers, driver_mode_mingdal, memoryfile_
 from fiona.env import GDALVersion
 from fiona.path import ARCHIVESCHEMES
 from tests.conftest import driver_extensions, get_temp_filename
-import pprint
+
 
 gdal_version = GDALVersion.runtime()
 
@@ -184,8 +184,8 @@ def test_zip_memoryfile_write_notsupported(driver, monkeypatch):
           fiona.drvsupport.zip_memoryfile_not_supported['/vsizip/']['w'][driver] = GDALVersion(major, minor)
     """
 
-    # DGN driver segfaults with gdal 3.0.4
-    if driver == 'DGN':
+    # DGN driver segfaults with gdal > 2.2
+    if gdal_version > GDALVersion(2, 2) and driver == 'DGN':
         return
 
     monkeypatch.delitem(fiona.drvsupport.zip_memoryfile_not_supported['/vsizip/']['w'], driver)

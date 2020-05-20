@@ -185,7 +185,7 @@ _filter_supported_drivers()
 # versions of GDAL
 #
 # Reasons for missing support:
-# DGN: segfault with gdal 3.0.4
+# DGN: Failed to open output file (<= gdal 2.2), segfault (gdal > 2.2)
 # GPKG,DXF,ESRI Shapefile,GPX,MapInfo File,PCIDSK': Random access not supported for writable file in /vsizip
 # GMT: Random access not supported for /vsizip for gdal 1.x
 # GPSTrackMaker: VSIFSeekL() is not supported on writable Zip files
@@ -193,7 +193,7 @@ zip_memoryfile_not_supported = {
     '/vsizip/': {
         'w': {
             'GMT': GDALVersion(2, 0),
-            # 'DGN': None,
+            'DGN': None,
             'GPKG': None,
             'DXF': None,
             'ESRI Shapefile': None,
