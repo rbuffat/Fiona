@@ -149,11 +149,11 @@ matrix:
         PROJVERSION="6.3.2"
 
 before_install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then pyenv install $PYTHON; fi
   - python3 -m pip install -U pip
   - python3 -m pip wheel -r requirements-dev.txt
   - python3 -m pip install -r requirements-dev.txt
   - python3 -m pip install coveralls>=1.1 --upgrade
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then pyenv install $PYTHON; fi
 #  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
 ##        brew update
 ##        # Per the `pyenv homebrew recommendations <https://github.com/yyuu/pyenv/wiki#suggested-build-environment>`_.
