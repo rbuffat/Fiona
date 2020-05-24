@@ -20,7 +20,6 @@ env:
 addons:
   apt:
     packages:
-      - libatlas-dev
       - libatlas-base-dev
       - gfortran
       - libsqlite3-dev
@@ -93,21 +92,21 @@ matrix:
     # OS X: Test all supported gdal minor versions (except latest stable) with one python version
     - name: "Python 3.6 / GDAL 2.3 / PROJ 4.9"
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10.3
       language: shell
       env:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
     - name: "Python 3.6 / GDAL 2.4 / PROJ 4.9"
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10.3
       language: shell
       env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
     - name: "Python 3.6 / GDAL 3.0 / PROJ 6.2"
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10.3
       language: shell
       env:
         GDALVERSION="3.0.3"
@@ -116,19 +115,22 @@ matrix:
      # OS X: Test all supported python versions with latest stable gdal release
     - name: "Python ? / GDAL 3.1 / PROJ 6.3"
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10.3
+      language: shell
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
     - name: "Python ? / GDAL 3.1 / PROJ 6.3"
       os: osx
       osx_image: xcode10.3
+      language: shell
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
     - name: "Python ? / GDAL 3.1 / PROJ 6.3"
       os: osx
       osx_image: xcode11.4
+      language: shell
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
