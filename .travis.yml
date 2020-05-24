@@ -117,7 +117,7 @@ matrix:
      # OS X: Test all supported python versions with latest stable gdal release
     - name: "Python 3.6 / GDAL 3.1 / PROJ 6.3"
       os: osx
-      osx_image: xcode11.4
+      osx_image: xcode9.4
       language: shell
       env:
         GDALVERSION="3.1.0"
@@ -125,7 +125,7 @@ matrix:
         PYTHON="3.6.10"
     - name: "Python 3.7 / GDAL 3.1 / PROJ 6.3"
       os: osx
-      osx_image: xcode11.4
+      osx_image: xcode10.3
       language: shell
       env:
         GDALVERSION="3.1.0"
@@ -150,7 +150,7 @@ matrix:
         PROJVERSION="6.3.2"
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then echo 'eval "$(pyenv init -)"' >> ~/.bash_profile; source ~/.bash_profile; pyenv install --skip-existing $PYTHON; pyenv install --list; pyenv global $PYTHON; pyenv version; which python; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then echo 'eval "$(pyenv init -)"' >> ~/.bash_profile; source ~/.bash_profile; pyenv install --skip-existing $PYTHON; pyenv global $PYTHON; pyenv version; which python; fi
   - python --version
   - python -m pip install -U pip wheel
   - python -m pip wheel -r requirements-dev.txt
