@@ -37,19 +37,19 @@ matrix:
   include:
     # Linux: Test all supported gdal minor versions (except latest stable) with one python version
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.6"
       env:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.6"
       env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.6"
       env:
         GDALVERSION="3.0.4"
@@ -57,48 +57,55 @@ matrix:
 
      # Linux: Test all supported python versions with latest stable gdal release
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.6"
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.7"
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.8"
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
 
-    # Linux: Test master
+    # Linux: Test master and Python dev
     - os: linux
-      dist: xenial
+      dist: bionic
       python: "3.8"
       env:
         GDALVERSION="master"
-        PROJVERSION="6.3.0"
+        PROJVERSION="7.0.1"
+    - os: linux
+      dist: bionic
+      python: "3.9-dev"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+
 
     # OS X: Test all supported gdal minor versions (except latest stable) with one python version
-    - name: "Python 3.6.5 on Mac OS X 10.13"
+    - name: "Python 3.6 / GDAL 2.3 / PROJ 4.9"
       os: osx
       osx_image: xcode9.4
       language: shell
       env:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
-    - name: "Python 3.6.5 on Mac OS X 10.13"
+    - name: "Python 3.6 / GDAL 2.4 / PROJ 4.9"
       os: osx
       osx_image: xcode9.4
       language: shell
       env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
-    - name: "Python 3.6.5 on Mac OS X 10.13"
+    - name: "Python 3.6 / GDAL 3.0 / PROJ 6.2"
       os: osx
       osx_image: xcode9.4
       language: shell
@@ -107,19 +114,19 @@ matrix:
         PROJVERSION="6.2.1"
 
      # OS X: Test all supported python versions with latest stable gdal release
-    - name: "Python 3.6.5 on Mac OS X 10.13"
+    - name: "Python ? / GDAL 3.1 / PROJ 6.3"
       os: osx
       osx_image: xcode9.4
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
-    - name: "Python ? on Mac OS X 10.13"
+    - name: "Python ? / GDAL 3.1 / PROJ 6.3"
       os: osx
       osx_image: xcode10.3
       env:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
-    - name: "Python ? on Mac OS X 10.15.4"
+    - name: "Python ? / GDAL 3.1 / PROJ 6.3"
       os: osx
       osx_image: xcode11.4
       env:
@@ -129,8 +136,11 @@ matrix:
   allow_failures:
     - env:
         GDALVERSION="master"
-        PROJVERSION="6.3.0"
-
+        PROJVERSION="7.0.1"
+    - python: "3.9-dev"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
 
 before_install:
   - python3 -m pip install -U pip
