@@ -14,6 +14,8 @@ env:
     - PROJINST=$HOME/gdalinstall
     - PROJBUILD=$HOME/projbuild
     - MAKEFLAGS="-j 2"
+    - CXXFLAGS="-O0"
+    - CFLAGS="-O0"
 
 addons:
   apt:
@@ -33,68 +35,96 @@ addons:
 matrix:
   fast_finish: true
   include:
+    # Linux: Test all supported gdal minor versions (except latest stable) with one python version
     - os: linux
       dist: xenial
       python: "3.6"
       env:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
-
     - os: linux
       dist: xenial
       python: "3.6"
       env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
-
     - os: linux
       dist: xenial
       python: "3.6"
       env:
-        GDALVERSION="3.0.3"
+        GDALVERSION="3.0.4"
         PROJVERSION="6.2.1"
- 
+
+     # Linux: Test all supported python versions with latest stable gdal release
+    - os: linux
+      dist: xenial
+      python: "3.6"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
     - os: linux
       dist: xenial
       python: "3.7"
       env:
-        GDALVERSION="3.0.3"
-        PROJVERSION="6.2.1"
-
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
     - os: linux
       dist: xenial
       python: "3.8"
       env:
-        GDALVERSION="3.0.4"
-        PROJVERSION="6.2.1"
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
 
+    # Linux: Test master
     - os: linux
       dist: xenial
       python: "3.8"
       env:
         GDALVERSION="master"
         PROJVERSION="6.3.0"
-        
-    - os: osx
-      osx_image: xcode11.2
+
+    # OS X: Test all supported gdal minor versions (except latest stable) with one python version
+    - name: "Python 3.6.5 on Mac OS X 10.13"
+      os: osx
+      osx_image: xcode9.4
       language: shell
       env:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
-
-    - os: osx
-      osx_image: xcode11.2
+    - name: "Python 3.6.5 on Mac OS X 10.13"
+      os: osx
+      osx_image: xcode9.4
       language: shell
       env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
-
-    - os: osx
-      osx_image: xcode11.2
+    - name: "Python 3.6.5 on Mac OS X 10.13"
+      os: osx
+      osx_image: xcode9.4
       language: shell
       env:
         GDALVERSION="3.0.3"
         PROJVERSION="6.2.1"
+
+     # OS X: Test all supported python versions with latest stable gdal release
+    - name: "Python 3.6.5 on Mac OS X 10.13"
+      os: osx
+      osx_image: xcode9.4
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+    - name: "Python ? on Mac OS X 10.13"
+      os: osx
+      osx_image: xcode10.3
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+    - name: "Python ? on Mac OS X 10.15.4"
+      os: osx
+      osx_image: xcode11.4
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
 
   allow_failures:
     - env:
@@ -104,6 +134,9 @@ matrix:
 
 before_install:
   - python3 -m pip install -U pip
+  - python3 -m pip wheel -r requirements-dev.txt
+  - python3 -m pip install -r requirements-dev.txt
+  - python3 -m pip install coveralls>=1.1 --upgrade
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH; fi
@@ -113,9 +146,7 @@ before_install:
   - export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
   - gdal-config --version
   - $GDALINST/gdal-$GDALVERSION/bin/gdal-config --version
-  - python3 -m pip wheel -r requirements-dev.txt
-  - python3 -m pip install -r requirements-dev.txt
-  - python3 -m pip install coveralls>=1.1 --upgrade
+
 
 install:
   - if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
