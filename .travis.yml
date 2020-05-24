@@ -30,6 +30,7 @@ addons:
       - libspatialite
       - sqlite
       - geos
+      - pyenv
 
 matrix:
   fast_finish: true
