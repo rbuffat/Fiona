@@ -157,6 +157,7 @@ before_install:
   - python -m pip install -r requirements-dev.txt
   - python -m pip install coveralls>=1.1 --upgrade
   - export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then PATH=/Users/travis/.pyenv/versions/$PYTHON/bin:$PATH; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH; fi
   - chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
