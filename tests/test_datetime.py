@@ -67,8 +67,8 @@ def generate_testdata(data_type, driver):
                 (datetime.date(2018, 3, 25), "2018/03/25"),
                 (None, '')]
     elif data_type == 'date' and driver == 'GML':
-        return [("2018-03-25", '2018-03-25'),
-                (datetime.date(2018, 3, 25), '2018-03-25'),
+        return [("2018-03-25", '2018/03/25'),
+                (datetime.date(2018, 3, 25), '2018/03/25'),
                 (None, '')]
     elif data_type == 'date' and ((driver == 'GeoJSON' and gdal_version.major < 2) or
                                   (driver == 'GMT' and gdal_version.major < 2)):
@@ -115,7 +115,7 @@ def generate_testdata(data_type, driver):
                     (datetime.datetime(2018, 3, 25, 22, 49, 5, 220000), "2018/03/25 22:49:05"),
                     ("2018-03-25T22:49:05.123456", "2018/03/25 22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5, 123456), "2018/03/25 22:49:05"),
-                    (None, '')]
+                    (None, None)]
         else:
             return [("2018-03-25T22:49:05", "2018/03/25 22:49:05"),
                     (datetime.datetime(2018, 3, 25, 22, 49, 5), "2018/03/25 22:49:05"),
