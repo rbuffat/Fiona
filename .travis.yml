@@ -139,22 +139,6 @@ matrix:
         GDALVERSION="3.1.0"
         PROJVERSION="6.3.2"
         PYTHON="3.6.2"
-    - name: "Python 3.7 / GDAL 3.1 / PROJ 6.3"
-      os: osx
-      osx_image: xcode9.2
-      language: shell
-      env:
-        GDALVERSION="3.1.0"
-        PROJVERSION="6.3.2"
-        PYTHON="3.6.2"
-    - name: "Python 3.7 / GDAL 3.1 / PROJ 6.3"
-      os: osx
-      osx_image: xcode9
-      language: shell
-      env:
-        GDALVERSION="3.1.0"
-        PROJVERSION="6.3.2"
-        PYTHON="3.6.2"
 
   allow_failures:
     - env:
