@@ -151,26 +151,18 @@ def test_datefield(tmpdir, driver, field_type):
                     c.writerecords(records)
                 assert len(record) == 1
                 assert "silently converts" in record[0].message.args[0]
-
-            with fiona.open(path, 'r') as c:
-                assert get_schema_field(driver, c.schema) == 'str'
-                items = [get_field(driver, f) for f in c]
-                assert len(items) == len(values_in)
-                for val_in, val_out in zip(items, values_out):
-                    assert val_in == val_out
-
         else:
             with fiona.open(path, 'w',
                             driver=driver,
                             schema=schema) as c:
                 c.writerecords(records)
 
-            with fiona.open(path, 'r') as c:
-                assert get_schema_field(driver, c.schema) == field_type
-                items = [get_field(driver, f) for f in c]
-                assert len(items) == len(values_in)
-                for val_in, val_out in zip(items, values_out):
-                    assert val_in == val_out
+        with fiona.open(path, 'r') as c:
+            assert get_schema_field(driver, c.schema) == field_type
+            items = [get_field(driver, f) for f in c]
+            assert len(items) == len(values_in)
+            for val_in, val_out in zip(items, values_out):
+                assert val_in == val_out
 
 
 @pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
