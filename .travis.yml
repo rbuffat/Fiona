@@ -156,7 +156,7 @@ matrix:
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then echo 'eval "$(pyenv init -)"' >> ~/.bash_profile; source ~/.bash_profile; pyenv install --list;pyenv install --skip-existing $PYTHON; pyenv global $PYTHON; pyenv version; which python; fi
   - python --version
-  - python -m pip install -U pip wheel
+  - python -m pip install -U pip wheel==0.33.6
   - python -m pip wheel -r requirements-dev.txt
   - python -m pip install -r requirements-dev.txt
   - python -m pip install coveralls>=1.1 --upgrade
