@@ -207,15 +207,13 @@ def generate_testdata(data_type, driver):
                     (datetime.time(22, 49, 5, 123456), '0000/00/00 22:49:05.123'),
                     (None, '')]
     elif data_type == 'time' and driver == 'GPKG' and gdal_version >= GDALVersion(2, 0):
-        if gdal_version >= GDALVersion(2, 0):
-            return [("22:49:05", "22:49:05"),
-                    (datetime.time(22, 49, 5), "22:49:05"),
-                    ("22:49:05.22", "22:49:05.220"),
-                    (datetime.time(22, 49, 5, 220000), "22:49:05.220"),
-                    ("22:49:05.123456", "22:49:05.123"),
-                    (datetime.time(22, 49, 5, 123456), "22:49:05.123"),
-                    (None, None)]
-
+        return [("22:49:05", "22:49:05"),
+                (datetime.time(22, 49, 5), "22:49:05"),
+                ("22:49:05.22", "22:49:05.220"),
+                (datetime.time(22, 49, 5, 220000), "22:49:05.220"),
+                ("22:49:05.123456", "22:49:05.123"),
+                (datetime.time(22, 49, 5, 123456), "22:49:05.123"),
+                (None, None)]
     elif data_type == 'time' and driver == 'MapInfo File':
         if gdal_version.major < 2:
             return [("22:49:05", "22:49:05"),
@@ -279,8 +277,8 @@ def generate_testdata(data_type, driver):
         else:
             return [("22:49:05", "22:49:05"),
                     (datetime.time(22, 49, 5), "22:49:05"),
-                    ("22:49:05.22", "22:49:05.220"),
-                    (datetime.time(22, 49, 5, 220000), "22:49:05.220"),
+                    ("22:49:05.22", "22:49:05.22000"),
+                    (datetime.time(22, 49, 5, 220000), "22:49:05.22000"),
                     ("22:49:05.123456", "22:49:05.123000"),
                     (datetime.time(22, 49, 5, 123456), "22:49:05.123000"),
                     (None, None)]
