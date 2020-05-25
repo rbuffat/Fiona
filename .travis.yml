@@ -36,61 +36,61 @@ addons:
 matrix:
   fast_finish: true
   include:
-#    # Linux: Test all supported gdal minor versions (except latest stable) with one python version
-#    - os: linux
-#      dist: xenial
-#      python: "3.6"
-#      env:
-#        GDALVERSION="2.3.3"
-#        PROJVERSION="4.9.3"
-#    - os: linux
-#      dist: xenial
-#      python: "3.6"
-#      env:
-#        GDALVERSION="2.4.4"
-#        PROJVERSION="4.9.3"
-#    - os: linux
-#      dist: xenial
-#      python: "3.6"
-#      env:
-#        GDALVERSION="3.0.4"
-#        PROJVERSION="6.2.1"
-#
-#     # Linux: Test all supported python versions with latest stable gdal release
-#    - os: linux
-#      dist: xenial
-#      python: "3.6"
-#      env:
-#        GDALVERSION="3.1.0"
-#        PROJVERSION="6.3.2"
-#    - os: linux
-#      dist: xenial
-#      python: "3.7"
-#      env:
-#        GDALVERSION="3.1.0"
-#        PROJVERSION="6.3.2"
-#    - os: linux
-#      dist: xenial
-#      python: "3.8"
-#      env:
-#        GDALVERSION="3.1.0"
-#        PROJVERSION="6.3.2"
-#
-#    # Linux: Test master and Python dev
-#    - os: linux
-#      dist: xenial
-#      python: "3.8"
-#      env:
-#        GDALVERSION="master"
-#        PROJVERSION="7.0.1"
-#    - os: linux
-#      dist: xenial
-#      python: "3.9-dev"
-#      env:
-#        GDALVERSION="3.1.0"
-#        PROJVERSION="6.3.2"
-#
-#
+
+    # Linux: Test all supported gdal minor versions (except latest stable) with one python version
+    - os: linux
+      dist: xenial
+      python: "3.6"
+      env:
+        GDALVERSION="2.3.3"
+        PROJVERSION="4.9.3"
+    - os: linux
+      dist: xenial
+      python: "3.6"
+      env:
+        GDALVERSION="2.4.4"
+        PROJVERSION="4.9.3"
+    - os: linux
+      dist: xenial
+      python: "3.6"
+      env:
+        GDALVERSION="3.0.4"
+        PROJVERSION="6.2.1"
+
+     # Linux: Test all supported python versions with latest stable gdal release
+    - os: linux
+      dist: xenial
+      python: "3.6"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+    - os: linux
+      dist: xenial
+      python: "3.7"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+    - os: linux
+      dist: xenial
+      python: "3.8"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+
+    # Linux: Test master and Python dev
+    - os: linux
+      dist: xenial
+      python: "3.8"
+      env:
+        GDALVERSION="master"
+        PROJVERSION="7.0.1"
+    - os: linux
+      dist: xenial
+      python: "3.9-dev"
+      env:
+        GDALVERSION="3.1.0"
+        PROJVERSION="6.3.2"
+
     # OS X: Test all supported gdal minor versions (except latest stable) with one python version
     - name: "Python 3.6 / GDAL 2.3 / PROJ 4.9"
       os: osx
