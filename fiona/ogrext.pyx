@@ -22,7 +22,7 @@ from fiona._geometry cimport (
 from fiona._err cimport exc_wrap_int, exc_wrap_pointer, exc_wrap_vsilfile
 
 import fiona
-from fiona._env import GDALVersion, get_gdal_version_num
+from fiona._env import GDALVersion, get_gdal_version_num, calc_gdal_version_num
 from fiona._err import cpl_errs, FionaNullPointerError, CPLE_BaseError, CPLE_OpenFailedError
 from fiona._geometry import GEOMETRY_TYPES
 from fiona import compat
@@ -35,7 +35,7 @@ from fiona.rfc3339 import parse_date, parse_datetime, parse_time
 from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
 from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
 from fiona.path import vsi_path
-
+from fiona.drvsupport import driver_converts_field_type_silently_to_str
 from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
 
 from libc.stdlib cimport malloc, free
@@ -379,9 +379,28 @@ cdef class OGRFeatureBuilder:
                 elif (isinstance(value, datetime.time) and schema_type == 'time'):
                         y = m = d = 0
                         hh, mm, ss, ms = value.hour, value.minute, value.second, value.microsecond
-                # Add microseconds to seconds
-                ss += ms / 10**6
-                set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, 0)
+
+                if driver_converts_field_type_silently_to_str(collection.driver, schema_type):
+                    # GDAL 1.x does not support milliseconds
+                    if GDAL_VERSION_NUM < calc_gdal_version_num(2, 0, 0):
+                        ms = 0
+                    else:
+                        # GDAL has only milliseconds precision
+                        ms = int(ms / 1000.0) * 1000
+                    if schema_type == 'date':
+                        d = datetime.date(y, m, d)
+                    elif schema_type == 'time':
+                        d = datetime.time(hh, mm, ss, ms)
+                    else:
+                        d = datetime.datetime(y, m, d, hh, mm, ss, ms)
+
+                    value_bytes = d.isoformat().encode(encoding)
+                    string_c = value_bytes
+                    OGR_F_SetFieldString(cogr_feature, i, string_c)
+                else:
+                    # Add microseconds to seconds
+                    ss += ms / 10**6
+                    set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, 0)
             elif isinstance(value, bytes) and schema_type == "bytes":
                 string_c = value
                 OGR_F_SetFieldBinary(cogr_feature, i, len(value),
@@ -1106,6 +1125,9 @@ cdef class WritingSession(Session):
                             value = 'int64'
                         else:
                             value = 'int32'
+
+                if driver_converts_field_type_silently_to_str(collection.driver, value):
+                    value = 'str'
 
                 field_type = FIELD_TYPES.index(value)
 
