@@ -158,7 +158,10 @@ def test_datefield(tmpdir, driver, field_type):
                 c.writerecords(records)
 
         with fiona.open(path, 'r') as c:
-            assert get_schema_field(driver, c.schema) == field_type
+            if driver_converts_field_type_silently_to_str(driver, field_type):
+                assert get_schema_field(driver, c.schema) == 'str'
+            else:
+                assert get_schema_field(driver, c.schema) == field_type
             items = [get_field(driver, f) for f in c]
             assert len(items) == len(values_in)
             for val_in, val_out in zip(items, values_out):
