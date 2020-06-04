@@ -36,7 +36,7 @@ from fiona.rfc3339 import parse_date, parse_datetime, parse_time
 from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
 from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
 from fiona.path import vsi_path
-
+from fiona.meta import create_layer_options
 from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
 
 from libc.stdlib cimport malloc, free
@@ -1078,6 +1078,7 @@ cdef class WritingSession(Session):
             name_b = collection.name.encode('utf-8')
             name_c = name_b
 
+            driver_layer_creation_options = create_layer_options(collection.driver)
             for k, v in kwargs.items():
 
                 if v is None:
@@ -1088,7 +1089,16 @@ cdef class WritingSession(Session):
                 if k == 'encoding' and "Shapefile" not in collection.driver:
                     continue
 
-                k = k.upper().encode('utf-8')
+                k = k.upper()
+
+                # Check if option is supported by driver
+                if not k in driver_layer_creation_options:
+                    supported_options=",".join(driver_layer_creation_options.keys())
+                    raise ValueError("'{option}' is not a supported layer creation option by driver {driver}, "
+                                     "supported options are: {options}".format(option=k,
+                                                                               driver=collection.driver,
+                                                                               options=supported_options))
+                k = k.encode('utf-8')
 
                 if isinstance(v, bool):
                     v = ('ON' if v else 'OFF').encode('utf-8')
