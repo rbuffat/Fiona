@@ -6,7 +6,6 @@ from fiona.drvsupport import supported_drivers
 from .conftest import requires_gdal2
 
 
-@requires_gdal2
 @pytest.mark.parametrize("driver", supported_drivers)
 def test_print_driver_options(driver):
     # do not fail
