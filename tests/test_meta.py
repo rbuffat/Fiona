@@ -10,7 +10,6 @@ from .conftest import requires_gdal2
 def test_print_driver_options(driver):
     # do not fail
     fiona.meta.print_driver_options(driver)
-    a = 5 / 0
 
 
 @pytest.mark.parametrize("driver", supported_drivers)
