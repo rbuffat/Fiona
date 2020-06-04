@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from fiona._meta import _get_metadata_item
-from fiona.env import require_gdal_version, ensure_env_with_credentials
+from fiona.env import require_gdal_version, ensure_env_with_credentials, GDALVersion
 
 
 class MetadataItem:
@@ -113,7 +113,6 @@ def open_options(driver):
     return options
 
 
-@ensure_env_with_credentials
 def print_driver_options(driver):
     """ Print driver options for dataset open, dataset creation, and layer creation.
 
@@ -141,7 +140,7 @@ def print_driver_options(driver):
                 if 'default' in options[option_name]:
                     print("\t\tDefault value: {default}".format(default=options[option_name]['default']))
                 if 'values' in options[option_name] and len(options[option_name]['values']) > 0:
-                    print("\t\tAccepted values: {values}".format(values="','".join(options[option_name]['values'])))
+                    print("\t\tAccepted values: {values}".format(values=",".join(options[option_name]['values'])))
         print("")
 
 
@@ -159,9 +158,10 @@ def extensions(driver):
 
     """
     driver_extensions = set()
-    for ext in _get_metadata_item(driver, MetadataItem.EXTENSIONS).split(" "):
-        if len(ext) > 0:
-            driver_extensions.add(ext)
+    if GDALVersion().runtime().at_least((2, 0)):
+        for ext in _get_metadata_item(driver, MetadataItem.EXTENSIONS).split(" "):
+            if len(ext) > 0:
+                driver_extensions.add(ext)
     for ext in _get_metadata_item(driver, MetadataItem.EXTENSION).split(" "):
         if len(ext) > 0:
             driver_extensions.add(ext)
