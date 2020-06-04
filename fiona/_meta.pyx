@@ -21,17 +21,14 @@ def _get_metadata_item(driver, metadata_item):
         XML of metadata item or empty string
 
     """
-    cdef char *driver_c
-    cdef char *result_c
     cdef void* cogr_driver = NULL
-    cdef char * metadata_c
+    cdef char* metadata_c
 
-    driver_b = driver.encode()
-    driver_c = driver_b
-    cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_c))
+
+    cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
 
     metadata = ""
-    metadata_c = GDALGetMetadataItem(cogr_driver, metadata_item.encode(), NULL)
+    metadata_c = GDALGetMetadataItem(cogr_driver, metadata_item.encode("utf-8"), NULL)
     if metadata_c != NULL:
         metadata = metadata_c
         metadata = metadata.decode('utf-8')
