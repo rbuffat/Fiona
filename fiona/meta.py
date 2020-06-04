@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from fiona._meta import _get_metadata_item
+from fiona.env import require_gdal_version, ensure_env_with_credentials
 
 
 class MetadataItem:
@@ -112,6 +113,7 @@ def open_options(driver):
     return options
 
 
+@ensure_env_with_credentials
 def print_driver_options(driver):
     """ Print driver options for dataset open, dataset creation, and layer creation.
 
@@ -166,6 +168,7 @@ def extensions(driver):
     return list(driver_extensions)
 
 
+@require_gdal_version('2.0')
 def supports_vsi(driver):
     """ Returns True if driver supports GDAL's VSI*L API
 
