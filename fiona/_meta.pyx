@@ -25,7 +25,7 @@ def _get_metadata_item(driver, metadata_item):
     cdef void* cogr_driver = NULL
     cdef char* metadata_c
 
-    driver_b = strencode(driver)
+    driver_b = driver.encode("utf-8")
     driver_c = driver_b
     print(driver_b, type(driver_b))
     cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_c))
