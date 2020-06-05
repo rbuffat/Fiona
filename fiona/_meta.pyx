@@ -7,7 +7,7 @@ from fiona._err cimport  exc_wrap_pointer
 from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
-
+import logging
 
 from fiona._geometry cimport (
     GeomBuilder, OGRGeomBuilder, geometry_type_code,
