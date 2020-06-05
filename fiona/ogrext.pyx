@@ -984,9 +984,7 @@ cdef class WritingSession(Session):
             path_b = strencode(path)
             path_c = path_b
 
-            driver_b = collection.driver.encode()
-            driver_c = driver_b
-            cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_c))
+            cogr_driver = exc_wrap_pointer(GDALGetDriverByName(collection.driver.encode("utf-8")))
 
             driver_dataset_open_options = dataset_open_options(collection.driver)
             driver_dataset_creation_options = dataset_creation_options(collection.driver)
@@ -1602,7 +1600,7 @@ def _remove(path, driver=None):
         cogr_driver = GDALGetDatasetDriver(cogr_ds)
         GDALClose(cogr_ds)
     else:
-        cogr_driver = OGRGetDriverByName(driver.encode("utf-8"))
+        cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
 
     if cogr_driver == NULL:
         raise DatasetDeleteError("Null driver when attempting to delete {}".format(path))
