@@ -986,6 +986,7 @@ cdef class WritingSession(Session):
 
             cogr_driver = exc_wrap_pointer(GDALGetDriverByName(collection.driver.encode("utf-8")))
             print("success: {}".format(GDALGetDriverCount()))
+            print(collection.driver, type(collection.driver))
             cogr_driver = exc_wrap_pointer(GDALGetDriverByName(collection.driver.encode("utf-8")))
             print("success: {}".format(GDALGetDriverCount()))
 
