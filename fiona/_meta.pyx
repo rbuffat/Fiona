@@ -39,4 +39,5 @@ def _get_metadata_item(driver, metadata_item):
     metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
     if metadata_c != NULL:
         metadata = metadata_c
-    return metadata.decode('utf-8')
+        metadata = metadata.decode('utf-8')
+    return metadata
