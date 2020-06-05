@@ -25,6 +25,7 @@ def _get_metadata_item(driver, metadata_item):
     cdef char* metadata_c
     cdef void *cogr_driver
 
+    print("before 2: {}".format(GDALGetDriverCount()))
     cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
     print("success2: {}".format(GDALGetDriverCount()))
 
