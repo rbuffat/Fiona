@@ -1116,6 +1116,12 @@ cdef class WritingSession(Session):
                 if v is None:
                     continue
 
+                if get_gdal_version_num() < calc_gdal_version_num(2, 0, 0):
+                    # We need to remove encoding from the layer creation
+                    # options if we're not creating a shapefile.
+                    if k == 'encoding' and "Shapefile" not in collection.driver:
+                        continue
+
                 k = k.upper().encode('utf-8')
 
                 if isinstance(v, bool):
