@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 
 include "gdal.pxi"
 
@@ -7,8 +6,7 @@ from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
 import logging
-#from fiona._shim cimport *
-from six import integer_types, string_types, text_type
+from fiona._shim cimport *
 
 
 log = logging.getLogger(__name__)
@@ -33,13 +31,10 @@ def _get_metadata_item(driver, metadata_item):
     cdef char* metadata_c = NULL
     cdef void *cogr_driver
 
-    print("before 2: {}".format(GDALGetDriverCount()))
-    print(driver, type(driver))
     cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
-    print("success2: {}".format(GDALGetDriverCount()))
 
     metadata = ""
-    #metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
+    metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
     if metadata_c != NULL:
         metadata = metadata_c
 
