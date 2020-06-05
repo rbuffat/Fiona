@@ -113,6 +113,7 @@ def dataset_open_options(driver):
     return options
 
 
+@ensure_env_with_credentials
 def print_driver_options(driver):
     """ Print driver options for dataset open, dataset creation, and layer creation.
 
