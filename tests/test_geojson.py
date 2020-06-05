@@ -131,7 +131,7 @@ def test_overwrite_shp_with_json_clears_auxiliary_files(tmpdir):
     with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema1) as dst:
         dst.writerecords(features1)
 
-    assert set(os.listdir(tmpdir)) == set(['foo.cpg', 'foo.dbf', 'foo.shx', 'foo.shp'])
+    assert set(str(os.listdir(tmpdir))) == set(['foo.cpg', 'foo.dbf', 'foo.shx', 'foo.shp'])
 
     # attempt to overwrite it with a GeoJSON file
     with fiona.open(path, "w", driver="GeoJSON", schema=schema1) as dst:
@@ -158,7 +158,7 @@ def test_overwrite_shp_with_json_clears_auxiliary_files_different_extension(tmpd
     with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema1) as dst:
         dst.writerecords(features1)
 
-    assert set(os.listdir(tmpdir)) == set(['foo.cpg', 'foo.dbf', 'foo.shx', 'foo.shp'])
+    assert set(str(os.listdir(tmpdir))) == set(['foo.cpg', 'foo.dbf', 'foo.shx', 'foo.shp'])
 
     # attempt to overwrite it with a GeoJSON file
     path = str(tmpdir.join('foo.shx'))
