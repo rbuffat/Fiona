@@ -998,19 +998,19 @@ cdef class WritingSession(Session):
                 if k.upper() in driver_dataset_open_options:
                     open_kwargs[k] = v
                 else:
-                    log.info("Ignore '{}' as dataset open option.".format(k))
+                    log.debug("Ignore '{}' as dataset open option.".format(k))
             create_kwargs = {}
             for k, v in kwargs.items():
                 if k.upper() in driver_dataset_creation_options:
                     create_kwargs[k] = v
                 else:
-                    log.info("Ignore '{}' as dataset creation option.".format(k))
+                    log.debug("Ignore '{}' as dataset creation option.".format(k))
             layer_kwargs = {}
             for k, v in kwargs.items():
                 if k.upper() in driver_layer_creation_options:
                     layer_kwargs[k] = v
                 else:
-                    log.info("Ignore '{}' as layer creation option.".format(k))
+                    log.debug("Ignore '{}' as layer creation option.".format(k))
 
 
             # If file exists & we can open it => test if it is possible to add layer
@@ -1021,16 +1021,18 @@ cdef class WritingSession(Session):
                 try:
                     cogr_ds = gdal_open_vector(path_c, 1, [collection.driver], open_kwargs)
                 except DriverError:
+
                     try:
-                        try:
-                            # Existing file could be from a different file format. Let first _remove try to guess the
-                            # correct driver
-                            _remove(path)
-                        except:
-                            # Some drivers cannot be guessed, but files can be removed when a driver is specified
-                            _remove(path, collection.driver)
+                        # Existing file could be from a different file format. Let first _remove try to guess the
+                        # correct driver
+                        _remove(path)
                     except:
-                        raise DatasetDeleteError("File '{path}' exists and must be deleted manually.".format(path=path))
+                        # Some drivers cannot be guessed, but files can be removed when a driver is specified
+                        try:
+                            _remove(path, collection.driver)
+                        except:
+                            raise DatasetDeleteError("File '{path}' exists and must be deleted "
+                                                     "manually.".format(path=path))
                     cogr_ds = gdal_create(cogr_driver, path_c, create_kwargs)
                 else:
                     # check capability of creating a new layer in the existing dataset
