@@ -25,6 +25,7 @@ def _get_metadata_item(driver, metadata_item):
     cdef char* metadata_c
 
     driver_b = strencode(driver)
+    print(driver_b, type(driver_b)
     cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_b))
 
     metadata = ""
