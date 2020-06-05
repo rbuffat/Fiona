@@ -8,19 +8,6 @@ from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
 
-import datetime
-import json
-import locale
-import logging
-import os
-import warnings
-import math
-import uuid
-from collections import namedtuple
-
-from six import integer_types, string_types, text_type
-
-from fiona._shim cimport *
 
 from fiona._geometry cimport (
     GeomBuilder, OGRGeomBuilder, geometry_type_code,
