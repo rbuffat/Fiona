@@ -23,13 +23,13 @@ def _get_metadata_item(driver, metadata_item):
     """
     cdef char* metadata_c
 
-    cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
+    #cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
 
     metadata = ""
-    metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
-    if metadata_c != NULL:
-        metadata = metadata_c
-        metadata = metadata.decode('utf-8')
+    #metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
+    #if metadata_c != NULL:
+    #    metadata = metadata_c
+    #    metadata = metadata.decode('utf-8')
 
     return metadata
 
