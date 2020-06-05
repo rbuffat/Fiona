@@ -28,7 +28,7 @@ def _get_metadata_item(driver, metadata_item):
     driver_b = driver.encode("utf-8")
     driver_c = driver_b
     print(driver_b, type(driver_b))
-    print(GDALGetDriverByName(driver_c) == NULL)
+    print(OGRGetDriverByName(driver_c) == NULL)
     cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_c))
 
     metadata = ""
