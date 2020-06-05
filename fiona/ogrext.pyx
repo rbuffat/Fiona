@@ -985,6 +985,7 @@ cdef class WritingSession(Session):
             path_c = path_b
 
             cogr_driver = exc_wrap_pointer(GDALGetDriverByName(collection.driver.encode("utf-8")))
+            print("success")
 
             driver_dataset_open_options = dataset_open_options(collection.driver)
             driver_dataset_creation_options = dataset_creation_options(collection.driver)
