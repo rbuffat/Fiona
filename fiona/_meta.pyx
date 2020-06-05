@@ -6,17 +6,17 @@ from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
 import logging
+
+# This import is required otherwise GDALGetDriverByName returns NULL for GDAL 1.x
 from fiona._shim cimport *
-from fiona._env import get_gdal_version_num, calc_gdal_version_num
 
 
 log = logging.getLogger(__name__)
 
 
+@require_gdal_version('2.0')
 def _get_metadata_item(driver, metadata_item):
     """Query metadata items
-
-    Note: this function require GDAL 2.0
 
     Parameters
     ----------
@@ -35,11 +35,10 @@ def _get_metadata_item(driver, metadata_item):
     cdef void *cogr_driver
 
     metadata = ""
-    if get_gdal_version_num() >= calc_gdal_version_num(2, 0, 0):
-        cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
-        metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
-        if metadata_c != NULL:
-            metadata = metadata_c
+    cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
+    metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
+    if metadata_c != NULL:
+        metadata = metadata_c
     return metadata
 
 
