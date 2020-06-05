@@ -1,3 +1,4 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8
 from __future__ import absolute_import
 
 include "gdal.pxi"
@@ -77,7 +78,7 @@ def _get_metadata_item(driver, metadata_item):
         XML of metadata item or empty string
 
     """
-    cdef char* metadata_c
+    cdef char* metadata_c = NULL
     cdef void *cogr_driver
 
     print("before 2: {}".format(GDALGetDriverCount()))
@@ -86,7 +87,7 @@ def _get_metadata_item(driver, metadata_item):
     print("success2: {}".format(GDALGetDriverCount()))
 
     metadata = ""
-    metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
+    #metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
     if metadata_c != NULL:
         metadata = metadata_c
 
