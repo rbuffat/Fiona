@@ -1,10 +1,11 @@
 from fiona._err cimport  exc_wrap_pointer
 from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
+from fiona.env import ensure_env
 
 include "gdal.pxi"
 
-
+@ensure_env
 def _get_metadata_item(driver, metadata_item):
     """Query metadata items
 
