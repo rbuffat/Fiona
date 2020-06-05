@@ -4,6 +4,7 @@ import pytest
 
 import fiona
 from fiona.collection import supported_drivers
+from fiona.crs import from_epsg
 from fiona.errors import FionaValueError, DriverError, SchemaError, CRSError
 
 
@@ -114,6 +115,7 @@ def test_write_json_invalid_directory(tmpdir):
 
 
 def test_overwrite_shp_with_json_clears_auxiliary_files(tmpdir):
+    """ Test that auxiliary files are also removed if dataset is overwritten"""
     schema1 = {"geometry": "Point", "properties": [("title", "str")]}
     features1 = [
         {
@@ -141,6 +143,7 @@ def test_overwrite_shp_with_json_clears_auxiliary_files(tmpdir):
 
 
 def test_overwrite_shp_with_json_clears_auxiliary_files_different_extension(tmpdir):
+    """ Test that auxiliary files are also removed if dataset is overwritten"""
     schema1 = {"geometry": "Point", "properties": [("title", "str")]}
     features1 = [
         {
@@ -166,3 +169,31 @@ def test_overwrite_shp_with_json_clears_auxiliary_files_different_extension(tmpd
         dst.writerecords(features1)
 
     assert os.listdir(tmpdir.strpath) == ['foo.shx']
+
+
+def test_overwrite_no(tmpdir, caplog):
+    """ Test that no "ERROR:fiona._env:/tmp/test.geojson: No such file or directory" message
+        is shown if geojson is overwritten"""
+
+    schema = {"geometry": "Point", "properties": [("title", "str")]}
+    features = [
+        {
+            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "properties": {"title": "One"},
+        },
+        {
+            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "properties": {"title": "Two"},
+        }
+    ]
+
+    path = tmpdir.join('foo.json').strpath
+
+    for i in range(2):
+        with fiona.open(path, "w",
+                        driver="GeoJSON",
+                        schema=schema,
+                        crs=from_epsg(4326)) as sink:
+            sink.writerecords(features)
+
+    assert "No such file or directory" not in caplog.text
