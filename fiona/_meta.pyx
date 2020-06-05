@@ -22,7 +22,10 @@ def _get_metadata_item(driver, metadata_item):
 
     """
     cdef char* metadata_c
+    cdef void *cogr_driver
 
+    GDALAllRegister()
+    OGRRegisterAll()
     cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver.encode("utf-8")))
 
     metadata = ""
