@@ -4,9 +4,65 @@ from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
 
+from __future__ import absolute_import
+
 include "gdal.pxi"
 
-@ensure_env
+import datetime
+import json
+import locale
+import logging
+import os
+import warnings
+import math
+import uuid
+from collections import namedtuple
+
+from six import integer_types, string_types, text_type
+
+from fiona._shim cimport *
+
+from fiona._geometry cimport (
+    GeomBuilder, OGRGeomBuilder, geometry_type_code,
+    normalize_geometry_type_code, base_geometry_type_code)
+from fiona._err cimport exc_wrap_int, exc_wrap_pointer, exc_wrap_vsilfile, get_last_error_msg
+
+import fiona
+from fiona._env import GDALVersion, get_gdal_version_num
+from fiona._err import cpl_errs, FionaNullPointerError, CPLE_BaseError, CPLE_OpenFailedError
+from fiona._geometry import GEOMETRY_TYPES
+from fiona import compat
+from fiona.errors import (
+    DriverError, DriverIOError, SchemaError, CRSError, FionaValueError,
+    TransactionError, GeometryTypeValidationError, DatasetDeleteError,
+    FionaDeprecationWarning)
+from fiona.compat import OrderedDict, strencode
+from fiona.rfc3339 import parse_date, parse_datetime, parse_time
+from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
+from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
+from fiona.path import vsi_path
+from fiona.meta import dataset_open_options, dataset_creation_options, layer_creation_options
+from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
+
+from libc.stdlib cimport malloc, free
+from libc.string cimport strcmp
+from cpython cimport PyBytes_FromStringAndSize, PyBytes_AsString
+
+
+cdef extern from "ogr_api.h" nogil:
+
+    ctypedef void * OGRLayerH
+    ctypedef void * OGRDataSourceH
+    ctypedef void * OGRSFDriverH
+    ctypedef void * OGRFieldDefnH
+    ctypedef void * OGRFeatureDefnH
+    ctypedef void * OGRFeatureH
+    ctypedef void * OGRGeometryH
+
+
+log = logging.getLogger(__name__)
+
+
 def _get_metadata_item(driver, metadata_item):
     """Query metadata items
 
@@ -35,7 +91,6 @@ def _get_metadata_item(driver, metadata_item):
     metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
     if metadata_c != NULL:
         metadata = metadata_c
-        metadata = metadata.decode('utf-8')
 
     return metadata
 
