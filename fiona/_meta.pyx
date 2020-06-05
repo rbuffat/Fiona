@@ -29,7 +29,7 @@ def _get_metadata_item(driver, metadata_item):
     driver_c = driver_b
     print(driver_b, type(driver_b))
     print(OGRGetDriverByName(driver_c) == NULL)
-    cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_c))
+    cogr_driver = exc_wrap_pointer(OGRGetDriverByName(driver_c))
 
     metadata = ""
     metadata_c = GDALGetMetadataItem(cogr_driver, strencode(metadata_item), NULL)
