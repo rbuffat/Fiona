@@ -7,7 +7,7 @@ from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
 import logging
-from fiona._shim cimport *
+#from fiona._shim cimport *
 from six import integer_types, string_types, text_type
 
 
