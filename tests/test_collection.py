@@ -907,10 +907,10 @@ def test_collection_zip_http():
     assert len(ds) == 67
 
 
-def test_encoding_option_warning(tmpdir, caplog):
+def test_no_encoding_option_warning(tmpdir, caplog):
     """There is no ENCODING creation option log warning for GeoJSON"""
     fiona.Collection(str(tmpdir.join("test.geojson")), "w", driver="GeoJSON", crs="epsg:4326",
-            schema={"geometry": "Point", "properties": {"foo": "int"}})
+                     schema={"geometry": "Point", "properties": {"foo": "int"}})
     assert not caplog.text
 
 

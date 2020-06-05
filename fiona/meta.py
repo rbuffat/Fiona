@@ -51,7 +51,7 @@ def _parse_options(xml):
     return options
 
 
-def create_options(driver):
+def dataset_creation_options(driver):
     """ Returns dataset creation options for driver
 
     Parameters
@@ -77,7 +77,7 @@ def create_options(driver):
     return options
 
 
-def create_layer_options(driver):
+def layer_creation_options(driver):
     """ Returns layer creation options for driver
 
     Parameters
@@ -95,7 +95,7 @@ def create_layer_options(driver):
     return options
 
 
-def open_options(driver):
+def dataset_open_options(driver):
     """ Returns dataset open options for driver
 
     Parameters
@@ -122,9 +122,9 @@ def print_driver_options(driver):
 
     """
 
-    for option_type, options in [("Dataset Open Options", open_options(driver)),
-                                 ("Dataset Creation Options", create_options(driver)),
-                                 ("Layer Creation Options", create_layer_options(driver))]:
+    for option_type, options in [("Dataset Open Options", dataset_open_options(driver)),
+                                 ("Dataset Creation Options", dataset_creation_options(driver)),
+                                 ("Layer Creation Options", layer_creation_options(driver))]:
 
         print("{option_type}:".format(option_type=option_type))
         if len(options) == 0:

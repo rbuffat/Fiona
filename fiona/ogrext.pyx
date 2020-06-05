@@ -36,7 +36,7 @@ from fiona.rfc3339 import parse_date, parse_datetime, parse_time
 from fiona.rfc3339 import FionaDateType, FionaDateTimeType, FionaTimeType
 from fiona.schema import FIELD_TYPES, FIELD_TYPES_MAP, normalize_field_type
 from fiona.path import vsi_path
-from fiona.meta import create_layer_options
+from fiona.meta import dataset_open_options, dataset_creation_options, layer_creation_options
 from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_mapping_strategy
 
 from libc.stdlib cimport malloc, free
@@ -988,27 +988,50 @@ cdef class WritingSession(Session):
             driver_c = driver_b
             cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_c))
 
-            # Our most common use case is the creation of a new data
-            # file and historically we've assumed that it's a file on
-            # the local filesystem and queryable via os.path.
-            #
-            # TODO: remove the assumption.
-            if not os.path.exists(path):
-                log.debug("File doesn't exist. Creating a new one...")
-                cogr_ds = gdal_create(cogr_driver, path_c, {})
+            driver_dataset_open_options = dataset_open_options(collection.driver)
+            driver_dataset_creation_options = dataset_creation_options(collection.driver)
+            driver_layer_creation_options = layer_creation_options(collection.driver)
 
-            # TODO: revisit the logic in the following blocks when we
-            # change the assumption above.
-            else:
-                if collection.driver == "GeoJSON" and os.path.exists(path):
-                    # manually remove geojson file as GDAL doesn't do this for us
-                    os.unlink(path)
+            # filter options not supported by driver
+            open_kwargs = {}
+            for k, v in kwargs.items():
+                if k.upper() in driver_dataset_open_options:
+                    open_kwargs[k] = v
+                else:
+                    log.info("Ignore '{}' as dataset open option.".format(k))
+            create_kwargs = {}
+            for k, v in kwargs.items():
+                if k.upper() in driver_dataset_creation_options:
+                    create_kwargs[k] = v
+                else:
+                    log.info("Ignore '{}' as dataset creation option.".format(k))
+            layer_kwargs = {}
+            for k, v in kwargs.items():
+                if k.upper() in driver_layer_creation_options:
+                    layer_kwargs[k] = v
+                else:
+                    log.info("Ignore '{}' as layer creation option.".format(k))
+
+
+            # If file exists & we can open it => test if it is possible to add layer
+            #                                    if not possible => recreate file
+            # If file exists & we can not open it => recreate file
+            # If file does not exists => create file
+            if CPLCheckForFile(path_c, NULL):
                 try:
-                    # attempt to open existing dataset in write mode
-                    cogr_ds = gdal_open_vector(path_c, 1, None, kwargs)
+                    cogr_ds = gdal_open_vector(path_c, 1, [collection.driver], open_kwargs)
                 except DriverError:
-                    # failed, attempt to create it
-                    cogr_ds = gdal_create(cogr_driver, path_c, kwargs)
+                    try:
+                        try:
+                            # Existing file could be from a different file format. Let first _remove try to guess the
+                            # correct driver
+                            _remove(path)
+                        except:
+                            # Some drivers cannot be guessed, but files can be removed when a driver is specified
+                            _remove(path, collection.driver)
+                    except:
+                        raise DatasetDeleteError("File '{path}' exists and must be deleted manually.".format(path=path))
+                    cogr_ds = gdal_create(cogr_driver, path_c, create_kwargs)
                 else:
                     # check capability of creating a new layer in the existing dataset
                     capability = check_capability_create_layer(cogr_ds)
@@ -1019,7 +1042,14 @@ cdef class WritingSession(Session):
                         # unable to use existing dataset, recreate it
                         GDALClose(cogr_ds)
                         cogr_ds = NULL
-                        cogr_ds = gdal_create(cogr_driver, path_c, kwargs)
+                        try:
+                            _remove(path, collection.driver)
+                        except:
+                            raise DatasetDeleteError("File '{path}' exists and must be deleted "
+                                                     "manually.".format(path=path))
+                        cogr_ds = gdal_create(cogr_driver, path_c, create_kwargs)
+            else:
+                cogr_ds = gdal_create(cogr_driver, path_c, create_kwargs)
 
             self.cogr_ds = cogr_ds
 
@@ -1078,27 +1108,12 @@ cdef class WritingSession(Session):
             name_b = collection.name.encode('utf-8')
             name_c = name_b
 
-            driver_layer_creation_options = create_layer_options(collection.driver)
-            for k, v in kwargs.items():
+            for k, v in layer_kwargs.items():
 
                 if v is None:
                     continue
 
-                # We need to remove encoding from the layer creation
-                # options if we're not creating a shapefile.
-                if k == 'encoding' and "Shapefile" not in collection.driver:
-                    continue
-
-                k = k.upper()
-
-                # Check if option is supported by driver
-                if not k in driver_layer_creation_options:
-                    supported_options=",".join(driver_layer_creation_options.keys())
-                    raise ValueError("'{option}' is not a supported layer creation option by driver {driver}, "
-                                     "supported options are: {options}".format(option=k,
-                                                                               driver=collection.driver,
-                                                                               options=supported_options))
-                k = k.encode('utf-8')
+                k = k.upper().encode('utf-8')
 
                 if isinstance(v, bool):
                     v = ('ON' if v else 'OFF').encode('utf-8')

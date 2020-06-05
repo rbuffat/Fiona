@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import fiona
@@ -109,3 +111,58 @@ def test_write_json_invalid_directory(tmpdir):
     schema = {"geometry": "Unknown", "properties": [("title", "str")]}
     with pytest.raises(DriverError):
         fiona.open(path, "w", driver="GeoJSON", schema=schema)
+
+
+def test_overwrite_shp_with_json_clears_auxiliary_files(tmpdir):
+    schema1 = {"geometry": "Point", "properties": [("title", "str")]}
+    features1 = [
+        {
+            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "properties": {"title": "One"},
+        },
+        {
+            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "properties": {"title": "Two"},
+        }
+    ]
+
+    path = str(tmpdir.join('foo.shp'))
+    # attempt to overwrite it with a valid file
+    with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema1) as dst:
+        dst.writerecords(features1)
+
+    assert os.listdir(tmpdir) == ['foo.cpg', 'foo.dbf', 'foo.shx', 'foo.shp']
+
+    # attempt to overwrite it with a GeoJSON file
+    with fiona.open(path, "w", driver="GeoJSON", schema=schema1) as dst:
+        dst.writerecords(features1)
+
+    assert os.listdir(tmpdir) == ['foo.shp']
+
+
+def test_overwrite_shp_with_json_clears_auxiliary_files_different_extension(tmpdir):
+    schema1 = {"geometry": "Point", "properties": [("title", "str")]}
+    features1 = [
+        {
+            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "properties": {"title": "One"},
+        },
+        {
+            "geometry": {"type": "Point", "coordinates": [0.0, 0.0]},
+            "properties": {"title": "Two"},
+        }
+    ]
+
+    path = str(tmpdir.join('foo.shp'))
+    # attempt to overwrite it with a valid file
+    with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema1) as dst:
+        dst.writerecords(features1)
+
+    assert os.listdir(tmpdir) == ['foo.cpg', 'foo.dbf', 'foo.shx', 'foo.shp']
+
+    # attempt to overwrite it with a GeoJSON file
+    path = str(tmpdir.join('foo.shx'))
+    with fiona.open(path, "w", driver="GeoJSON", schema=schema1) as dst:
+        dst.writerecords(features1)
+
+    assert os.listdir(tmpdir) == ['foo.shx']
