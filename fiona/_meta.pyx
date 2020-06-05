@@ -1,12 +1,12 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
+from __future__ import absolute_import
+
+include "gdal.pxi"
+
 from fiona._err cimport  exc_wrap_pointer
 from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
 from fiona.env import ensure_env
-
-from __future__ import absolute_import
-
-include "gdal.pxi"
 
 import datetime
 import json
