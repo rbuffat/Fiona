@@ -23,7 +23,7 @@ from fiona._geometry cimport (
 from fiona._err cimport exc_wrap_int, exc_wrap_pointer, exc_wrap_vsilfile, get_last_error_msg
 
 import fiona
-from fiona._env import GDALVersion, get_gdal_version_num
+from fiona._env import GDALVersion, get_gdal_version_num, calc_gdal_version_num
 from fiona._err import cpl_errs, FionaNullPointerError, CPLE_BaseError, CPLE_OpenFailedError
 from fiona._geometry import GEOMETRY_TYPES
 from fiona import compat
@@ -985,34 +985,33 @@ cdef class WritingSession(Session):
             path_c = path_b
 
             cogr_driver = exc_wrap_pointer(GDALGetDriverByName(collection.driver.encode("utf-8")))
-            print("success: {}".format(GDALGetDriverCount()))
-            print(collection.driver, type(collection.driver))
-            cogr_driver = exc_wrap_pointer(GDALGetDriverByName(collection.driver.encode("utf-8")))
-            print("success: {}".format(GDALGetDriverCount()))
 
-            driver_dataset_open_options = dataset_open_options(collection.driver)
-            driver_dataset_creation_options = dataset_creation_options(collection.driver)
-            driver_layer_creation_options = layer_creation_options(collection.driver)
+            if get_gdal_version_num() < calc_gdal_version_num(2, 0, 0):
+                open_kwargs = create_kwargs = layer_kwargs = kwargs
+            else:
+                driver_dataset_open_options = dataset_open_options(collection.driver)
+                driver_dataset_creation_options = dataset_creation_options(collection.driver)
+                driver_layer_creation_options = layer_creation_options(collection.driver)
 
-            # filter options not supported by driver
-            open_kwargs = {}
-            for k, v in kwargs.items():
-                if k.upper() in driver_dataset_open_options:
-                    open_kwargs[k] = v
-                else:
-                    log.debug("Ignore '{}' as dataset open option.".format(k))
-            create_kwargs = {}
-            for k, v in kwargs.items():
-                if k.upper() in driver_dataset_creation_options:
-                    create_kwargs[k] = v
-                else:
-                    log.debug("Ignore '{}' as dataset creation option.".format(k))
-            layer_kwargs = {}
-            for k, v in kwargs.items():
-                if k.upper() in driver_layer_creation_options:
-                    layer_kwargs[k] = v
-                else:
-                    log.debug("Ignore '{}' as layer creation option.".format(k))
+                # filter options not supported by driver
+                open_kwargs = {}
+                for k, v in kwargs.items():
+                    if k.upper() in driver_dataset_open_options:
+                        open_kwargs[k] = v
+                    else:
+                        log.debug("Ignore '{}' as dataset open option.".format(k))
+                create_kwargs = {}
+                for k, v in kwargs.items():
+                    if k.upper() in driver_dataset_creation_options:
+                        create_kwargs[k] = v
+                    else:
+                        log.debug("Ignore '{}' as dataset creation option.".format(k))
+                layer_kwargs = {}
+                for k, v in kwargs.items():
+                    if k.upper() in driver_layer_creation_options:
+                        layer_kwargs[k] = v
+                    else:
+                        log.debug("Ignore '{}' as layer creation option.".format(k))
 
 
             # If file exists & we can open it => test if it is possible to add layer
