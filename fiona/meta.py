@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from fiona._meta import _get_metadata_item
-from fiona.env import require_gdal_version, ensure_env_with_credentials, GDALVersion
+from fiona.env import require_gdal_version, GDALVersion
 
 
 class MetadataItem:
@@ -51,6 +51,7 @@ def _parse_options(xml):
     return options
 
 
+@require_gdal_version('2.0')
 def dataset_creation_options(driver):
     """ Returns dataset creation options for driver
 
@@ -77,6 +78,7 @@ def dataset_creation_options(driver):
     return options
 
 
+@require_gdal_version('2.0')
 def layer_creation_options(driver):
     """ Returns layer creation options for driver
 
@@ -95,6 +97,7 @@ def layer_creation_options(driver):
     return options
 
 
+@require_gdal_version('2.0')
 def dataset_open_options(driver):
     """ Returns dataset open options for driver
 
@@ -113,7 +116,7 @@ def dataset_open_options(driver):
     return options
 
 
-@ensure_env_with_credentials
+@require_gdal_version('2.0')
 def print_driver_options(driver):
     """ Print driver options for dataset open, dataset creation, and layer creation.
 
@@ -145,6 +148,7 @@ def print_driver_options(driver):
         print("")
 
 
+@require_gdal_version('2.0')
 def extensions(driver):
     """ Returns file extensions supported by driver
 
@@ -184,3 +188,27 @@ def supports_vsi(driver):
     """
     return _get_metadata_item(driver, MetadataItem.VIRTUAL_IO).upper() == "YES"
 
+
+@require_gdal_version('2.0')
+def supported_field_types(driver):
+    """ Returns supported field and sub field types
+
+    Parameters
+    ----------
+    driver : str
+
+    Returns
+    -------
+    list
+        List with supported field types
+
+    """
+    field_types = set()
+    for field_type in _get_metadata_item(driver, MetadataItem.CREATION_FIELD_DATA_TYPES).split(" "):
+        field_types.add(field_type)
+
+    if GDALVersion().runtime().at_least((2, 3)):
+        for field_type in _get_metadata_item(driver, MetadataItem.CREATION_FIELD_DATA_SUB_TYPES).split(" "):
+            field_types.add(field_type)
+
+    return list(field_types)
