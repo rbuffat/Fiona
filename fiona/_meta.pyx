@@ -1,3 +1,4 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8
 from fiona._err cimport  exc_wrap_pointer
 from fiona.compat import strencode
 from fiona._shim cimport gdal_open_vector
