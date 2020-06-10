@@ -13,6 +13,7 @@ def test_print_driver_options(driver):
     fiona.meta.print_driver_options(driver)
 
 
+@requires_gdal2
 @pytest.mark.parametrize("driver", supported_drivers)
 def test_extension(driver):
     # do not fail
