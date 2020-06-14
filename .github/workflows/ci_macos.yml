@@ -11,9 +11,10 @@ jobs:
 
     runs-on: macos-10.15
     strategy:
+      fail-fast: false
       matrix:
         config:
-          - {python-version: 3.6, GDALVERSION: "1.11.5", PROJVERSION: "4.9.3"}
+          #- {python-version: 3.6, GDALVERSION: "1.11.5", PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.4.4", PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "3.1.0", PROJVERSION: "6.3.2"}
 
@@ -58,6 +59,14 @@ jobs:
         python -m pip install -r requirements-dev.txt
         python -m pip install coveralls>=1.1 --upgrade
 
+    - name: Dependency Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-gdal
+      with:
+        path: $HOME/gdalinstall
+        key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}
+        
     - name: Build PROJ
       run: |
         source $HOME/env_variables
