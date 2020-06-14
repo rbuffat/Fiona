@@ -30,19 +30,20 @@ jobs:
 
     - name: Set env variables
       run: |
-        echo "export GDALINST=$HOME/gdalinstall" >> ~/.bashrc
-        echo "export GDALBUILD=$HOME/gdalbuild" >> ~/.bashrc
-        echo "export PROJINST=$HOME/gdalinstall" >> ~/.bashrc
-        echo "export PROJBUILD=$HOME/projbuild" >> ~/.bashrc
-        echo "export GDALVERSION=${{matrix.config.GDALVERSION}}" >> ~/.bashrc
-        echo "export PROJVERSION=${{matrix.config.PROJVERSION}}" >> ~/.bashrc
-        echo "export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" >> ~/.bashrc
-        echo "export TRAVIS_OS_NAME=osx" >> ~/.bashrc
-        source ~/.bashrc
-        echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> ~/.bashrc
-        echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> ~/.bashrc
-        echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:\$PATH" >> ~/.bashrc
-        echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:\$DYLD_LIBRARY_PATH" >> ~/.bashrc
+        echo "export GDALINST=$HOME/gdalinstall" >> $HOME/env_variables
+        echo "export GDALBUILD=$HOME/gdalbuild" >> $HOME/env_variables
+        echo "export PROJINST=$HOME/gdalinstall" >> $HOME/env_variables
+        echo "export PROJBUILD=$HOME/projbuild" >> $HOME/env_variables
+        echo "export GDALVERSION=${{matrix.config.GDALVERSION}}" >> $HOME/env_variables
+        echo "export PROJVERSION=${{matrix.config.PROJVERSION}}" >> $HOME/env_variables
+        echo "export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" >> $HOME/env_variables
+        echo "export TRAVIS_OS_NAME=osx" >> $HOME/env_variables
+        ./$HOME/env_variables
+        echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> $HOME/env_variables
+        echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> $HOME/env_variables
+        echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:\$PATH" >> $HOME/env_variables
+        echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:\$DYLD_LIBRARY_PATH" >> $HOME/env_variables
+        cat $HOME/env_variables
         
     - name: Install brew packages
       run: |
@@ -56,20 +57,20 @@ jobs:
 
     - name: Build PROJ
       run: |
-        cat ~/.bashrc
-        source ~/.bashrc
+        cat $HOME/env_variables
+        source $HOME/env_variables
         echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
         chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
-        
+
     - name: Build GDAL
       run: |
-        source ~/.bashrc
+        source $HOME/env_variables
         chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
         gdal-config --version
 
     - name: Build Fiona
       run: |
-        source ~/.bashrc
+        source $HOME/env_variables
         if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
         GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install -v -v -v --no-deps --force-reinstall --no-use-pep517 -e .
         fio --version
@@ -78,5 +79,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-        source ~/.bashrc
+        source $HOME/env_variables
         python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
