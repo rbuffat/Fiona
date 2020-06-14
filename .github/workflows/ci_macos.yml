@@ -1,0 +1,54 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: MacOS CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: macos-10.15
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install brew packages
+      run: |
+        brew expat libspatialite sqlite geos
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip wheel -r requirements-dev.txt
+        python -m pip install -r requirements-dev.txt
+        python -m pip install coveralls>=1.1 --upgrade
+
+    - name: Build GDAL
+      run: |
+        export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+        export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
+        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+        chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
+        export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
+        export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
+        gdal-config --version
+
+    - name: Build Fiona
+      run: |
+        if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
+        GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python3 -m pip install -v -v -v --no-deps --force-reinstall --no-use-pep517 -e .
+        fio --version
+        fio --gdal-version
+
+    - name: Test with pytest
+      run: |
+        python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
