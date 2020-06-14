@@ -79,6 +79,7 @@ jobs:
     - name: Build GDAL
       run: |
         source $HOME/env_variables
+        ls -l $GDALINST
         chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
         gdal-config --version
 
