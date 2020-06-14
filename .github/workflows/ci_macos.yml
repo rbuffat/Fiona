@@ -39,7 +39,8 @@ jobs:
         echo "export PROJVERSION=${{matrix.config.PROJVERSION}}" >> $HOME/env_variables
         echo "export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" >> $HOME/env_variables
         echo "export TRAVIS_OS_NAME=osx" >> $HOME/env_variables
-        cat $HOME/env_variables
+        echo "export PATH="/usr/local/opt/expat/bin:\$PATH" >> $HOME/env_variables
+        echo "export PATH="/usr/local/opt/libxml2/bin:\$PATH" >> $HOME/env_variables
         source $HOME/env_variables
         echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> $HOME/env_variables
         echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> $HOME/env_variables
@@ -49,7 +50,7 @@ jobs:
 
     - name: Install brew packages
       run: |
-        brew install expat libspatialite sqlite geos
+        brew install pkg-config expat libspatialite sqlite geos
 
     - name: Install Python dependencies
       run: |
