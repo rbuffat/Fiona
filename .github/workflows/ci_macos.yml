@@ -32,9 +32,9 @@ jobs:
       with:
         python-version: ${{ matrix.config.python-version }}
 
-    - name: Install brew packages
-      run: |
-        brew install expat libspatialite sqlite geos
+    #- name: Install brew packages
+      #run: |
+        #brew install expat libspatialite sqlite geos
 
     - name: Install Python dependencies
       run: |
@@ -48,17 +48,17 @@ jobs:
         
     - name: Build GDAL
       run: |
-        echo $GDALINST
-        echo ${{ env.GDALINST }}
-        #export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
-        #echo $PATH
-        #export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
-        #echo $DYLD_LIBRARY_PATH
-        #chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
-        #chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
-        #export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
-        #export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
-        #gdal-config --version
+        export GDALVERSION=${{matrix.config.GDALVERSION}}
+        export PROJVERSION=${{matrix.config.PROJVERSION}}
+        export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+        echo $PATH
+        export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
+        echo $DYLD_LIBRARY_PATH
+        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+        chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
+        export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
+        export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
+        gdal-config --version
 
     - name: Build Fiona
       run: |
