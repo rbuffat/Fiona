@@ -5,11 +5,6 @@ name: MacOS CI
 
 on: [push, pull_request]
 
-env:
-    MAKEFLAGS: "-j 4 -s"
-    CXXFLAGS: "-O0"
-    CFLAGS: "-O0"
-
     
 jobs:
   build:
@@ -31,6 +26,9 @@ jobs:
     - name: Set env variables
       run: |
         touch $HOME/env_variables
+        echo "export MAKEFLAGS="-j 4 -s" >> $HOME/env_variables
+        echo "export CXXFLAGS="-O0" >> $HOME/env_variables
+        echo "export CFLAGS="-O0" >> $HOME/env_variables
         echo "export GDALINST=$HOME/gdalinstall" >> $HOME/env_variables
         echo "export GDALBUILD=$HOME/gdalbuild" >> $HOME/env_variables
         echo "export PROJINST=$HOME/gdalinstall" >> $HOME/env_variables
@@ -46,7 +44,7 @@ jobs:
         echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:\$PATH" >> $HOME/env_variables
         echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:\$DYLD_LIBRARY_PATH" >> $HOME/env_variables
         cat $HOME/env_variables
-        
+
     - name: Install brew packages
       run: |
         brew install expat libspatialite sqlite geos
@@ -59,7 +57,6 @@ jobs:
 
     - name: Build PROJ
       run: |
-        cat $HOME/env_variables
         source $HOME/env_variables
         echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
         chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
