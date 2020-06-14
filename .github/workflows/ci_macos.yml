@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - {python-version: 3.6, GDALVERSION: "1.11.5", PROJVERSION: "4.8.0"}
+          - {python-version: 3.6, GDALVERSION: "1.11.5", PROJVERSION: "4.9.3"}
 
     steps:
     - uses: actions/checkout@v2
