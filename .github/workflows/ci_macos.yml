@@ -48,6 +48,7 @@ jobs:
         export GDALVERSION=${{matrix.config.GDALVERSION}}
         export PROJVERSION=${{matrix.config.PROJVERSION}}
         export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE
+        export TRAVIS_OS_NAME=osx
         export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
         echo $PATH
         export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
