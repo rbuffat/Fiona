@@ -30,19 +30,19 @@ jobs:
 
     - name: Set env variables
       run: |
-        echo "export GDALINST=$HOME/gdalinstall" > ~/.bashrc
-        echo "export GDALBUILD=$HOME/gdalbuild" > ~/.bashrc
-        echo "export PROJINST=$HOME/gdalinstall" > ~/.bashrc
-        echo "export PROJBUILD=$HOME/projbuild" > ~/.bashrc
-        echo "export GDALVERSION=${{matrix.config.GDALVERSION}}" > ~/.bashrc
-        echo "export PROJVERSION=${{matrix.config.PROJVERSION}}" > ~/.bashrc
-        echo "export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" > ~/.bashrc
-        echo "export TRAVIS_OS_NAME=osx" > ~/.bashrc
+        echo "export GDALINST=$HOME/gdalinstall" >> ~/.bashrc
+        echo "export GDALBUILD=$HOME/gdalbuild" >> ~/.bashrc
+        echo "export PROJINST=$HOME/gdalinstall" >> ~/.bashrc
+        echo "export PROJBUILD=$HOME/projbuild" >> ~/.bashrc
+        echo "export GDALVERSION=${{matrix.config.GDALVERSION}}" >> ~/.bashrc
+        echo "export PROJVERSION=${{matrix.config.PROJVERSION}}" >> ~/.bashrc
+        echo "export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" >> ~/.bashrc
+        echo "export TRAVIS_OS_NAME=osx" >> ~/.bashrc
         source ~/.bashrc
-        echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" > ~/.bashrc
-        echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" > ~/.bashrc
-        echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH" > ~/.bashrc
-        echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH" > ~/.bashrc
+        echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> ~/.bashrc
+        echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> ~/.bashrc
+        echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH" >> ~/.bashrc
+        echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH" >> ~/.bashrc
         cat ~/.bashrc
 
     - name: Build PROJ
