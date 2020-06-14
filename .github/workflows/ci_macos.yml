@@ -43,9 +43,11 @@ jobs:
         echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" > ~/.bashrc
         echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH" > ~/.bashrc
         echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH" > ~/.bashrc
+        cat ~/.bashrc
 
     - name: Build PROJ
       run: |
+        cat ~/.bashrc
         source ~/.bashrc
         echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
         chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
