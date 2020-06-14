@@ -41,16 +41,8 @@ jobs:
         source ~/.bashrc
         echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> ~/.bashrc
         echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> ~/.bashrc
-        echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH" >> ~/.bashrc
-        echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH" >> ~/.bashrc
-        cat ~/.bashrc
-
-    - name: Build PROJ
-      run: |
-        cat ~/.bashrc
-        source ~/.bashrc
-        echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
-        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+        echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:\$PATH" >> ~/.bashrc
+        echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:\$DYLD_LIBRARY_PATH" >> ~/.bashrc
         
     - name: Install brew packages
       run: |
@@ -61,7 +53,13 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r requirements-dev.txt
         python -m pip install coveralls>=1.1 --upgrade
-        
+
+    - name: Build PROJ
+      run: |
+        cat ~/.bashrc
+        source ~/.bashrc
+        echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
+        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
         
     - name: Build GDAL
       run: |
