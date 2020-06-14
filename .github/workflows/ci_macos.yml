@@ -24,9 +24,8 @@ jobs:
         include:
           os: macos-10.15
           python-version: 3.6
-          env:
-            GDALVERSION: "1.11.5"
-            PROJVERSION: "4.8.0"
+          GDALVERSION: "1.11.5"
+          PROJVERSION: "4.8.0"
 
     steps:
     - uses: actions/checkout@v2
