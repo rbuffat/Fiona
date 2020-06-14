@@ -6,10 +6,6 @@ name: MacOS CI
 on: [push, pull_request]
 
 env:
-    GDALINST: ./gdalinstall
-    GDALBUILD: ./gdalbuild
-    PROJINST: ./gdalinstall
-    PROJBUILD: ./projbuild
     MAKEFLAGS: "-j 2"
     CXXFLAGS: "-O0"
     CFLAGS: "-O0"
@@ -45,8 +41,13 @@ jobs:
     - name: Build GDAL
       run: |
         echo $HOME
+        export GDALINST=$HOME/gdalinstall
+        export GDALBUILD=$HOME/gdalbuild
+        export PROJINST=$HOME/gdalinstall
+        export PROJBUILD=$HOME/projbuild
         export GDALVERSION=${{matrix.config.GDALVERSION}}
         export PROJVERSION=${{matrix.config.PROJVERSION}}
+        export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE
         export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
         echo $PATH
         export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
