@@ -28,17 +28,17 @@ jobs:
       with:
         python-version: ${{ matrix.config.python-version }}
 
-    #- name: Install brew packages
-      #run: |
-        #brew install expat libspatialite sqlite geos
+    - name: Install brew packages
+      run: |
+        brew install expat libspatialite sqlite geos
 
-    #- name: Install Python dependencies
-      #run: |
-        #python -m pip install --upgrade pip
-        #python -m pip install -r requirements-dev.txt
-        #python -m pip install coveralls>=1.1 --upgrade
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements-dev.txt
+        python -m pip install coveralls>=1.1 --upgrade
         
-    - name: Build GDAL
+    - name: Build PROJ and GDAL
       run: |
         echo $HOME
         export GDALINST=$HOME/gdalinstall
@@ -58,14 +58,27 @@ jobs:
         export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
         gdal-config --version
 
-    #- name: Build Fiona
-      #run: |
-        #if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
-        #GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install -v -v -v --no-deps --force-reinstall --no-use-pep517 -e .
-        #fio --version
-        #fio --gdal-version
+    - name: Build Fiona
+      run: |
+        export GDALINST=$HOME/gdalinstall
+        export PROJINST=$HOME/gdalinstall
+        export GDALVERSION=${{matrix.config.GDALVERSION}}
+        export PROJVERSION=${{matrix.config.PROJVERSION}}
+        export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+        export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
 
-    #- name: Test with pytest
-      #run: |
-        #python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+        if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
+        GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install -v -v -v --no-deps --force-reinstall --no-use-pep517 -e .
+        fio --version
+        fio --gdal-version
 
+
+    - name: Test with pytest
+      run: |
+        export GDALINST=$HOME/gdalinstall
+        export PROJINST=$HOME/gdalinstall
+        export GDALVERSION=${{matrix.config.GDALVERSION}}
+        export PROJVERSION=${{matrix.config.PROJVERSION}}
+        export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+        export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
+        python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
