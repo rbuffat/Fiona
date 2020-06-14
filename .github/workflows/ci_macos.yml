@@ -6,13 +6,13 @@ name: MacOS CI
 on: [push, pull_request]
 
 env:
-    - GDALINST=$HOME/gdalinstall
-    - GDALBUILD=$HOME/gdalbuild
-    - PROJINST=$HOME/gdalinstall
-    - PROJBUILD=$HOME/projbuild
-    - MAKEFLAGS="-j 2"
-    - CXXFLAGS="-O0"
-    - CFLAGS="-O0"
+    GDALINST: $HOME/gdalinstall
+    GDALBUILD: $HOME/gdalbuild
+    PROJINST: $HOME/gdalinstall
+    PROJBUILD: $HOME/projbuild
+    MAKEFLAGS: "-j 2"
+    CXXFLAGS: "-O0"
+    CFLAGS: "-O0"
 
     
 jobs:
