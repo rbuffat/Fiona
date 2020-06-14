@@ -6,10 +6,10 @@ name: MacOS CI
 on: [push, pull_request]
 
 env:
-    GDALINST: $HOME/gdalinstall
-    GDALBUILD: $HOME/gdalbuild
-    PROJINST: $HOME/gdalinstall
-    PROJBUILD: $HOME/projbuild
+    GDALINST: ./gdalinstall
+    GDALBUILD: ./gdalbuild
+    PROJINST: ./gdalinstall
+    PROJBUILD: ./projbuild
     MAKEFLAGS: "-j 2"
     CXXFLAGS: "-O0"
     CFLAGS: "-O0"
@@ -42,10 +42,16 @@ jobs:
         python -m pip install -r requirements-dev.txt
         python -m pip install coveralls>=1.1 --upgrade
 
+    - name: Debug
+      run: |
+        ls -l
+        
     - name: Build GDAL
       run: |
         export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+        echo $PATH
         export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
+        echo $DYLD_LIBRARY_PATH
         chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
         chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
         export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
