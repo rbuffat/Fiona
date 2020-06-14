@@ -6,7 +6,7 @@ name: MacOS CI
 on: [push, pull_request]
 
 env:
-    MAKEFLAGS: "-j 2"
+    MAKEFLAGS: "-j 2 -s"
     CXXFLAGS: "-O0"
     CFLAGS: "-O0"
 
