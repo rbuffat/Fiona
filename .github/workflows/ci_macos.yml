@@ -48,20 +48,22 @@ jobs:
         
     - name: Build GDAL
       run: |
-        export PATH=${{ env.GDALINST }}/gdal-${{ env.GDALVERSION }}/bin:${{ env.GDALINST }}/proj-${{ env.PROJVERSION }}/bin:$PATH
-        echo $PATH
-        export DYLD_LIBRARY_PATH=${{ env.GDALINST }}/gdal-${{ env.GDALVERSION }}/lib:${{ env.GDALINST }}/proj-${{ env.PROJVERSION }}/lib:$DYLD_LIBRARY_PATH
-        echo $DYLD_LIBRARY_PATH
-        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
-        chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
-        export GDAL_DATA=${{ env.GDALINST }}/gdal-${{ env.GDALVERSION }}/share/gdal
-        export PROJ_LIB=${{ env.GDALINST }}/gdal-${{ env.GDALVERSION }}/share/proj
-        gdal-config --version
+        echo $GDALINST
+        echo ${{ env.GDALINST }}
+        #export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH
+        #echo $PATH
+        #export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH
+        #echo $DYLD_LIBRARY_PATH
+        #chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+        #chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
+        #export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal
+        #export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj
+        #gdal-config --version
 
     - name: Build Fiona
       run: |
-        if [ "${{ env.GDALVERSION }}" = "master" ]; then echo "Using gdal master"; elif [ $(${{ env.GDALINST }}/gdal-${{ env.GDALVERSION }}/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< ${{ env.GDALVERSION }}) ]; then echo "Using gdal ${{ env.GDALVERSION }}"; else echo "NOT using gdal ${{ env.GDALVERSION }} as expected; aborting"; exit 1; fi
-        GDAL_CONFIG=${{ env.GDALINST }}/gdal-${{ env.GDALVERSION }}/bin/gdal-config python -m pip install -v -v -v --no-deps --force-reinstall --no-use-pep517 -e .
+        if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
+        GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install -v -v -v --no-deps --force-reinstall --no-use-pep517 -e .
         fio --version
         fio --gdal-version
 
