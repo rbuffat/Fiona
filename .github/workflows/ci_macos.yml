@@ -16,7 +16,7 @@ jobs:
         config:
           - {python-version: 3.6, GDALVERSION: "2.3.3",  PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.4.4",  PROJVERSION: "4.9.3"}
-          - {python-version: 3.6, GDALVERSION: "3.0.4",  PROJVERSION: "4.9.3"}
+          - {python-version: 3.6, GDALVERSION: "3.0.4",  PROJVERSION: "6.2.1"}
           - {python-version: 3.6, GDALVERSION: "3.1.0",  PROJVERSION: "6.3.2"}
           - {python-version: 3.7, GDALVERSION: "3.1.0",  PROJVERSION: "6.3.2"}
           - {python-version: 3.8, GDALVERSION: "3.1.0",  PROJVERSION: "6.3.2"}
