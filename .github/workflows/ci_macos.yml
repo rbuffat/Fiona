@@ -60,7 +60,6 @@ jobs:
     - name: Build PROJ
       run: |
         source $HOME/env_variables
-        echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
         chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
 
     - name: Build GDAL
