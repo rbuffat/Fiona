@@ -30,6 +30,7 @@ jobs:
 
     - name: Set env variables
       run: |
+        touch $HOME/env_variables
         echo "export GDALINST=$HOME/gdalinstall" >> $HOME/env_variables
         echo "export GDALBUILD=$HOME/gdalbuild" >> $HOME/env_variables
         echo "export PROJINST=$HOME/gdalinstall" >> $HOME/env_variables
