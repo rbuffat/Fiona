@@ -54,10 +54,14 @@ jobs:
         python -m pip install -r requirements-dev.txt
         python -m pip install coveralls>=1.1 --upgrade
         
-    - name: Build PROJ and GDAL
+    - name: Build PROJ
       run: |
         source ~/.bashrc
         chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+        
+    - name: Build GDAL
+      run: |
+        source ~/.bashrc
         chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
         gdal-config --version
 
