@@ -34,6 +34,7 @@ jobs:
 
     - name: Install Python dependencies
       run: |
+        python -c "import multiprocessing; print(multiprocessing.cpu_count())"
         python -m pip install --upgrade pip
         python -m pip install -r requirements-dev.txt
         python -m pip install coveralls>=1.1 --upgrade
