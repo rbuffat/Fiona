@@ -44,6 +44,12 @@ jobs:
         echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:$PATH" > ~/.bashrc
         echo "export DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$DYLD_LIBRARY_PATH" > ~/.bashrc
 
+    - name: Build PROJ
+      run: |
+        source ~/.bashrc
+        echo $GDALVERSION $PROJVERSION $GDALINST $GDALBUILD
+        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+        
     - name: Install brew packages
       run: |
         brew install expat libspatialite sqlite geos
@@ -54,10 +60,6 @@ jobs:
         python -m pip install -r requirements-dev.txt
         python -m pip install coveralls>=1.1 --upgrade
         
-    - name: Build PROJ
-      run: |
-        source ~/.bashrc
-        chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
         
     - name: Build GDAL
       run: |
