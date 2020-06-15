@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {python-version: 3.6, GDALVERSION: "1.11.5",  PROJVERSION: "4.8.0"}
+          - {python-version: 3.6, GDALVERSION: "1.11.5",  PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.1.4",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.2.4",   PROJVERSION: "4.9.3"}
