@@ -117,6 +117,8 @@ else
         wget -q http://download.osgeo.org/gdal/$gdalver/gdal-$GDALVERSION.tar.gz
         tar -xzf gdal-$GDALVERSION.tar.gz
         cd gdal-$gdalver
+        echo $GDALOPTS
+        echo $PROJOPT
         ./configure --prefix=$GDALINST/gdal-$GDALVERSION $GDALOPTS $PROJOPT
         make
         make install
