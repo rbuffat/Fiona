@@ -56,6 +56,7 @@ jobs:
         run: |
           brew install pkg-config expat libspatialite sqlite geos
           brew list --versions > $GITHUB_WORKSPACE/brew_list
+          cat $GITHUB_WORKSPACE/brew_list
 
       - name: Install Python dependencies
         run: |
@@ -69,7 +70,7 @@ jobs:
           cache-name: cache-gdal
         with:
           path: $HOME/gdalinstall
-          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles($GITHUB_WORKSPACE/brew_list) }}
+          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/brew_list') }}
 
       - name: Build PROJ
         run: |
