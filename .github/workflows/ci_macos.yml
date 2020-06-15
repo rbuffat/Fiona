@@ -79,14 +79,16 @@ jobs:
       - name: Build PROJ
         run: |
           source $GITHUB_WORKSPACE/env_variables
-          ls -l $PROJINST
+          ls -l $GITHUB_WORKSPACE
           chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+          ls -l $PROJINST
 
       - name: Build GDAL
         run: |
           source $GITHUB_WORKSPACE/env_variables
-          ls -l $GDALINST
+          ls -l $GITHUB_WORKSPACE
           chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
+          ls -l $GDALINST
           gdal-config --version
 
       - name: Build Fiona
