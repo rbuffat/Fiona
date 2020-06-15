@@ -80,6 +80,7 @@ jobs:
         run: |
           source $GITHUB_WORKSPACE/env_variables
           chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
+          otool -L $GDALINST/gdal-$GDALVERSION/bin/gdalinfo
           gdal-config --version
 
       - name: Build Fiona
