@@ -56,7 +56,7 @@ jobs:
       - name: Install brew packages
         run: |
           brew install pkg-config expat libspatialite sqlite geos
-          brew list --versions > $GITHUB_WORKSPACE/brew_list
+          brew list --versions | grep 'expat\|libspatialite\|sqlite\|geos\|curl\|libxml2' > $GITHUB_WORKSPACE/brew_list
           cat $GITHUB_WORKSPACE/brew_list
 
       - name: Dependency Cache
