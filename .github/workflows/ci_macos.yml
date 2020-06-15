@@ -56,7 +56,7 @@ jobs:
         run: |
           #brew install pkg-config@0.29.2_3 expat@2.2.9 libspatialite@4.3.0a_8 sqlite@3.32.1 geos@3.8.1_1
           brew install pkg-config expat libspatialite sqlite geos
-          brew list
+          brew list --versions
 
 #      - name: Install Python dependencies
 #        run: |
