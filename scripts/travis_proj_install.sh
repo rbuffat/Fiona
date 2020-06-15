@@ -21,7 +21,7 @@ if [ ! -d "$PROJINST/gdal-$GDALVERSION/share/proj" ]; then
     projver=$(expr "$PROJVERSION" : '\([0-9]*.[0-9]*.[0-9]*\)')
     cd proj-$projver
     ./configure --prefix=$PROJINST/gdal-$GDALVERSION
-    make -s
+    make
     make install
 fi
 
