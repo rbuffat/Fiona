@@ -64,11 +64,9 @@ jobs:
 
       - name: Dependency Cache
         uses: actions/cache@v2
-        env:
-          cache-name: cache-gdal
         with:
-          path: $GITHUB_WORKSPACE/gdalinstall
-          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/brew_list')}}-v2
+          path: gdalinstall
+          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/brew_list')}}-v3
 
       - name: Install Python dependencies
         run: |
