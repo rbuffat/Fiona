@@ -117,6 +117,16 @@ def _bounds(geometry):
 cdef int GDAL_VERSION_NUM = get_gdal_version_num()
 
 
+class TZ(datetime.tzinfo):
+
+    def __init__(self, hours, minutes):
+        self.hours = hours
+        self.minutes = minutes
+
+    def utcoffset(self, dt):
+        return datetime.timedelta(hours=self.hours, minutes=self.minutes)
+   
+
 # Feature extension classes and functions follow.
 
 cdef class FeatureBuilder:
@@ -233,17 +243,27 @@ cdef class FeatureBuilder:
 
             elif fieldtype in (FionaDateType, FionaTimeType, FionaDateTimeType):
                 retval, y, m, d, hh, mm, ss, tz = get_field_as_datetime(feature, i)
+                
                 ms, ss = math.modf(ss)
                 ss = int(ss)
                 ms = int(round(ms * 10**6))
+
+                # OGR_F_GetFieldAsDateTimeEx: (0=unknown, 1=localtime, 100=GMT, see data model for details)
+                # CPLParseRFC822DateTime: (0=unknown, 100=GMT, 101=GMT+15minute, 99=GMT-15minute), or NULL
+                tzinfo = None
+                if tz > 1:
+                    total_minutes = (tz - 100) * 15
+                    hours = int(total_minutes / 60)
+                    minutes = total_minutes % 60
+                    tzinfo = TZ(hours, minutes)
 
                 try:
                     if fieldtype is FionaDateType:
                         props[key] = datetime.date(y, m, d).isoformat()
                     elif fieldtype is FionaTimeType:
-                        props[key] = datetime.time(hh, mm, ss, ms).isoformat()
+                        props[key] = datetime.time(hh, mm, ss, ms, tzinfo).isoformat()
                     else:
-                        props[key] = datetime.datetime(y, m, d, hh, mm, ss, ms).isoformat()
+                        props[key] = datetime.datetime(y, m, d, hh, mm, ss, ms, tzinfo).isoformat()
                 except ValueError as err:
                     log.exception(err)
                     props[key] = None
