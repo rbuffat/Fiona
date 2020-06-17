@@ -45,6 +45,22 @@ matrix:
         PROJVERSION="4.9.3"
     - python: "3.6"
       env:
+        GDALVERSION="2.4.0"
+        PROJVERSION="4.9.3"
+    - python: "3.6"
+      env:
+        GDALVERSION="2.4.1"
+        PROJVERSION="4.9.3"
+    - python: "3.6"
+      env:
+        GDALVERSION="2.4.2"
+        PROJVERSION="4.9.3"
+    - python: "3.6"
+      env:
+        GDALVERSION="2.4.3"
+        PROJVERSION="4.9.3"
+    - python: "3.6"
+      env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
     - python: "3.6"
