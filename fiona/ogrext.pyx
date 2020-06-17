@@ -22,7 +22,7 @@ from fiona._geometry cimport (
 from fiona._err cimport exc_wrap_int, exc_wrap_pointer, exc_wrap_vsilfile
 
 import fiona
-from fiona._env import GDALVersion, get_gdal_version_num
+from fiona._env import GDALVersion, get_gdal_version_num, calc_gdal_version_num
 from fiona._err import cpl_errs, FionaNullPointerError, CPLE_BaseError, CPLE_OpenFailedError
 from fiona._geometry import GEOMETRY_TYPES
 from fiona import compat
@@ -119,12 +119,11 @@ cdef int GDAL_VERSION_NUM = get_gdal_version_num()
 
 class TZ(datetime.tzinfo):
 
-    def __init__(self, hours, minutes):
-        self.hours = hours
+    def __init__(self, minutes):
         self.minutes = minutes
 
     def utcoffset(self, dt):
-        return datetime.timedelta(hours=self.hours, minutes=self.minutes)
+        return datetime.timedelta(minutes=self.minutes)
    
 
 # Feature extension classes and functions follow.
@@ -243,7 +242,8 @@ cdef class FeatureBuilder:
 
             elif fieldtype in (FionaDateType, FionaTimeType, FionaDateTimeType):
                 retval, y, m, d, hh, mm, ss, tz = get_field_as_datetime(feature, i)
-                
+                print("Get", y, m, d, hh, mm, ss, tz)
+
                 ms, ss = math.modf(ss)
                 ss = int(ss)
                 ms = int(round(ms * 10**6))
@@ -252,10 +252,8 @@ cdef class FeatureBuilder:
                 # CPLParseRFC822DateTime: (0=unknown, 100=GMT, 101=GMT+15minute, 99=GMT-15minute), or NULL
                 tzinfo = None
                 if tz > 1:
-                    total_minutes = (tz - 100) * 15
-                    hours = int(total_minutes / 60)
-                    minutes = total_minutes % 60
-                    tzinfo = TZ(hours, minutes)
+                    tz_minutes = (tz - 100) * 15
+                    tzinfo = TZ(tz_minutes)
 
                 try:
                     if fieldtype is FionaDateType:
@@ -385,23 +383,41 @@ cdef class OGRFeatureBuilder:
             elif schema_type in ['date', 'time', 'datetime'] and value is not None:
                 if isinstance(value, string_types):
                     if schema_type == 'date':
-                        y, m, d, hh, mm, ss, ms = parse_date(value)
+                        y, m, d, hh, mm, ss, ms, tz = parse_date(value)
                     elif schema_type == 'time':
-                        y, m, d, hh, mm, ss, ms = parse_time(value)
+                        y, m, d, hh, mm, ss, ms, tz = parse_time(value)
                     else:
-                        y, m, d, hh, mm, ss, ms = parse_datetime(value)
+                        y, m, d, hh, mm, ss, ms, tz = parse_datetime(value)
                 elif (isinstance(value, datetime.date) and schema_type == 'date'):
                         y, m, d = value.year, value.month, value.day
                         hh = mm = ss = ms = 0
+                        tz = None
                 elif (isinstance(value, datetime.datetime) and schema_type == 'datetime'):
                         y, m, d = value.year, value.month, value.day
                         hh, mm, ss, ms = value.hour, value.minute, value.second, value.microsecond
+                        if value.utcoffset() is None:
+                            tz = None
+                        else:
+                            tz = value.utcoffset().total_seconds() / 60
                 elif (isinstance(value, datetime.time) and schema_type == 'time'):
                         y = m = d = 0
                         hh, mm, ss, ms = value.hour, value.minute, value.second, value.microsecond
+                        if value.utcoffset() is None:
+                            tz = None
+                        else:
+                            tz = value.utcoffset().total_seconds() / 60
+
                 # Add microseconds to seconds
                 ss += ms / 10**6
-                set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, 0)
+
+                if tz is not None:               
+                    tzinfo = int(tz / 15.0 + 100)
+                else:
+                    tzinfo = 0
+
+                print("Set", y, m, d, hh, mm, ss, tzinfo)
+                set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, tzinfo)
+
             elif isinstance(value, bytes) and schema_type == "bytes":
                 string_c = value
                 OGR_F_SetFieldBinary(cogr_feature, i, len(value),
