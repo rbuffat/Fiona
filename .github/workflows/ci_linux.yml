@@ -11,7 +11,7 @@ jobs:
       matrix:
         config:
           - {python-version: 2.7, GDALVERSION: "1.11.5",   PROJVERSION: "4.8.0"}
-          - {python-version: 3.6, GDALVERSION: "2.0.0",   PROJVERSION: "4.9.3"}
+#          - {python-version: 3.6, GDALVERSION: "2.0.0",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.0.1",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.0.2",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3"}
@@ -34,7 +34,7 @@ jobs:
           - {python-version: 3.6, GDALVERSION: "2.4.2",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.4.3",   PROJVERSION: "4.9.3"}
           - {python-version: 3.6, GDALVERSION: "2.4.4",   PROJVERSION: "4.9.3"}
-          - {python-version: 3.6, GDALVERSION: "3.0.0",   PROJVERSION: "6.2.1"}
+#          - {python-version: 3.6, GDALVERSION: "3.0.0",   PROJVERSION: "6.2.1"}
           - {python-version: 3.6, GDALVERSION: "3.0.1",   PROJVERSION: "6.2.1"}
           - {python-version: 3.6, GDALVERSION: "3.0.2",   PROJVERSION: "6.2.1"}
           - {python-version: 3.6, GDALVERSION: "3.0.3",   PROJVERSION: "6.2.1"}
