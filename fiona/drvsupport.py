@@ -181,7 +181,7 @@ _filter_supported_drivers()
 # driver_converts_to_str contains field type, driver combinations that are silently converted to string
 # None: field type is always converted to str
 # GDALVersion(2, 0): starting from gdal 2.0 field type is not converted to string
-driver_converts_to_str = {
+_driver_converts_to_str = {
     'time': {
         'CSV': None,
         'PCIDSK': None,
@@ -205,19 +205,19 @@ driver_converts_to_str = {
 }
 
 
-def driver_converts_field_type_silently_to_str(driver, field_type):
+def _driver_converts_field_type_silently_to_str(driver, field_type):
     """ Returns True if the driver converts the field_type silently to str, False otherwise """
 
-    if field_type in driver_converts_to_str and driver in driver_converts_to_str[field_type]:
-        if driver_converts_to_str[field_type][driver] is None:
+    if field_type in _driver_converts_to_str and driver in _driver_converts_to_str[field_type]:
+        if _driver_converts_to_str[field_type][driver] is None:
             return True
-        elif get_gdal_version_num() < calc_gdal_version_num(*driver_converts_to_str[field_type][driver]):
+        elif get_gdal_version_num() < calc_gdal_version_num(*_driver_converts_to_str[field_type][driver]):
             return True
     return False
 
 
 # None: field type is never supported, GDALVersion(2, 0) field type is supported starting with gdal 2.0
-driver_field_type_unsupported = {
+_driver_field_type_unsupported = {
     'time': {
         'ESRI Shapefile': None,
         'GPKG': (2, 0, 0),
@@ -248,19 +248,19 @@ driver_field_type_unsupported = {
 }
 
 
-def driver_supports_field(driver, field_type):
-    """ Returns True if driver supports the field_type, False otherwise"""
+def _driver_supports_field(driver, field_type):
+    """ Returns True if the driver supports the field_type, False otherwise"""
 
-    if field_type in driver_field_type_unsupported and driver in driver_field_type_unsupported[field_type]:
-        if driver_field_type_unsupported[field_type][driver] is None:
+    if field_type in _driver_field_type_unsupported and driver in _driver_field_type_unsupported[field_type]:
+        if _driver_field_type_unsupported[field_type][driver] is None:
             return False
-        elif get_gdal_version_num() < calc_gdal_version_num(*driver_field_type_unsupported[field_type][driver]):
+        elif get_gdal_version_num() < calc_gdal_version_num(*_driver_field_type_unsupported[field_type][driver]):
             return False
 
     return True
 
 
-drivers_not_supporting_timezones = {
+_drivers_not_supporting_timezones = {
     'datetime': {
         'MapInfo File': None,
         'GPKG': (3, 1, 0),
@@ -279,31 +279,33 @@ drivers_not_supporting_timezones = {
 }
 
 
-def driver_supports_timezones(driver, field_type):
+def _driver_supports_timezones(driver, field_type):
+    """ Returns True if the driver supports timezones for field_type, False otherwise"""
 
-    if field_type in drivers_not_supporting_timezones and driver in drivers_not_supporting_timezones[field_type]:
-        if drivers_not_supporting_timezones[field_type][driver] is None:
+    if field_type in _drivers_not_supporting_timezones and driver in _drivers_not_supporting_timezones[field_type]:
+        if _drivers_not_supporting_timezones[field_type][driver] is None:
             return False
-        elif get_gdal_version_num() < calc_gdal_version_num(*drivers_not_supporting_timezones[field_type][driver]):
+        elif get_gdal_version_num() < calc_gdal_version_num(*_drivers_not_supporting_timezones[field_type][driver]):
             return False
     return True
 
 
-drivers_not_supporting_milliseconds = {
+_drivers_not_supporting_milliseconds = {
     'GPSTrackMaker': None
 }
 
 
-def driver_supports_milliseconds(driver):
+def _driver_supports_milliseconds(driver):
+    """ Returns True if the driver supports milliseconds, False otherwise"""
 
     # GDAL 2.0 introduced support for milliseconds
     if get_gdal_version_num() < calc_gdal_version_num(2, 0, 0):
         return False
 
-    if driver in drivers_not_supporting_milliseconds:
-        if drivers_not_supporting_milliseconds[driver] is None:
+    if driver in _drivers_not_supporting_milliseconds:
+        if _drivers_not_supporting_milliseconds[driver] is None:
             return False
-        elif calc_gdal_version_num(*drivers_not_supporting_milliseconds[driver]) < get_gdal_version_num():
+        elif calc_gdal_version_num(*_drivers_not_supporting_milliseconds[driver]) < get_gdal_version_num():
             return False
 
     return True

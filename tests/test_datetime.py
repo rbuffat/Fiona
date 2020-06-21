@@ -12,12 +12,12 @@ import pytest
 
 from fiona.errors import DriverSupportError
 from fiona.rfc3339 import parse_time, parse_datetime
-from .conftest import get_temp_filename, requires_gpkg
+from .conftest import get_temp_filename
 from fiona.env import GDALVersion
 import datetime
-from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str,
-                              driver_supports_field, driver_converts_to_str, driver_supports_timezones,
-                              driver_supports_milliseconds)
+from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, _driver_converts_field_type_silently_to_str,
+                              _driver_supports_field, _driver_converts_to_str, _driver_supports_timezones,
+                              _driver_supports_milliseconds)
 from pytz import timezone
 
 
@@ -204,8 +204,8 @@ def generate_testcases():
             if ('w' in raw and
                     (driver not in driver_mode_mingdal['w'] or
                      gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))):
-                if driver_supports_field(driver, field_type):
-                    if driver_converts_field_type_silently_to_str(driver, field_type):
+                if _driver_supports_field(driver, field_type):
+                    if _driver_converts_field_type_silently_to_str(driver, field_type):
                         _test_cases_datefield_to_str.append((driver, field_type))
                     else:
                         _test_cases_datefield.append((driver, field_type))
@@ -230,7 +230,7 @@ def test_datefield(tmpdir, driver, field_type):
             return val == val_exp.isoformat()
         elif field_type == 'datetime':
 
-            if driver_supports_milliseconds(driver):
+            if _driver_supports_milliseconds(driver):
                 y, m, d, hh, mm, ss, ms, tz = parse_datetime(val)
                 if tz is not None:
                     tz = TZ(tz)
@@ -245,7 +245,7 @@ def test_datefield(tmpdir, driver, field_type):
 
         elif field_type == 'time':
 
-            if driver_supports_milliseconds(driver):
+            if _driver_supports_milliseconds(driver):
                 y, m, d, hh, mm, ss, ms, tz = parse_time(val)
                 if tz is not None:
                     tz = TZ(tz)
@@ -293,12 +293,12 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                 return True
         elif field_type == 'datetime':
 
-            if not driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
+            if not _driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
                 val_exp = convert_time_to_utc(val_exp)
 
             # No timezone
             if val_exp.utcoffset() is None:
-                if not driver_supports_milliseconds(driver):
+                if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.year) in val and
                             str(val_exp.month) in val and
                             str(val_exp.day) in val and
@@ -331,7 +331,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                                                              hours=int(hours),
                                                              minutes=int(minutes))
 
-                if not driver_supports_milliseconds(driver):
+                if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.year) in val and
                             str(val_exp.month) in val and
                             str(val_exp.day) in val and
@@ -362,12 +362,12 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
 
         elif field_type == 'time':
 
-            if not driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
+            if not _driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
                 val_exp = convert_time_to_utc(val_exp)
 
             # No timezone
             if val_exp.utcoffset() is None:
-                if not driver_supports_milliseconds(driver):
+                if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val):
@@ -391,7 +391,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                                                              hours=int(hours),
                                                              minutes=int(minutes))
 
-                if not driver_supports_milliseconds(driver):
+                if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val and
@@ -480,7 +480,7 @@ def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, drive
         # BNA driver segfaults with gdal 1.11
         return
 
-    monkeypatch.delitem(fiona.drvsupport.driver_field_type_unsupported[field_type], driver)
+    monkeypatch.delitem(fiona.drvsupport._driver_field_type_unsupported[field_type], driver)
 
     schema = get_schema(driver, field_type)
     path = str(tmpdir.join(get_temp_filename(driver)))
@@ -509,13 +509,13 @@ def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, drive
 def generate_tostr_testcases():
     """ Flatten driver_converts_to_str to a list of (field_type, driver) tuples"""
     cases = []
-    for field_type in driver_converts_to_str:
-        for driver in driver_converts_to_str[field_type]:
+    for field_type in _driver_converts_to_str:
+        for driver in _driver_converts_to_str[field_type]:
             driver_supported = driver in supported_drivers
             driver_can_write = (driver not in driver_mode_mingdal['w'] or
                                 gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))
-            field_supported = driver_supports_field(driver, field_type)
-            converts_to_str = driver_converts_field_type_silently_to_str(driver, field_type)
+            field_supported = _driver_supports_field(driver, field_type)
+            converts_to_str = _driver_converts_field_type_silently_to_str(driver, field_type)
             if driver_supported and driver_can_write and converts_to_str and field_supported:
                 cases.append((field_type, driver))
     return cases
@@ -531,7 +531,7 @@ def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpd
       fiona.drvsupport.driver_converts_to_str with a GDALVersion(major, minor) value.
       """
 
-    monkeypatch.delitem(fiona.drvsupport.driver_converts_to_str[field_type], driver)
+    monkeypatch.delitem(fiona.drvsupport._driver_converts_to_str[field_type], driver)
 
     schema = get_schema(driver, field_type)
     path = str(tmpdir.join(get_temp_filename(driver)))

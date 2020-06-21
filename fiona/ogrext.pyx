@@ -41,7 +41,7 @@ from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_m
 from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 from cpython cimport PyBytes_FromStringAndSize, PyBytes_AsString
-from fiona.drvsupport import driver_supports_timezones
+from fiona.drvsupport import _driver_supports_timezones
   
 
 cdef extern from "ogr_api.h" nogil:
@@ -408,7 +408,7 @@ cdef class OGRFeatureBuilder:
                             tz = value.utcoffset().total_seconds() / 60
 
                 # Convert to UTC if driver does not support timezones
-                if tz is not None and not driver_supports_timezones(collection.driver, schema_type):
+                if tz is not None and not _driver_supports_timezones(collection.driver, schema_type):
 
                     if schema_type == 'datetime':
                         d_tz = datetime.datetime(y, m, d, hh, mm, ss, int(ms), TZ(tz))

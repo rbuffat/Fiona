@@ -62,7 +62,7 @@ def parse_time(text):
             int(g.group(1)),
             int(g.group(3)),
             int(g.group(5)),
-            1000000.0 * float(g.group(6)),
+            int(1000000.0 * float(g.group(6))),
             tz
             )
 
@@ -78,7 +78,7 @@ def parse_date(text):
         int(g.group(1)),
         int(g.group(3)),
         int(g.group(5)),
-        0, 0, 0, 0.0, None)
+        0, 0, 0, 0, None)
 
 
 def parse_datetime(text):
@@ -103,5 +103,5 @@ def parse_datetime(text):
         int(g.group(7)),
         int(g.group(9)),
         int(g.group(11)),
-        1000000.0 * float(g.group(12)),
+        int(1000000.0 * float(g.group(12))),
         tz)
