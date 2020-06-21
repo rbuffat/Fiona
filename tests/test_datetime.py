@@ -400,7 +400,7 @@ def test_datefield_null(tmpdir, driver, field_type):
 
     def _validate(val, val_exp, field_type, driver):
         if (driver == 'MapInfo File' and field_type == 'time' and
-                get_gdal_version_num() < calc_gdal_version_num(3, 1, 1)):
+                calc_gdal_version_num(2, 0, 0) <= get_gdal_version_num() < calc_gdal_version_num(3, 1, 1)):
             return val == '00:00:00'
         if val is None or val == '':
             return True
