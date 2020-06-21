@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from fiona.env import Env, GDALVersion
+from fiona.env import Env
 from fiona._env import get_gdal_version_num, calc_gdal_version_num
 
-gdal_version = GDALVersion.runtime()
 
 # Here is the list of available drivers as (name, modes) tuples. Currently,
 # we only expose the defaults (excepting FileGDB). We also don't expose
@@ -186,22 +185,22 @@ driver_converts_to_str = {
     'time': {
         'CSV': None,
         'PCIDSK': None,
-        'GeoJSON': GDALVersion(2, 0),
+        'GeoJSON': (2, 0, 0),
         'GPKG': None,
         'GMT': None,
     },
     'datetime': {
         'CSV': None,
         'PCIDSK': None,
-        'GeoJSON': GDALVersion(2, 0),
-        'GML': GDALVersion(3, 1),
+        'GeoJSON': (2, 0, 0),
+        'GML': (3, 1, 0),
     },
     'date': {
         'CSV': None,
         'PCIDSK': None,
-        'GeoJSON': GDALVersion(2, 0),
+        'GeoJSON': (2, 0, 0),
         'GMT': None,
-        'GML': GDALVersion(3, 1),
+        'GML': (3, 1, 0),
     }
 }
 
@@ -212,7 +211,7 @@ def driver_converts_field_type_silently_to_str(driver, field_type):
     if field_type in driver_converts_to_str and driver in driver_converts_to_str[field_type]:
         if driver_converts_to_str[field_type][driver] is None:
             return True
-        elif gdal_version < driver_converts_to_str[field_type][driver]:
+        elif get_gdal_version_num() < calc_gdal_version_num(*driver_converts_to_str[field_type][driver]):
             return True
     return False
 
@@ -221,22 +220,22 @@ def driver_converts_field_type_silently_to_str(driver, field_type):
 driver_field_type_unsupported = {
     'time': {
         'ESRI Shapefile': None,
-        'GPKG': GDALVersion(2, 0),
+        'GPKG': (2, 0, 0),
         'GPX': None,
         'GPSTrackMaker': None,
-        'GML': GDALVersion(3, 1),
+        'GML': (3, 1, 0),
         'DGN': None,
         'BNA': None,
         'DXF': None,
-        'PCIDSK': GDALVersion(2, 1)
+        'PCIDSK': (2, 1, 0)
     },
     'datetime': {
         'ESRI Shapefile': None,
-        'GPKG': GDALVersion(2, 0),
+        'GPKG': (2, 0, 0),
         'DGN': None,
         'BNA': None,
         'DXF': None,
-        'PCIDSK': GDALVersion(2, 1)
+        'PCIDSK': (2, 1, 0)
     },
     'date': {
         'GPX': None,
@@ -244,7 +243,7 @@ driver_field_type_unsupported = {
         'DGN': None,
         'BNA': None,
         'DXF': None,
-        'PCIDSK': GDALVersion(2, 1)
+        'PCIDSK': (2, 1, 0)
     }
 }
 
@@ -255,7 +254,7 @@ def driver_supports_field(driver, field_type):
     if field_type in driver_field_type_unsupported and driver in driver_field_type_unsupported[field_type]:
         if driver_field_type_unsupported[field_type][driver] is None:
             return False
-        elif driver_field_type_unsupported[field_type][driver] > gdal_version:
+        elif get_gdal_version_num() < calc_gdal_version_num(*driver_field_type_unsupported[field_type][driver]):
             return False
 
     return True
@@ -265,14 +264,15 @@ drivers_not_supporting_timezones = {
     'datetime': {
         'MapInfo File': None,
         'GPKG': (3, 1, 0),
-        'GPSTrackMaker': None
+        'GPSTrackMaker': (3, 1, 1)
     },
     'time': {
         'MapInfo File': None,
         'GPKG': (3, 1, 0),
         'GPSTrackMaker': None,
         'GeoJSON': None,
-        'GeoJSONSeq': None
+        'GeoJSONSeq': None,
+        'GML': None
     }
 }
 
