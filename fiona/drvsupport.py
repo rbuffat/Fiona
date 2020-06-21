@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from fiona.env import Env, GDALVersion
+from fiona._env import get_gdal_version_num, calc_gdal_version_num
 
 gdal_version = GDALVersion.runtime()
 
@@ -252,6 +253,52 @@ def driver_supports_field(driver, field_type):
         if driver_field_type_unsupported[field_type][driver] is None:
             return False
         elif driver_field_type_unsupported[field_type][driver] > gdal_version:
+            return False
+
+    return True
+
+
+drivers_not_supporting_timezones = {
+    'datetime': {
+        'MapInfo File': None,
+        'GPKG': (3, 1, 0),
+        'GPSTrackMaker': None
+    },
+    'time': {
+        'MapInfo File': None,
+        'GPKG': (3, 1, 0),
+        'GPSTrackMaker': None,
+        'GeoJSON': None,
+        'GeoJSONSeq': None
+    }
+}
+
+
+def driver_supports_timezones(driver, field_type):
+
+    if field_type in drivers_not_supporting_timezones and driver in drivers_not_supporting_timezones[field_type]:
+        if drivers_not_supporting_timezones[field_type][driver] is None:
+            return False
+        elif get_gdal_version_num() < calc_gdal_version_num(*drivers_not_supporting_timezones[field_type][driver]):
+            return False
+    return True
+
+
+drivers_not_supporting_milliseconds = {
+    'GPSTrackMaker': None
+}
+
+
+def driver_supports_milliseconds(driver):
+
+    # GDAL 2.0 introduced support for milliseconds
+    if get_gdal_version_num() < calc_gdal_version_num(2, 0, 0):
+        return False
+
+    if driver in drivers_not_supporting_milliseconds:
+        if drivers_not_supporting_milliseconds[driver] is None:
+            return False
+        elif calc_gdal_version_num(*drivers_not_supporting_milliseconds[driver]) < get_gdal_version_num():
             return False
 
     return True
