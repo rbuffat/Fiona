@@ -44,14 +44,14 @@ supported_drivers = dict([
     ("OpenFileGDB", "r"),
     # ESRI Personal GeoDatabase 	PGeo 	No 	Yes 	No, needs ODBC library
     # ESRI ArcSDE 	SDE 	No 	Yes 	No, needs ESRI SDE
-    # ESRIJSON 	ESRIJSON 	No 	Yes 	Yes
+    # ESRIJSON 	ESRIJSON 	No 	Yes 	Yes 
     ("ESRIJSON", "r"),
     # ESRI Shapefile 	ESRI Shapefile 	Yes 	Yes 	Yes
     ("ESRI Shapefile", "raw"),
     # FMEObjects Gateway 	FMEObjects Gateway 	No 	Yes 	No, needs FME
     # GeoJSON 	GeoJSON 	Yes 	Yes 	Yes
     ("GeoJSON", "raw"),
-    # GeoJSONSeq 	GeoJSON sequences 	Yes 	Yes 	Yes
+    # GeoJSONSeq 	GeoJSON sequences 	Yes 	Yes 	Yes 
     ("GeoJSONSeq", "rw"),
     # Géoconcept Export 	Geoconcept 	Yes 	Yes 	Yes
     # multi-layers
@@ -64,7 +64,9 @@ supported_drivers = dict([
     # GML 	GML 	Yes 	Yes 	Yes (read support needs Xerces or libexpat)
     ("GML", "rw"),
     # GMT 	GMT 	Yes 	Yes 	Yes
-    ("GMT", "raw"),
+    ("GMT", "rw"),
+    # GMT renamed to OGR_GMT for GDAL 2.x
+    ("OGR_GMT", "rw"),
     # GPSBabel 	GPSBabel 	Yes 	Yes 	Yes (needs GPSBabel and GPX driver)
     # GPX 	GPX 	Yes 	Yes 	Yes (read support needs libexpat)
     ("GPX", "rw"),
@@ -97,9 +99,11 @@ supported_drivers = dict([
     # multi-layer
     #   ("OpenAir", "r"),
     # PCI Geomatics Database File 	PCIDSK 	No 	No 	Yes, using internal PCIDSK SDK (from GDAL 1.7.0)
-    ("PCIDSK", "raw"),
+    ("PCIDSK", "rw"),
     # PDS 	PDS 	No 	Yes 	Yes
     ("PDS", "r"),
+    # PDS renamed to OGR_PDS for GDAL 2.x
+    ("OGR_PDS", "r"),
     # PGDump 	PostgreSQL SQL dump 	Yes 	Yes 	Yes
     # PostgreSQL/PostGIS 	PostgreSQL/PostGIS 	Yes 	Yes 	No, needs PostgreSQL client library (libpq)
     # EPIInfo .REC 	REC 	No 	No 	Yes
@@ -119,7 +123,7 @@ supported_drivers = dict([
     # SUA 	SUA 	No 	Yes 	Yes
     ("SUA", "r"),
     # SVG 	SVG 	No 	Yes 	No, needs libexpat
-    # TopoJSON 	TopoJSON 	No 	Yes 	Yes
+    # TopoJSON 	TopoJSON 	No 	Yes 	Yes 
     ("TopoJSON", "r"),
     # UK .NTF 	UK. NTF 	No 	Yes 	Yes
     # multi-layer

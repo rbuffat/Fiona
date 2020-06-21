@@ -3,13 +3,9 @@ See also test_rfc3339.py for datetime parser tests.
 """
 
 from collections import OrderedDict
-
-import pytz
-from fiona._env import get_gdal_version_num, calc_gdal_version_num
-
 import fiona
+from fiona._env import get_gdal_version_num, calc_gdal_version_num
 import pytest
-
 from fiona.errors import DriverSupportError
 from fiona.rfc3339 import parse_time, parse_datetime
 from .conftest import get_temp_filename
@@ -18,8 +14,8 @@ import datetime
 from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, _driver_converts_field_type_silently_to_str,
                               _driver_supports_field, _driver_converts_to_str, _driver_supports_timezones,
                               _driver_supports_milliseconds)
+import pytz
 from pytz import timezone
-
 
 gdal_version = GDALVersion.runtime()
 
@@ -75,7 +71,8 @@ class TZ(datetime.tzinfo):
 def generate_testdata(field_type, driver):
     """ Generate test cases for test_datefield
 
-    Each test case has the format [(in_value1, out_value1), (in_value2, out_value2), ...]
+    Each test case has the format [(in_value1, true_value as datetime.*object),
+                                   (in_value2, true_value as datetime.*object), ...]
     """
 
     # Test data for 'date' data type
@@ -96,7 +93,17 @@ def generate_testdata(field_type, driver):
                 (datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(90)),
                  datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(90))),
                 (datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-90)),
-                 datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-90)))]
+                 datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-90))),
+                (datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich')),
+                 datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))),
+                (datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('US/Mountain')),
+                 datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('US/Mountain'))),
+                (datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(60 * 24 - 15)),
+                 datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(60 * 24 - 15))),
+                (datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-60 * 24 + 15)),
+                 datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-60 * 24 + 15))),
+                ("2018-03-25T22:49:05-23:45", datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-60 * 24 + 15))),
+                ("2018-03-25T22:49:05+23:45", datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(60 * 24 - 15)))]
 
     # Test data for 'time' data type
     elif field_type == 'time':
@@ -109,14 +116,22 @@ def generate_testdata(field_type, driver):
                 ("22:49:05+01:30", datetime.time(22, 49, 5, tzinfo=TZ(90))),
                 ("22:49:05-01:30", datetime.time(22, 49, 5, tzinfo=TZ(-90))),
                 (datetime.time(22, 49, 5, tzinfo=TZ(90)), datetime.time(22, 49, 5, tzinfo=TZ(90))),
-                (datetime.time(22, 49, 5, tzinfo=TZ(-90)), datetime.time(22, 49, 5, tzinfo=TZ(-90)))]
+                (datetime.time(22, 49, 5, tzinfo=TZ(-90)), datetime.time(22, 49, 5, tzinfo=TZ(-90))),
+                (datetime.time(22, 49, 5, tzinfo=TZ(60 * 24 - 15)),
+                 datetime.time(22, 49, 5, tzinfo=TZ(60 * 24 - 15))),
+                (datetime.time(22, 49, 5, tzinfo=TZ(-60 * 24 + 15)),
+                 datetime.time(22, 49, 5, tzinfo=TZ(-60 * 24 + 15))),
+                ("22:49:05-23:45", datetime.time(22, 49, 5, tzinfo=TZ(-60 * 24 + 15))),
+                ("22:49:05+23:45", datetime.time(22, 49, 5, tzinfo=TZ(60 * 24 - 15)))]
 
 
 def convert_datetime_to_utc(d):
+    """ Convert datetime.datetime to UTC"""
     return d - d.utcoffset()
 
 
 def compare_datetimes_utc(d1, d2):
+    """ Test if two datetime.datetime objects with timezones have the same UTC time"""
     if d1.tzinfo is not None:
         d1 = convert_datetime_to_utc(d1)
 
@@ -126,6 +141,7 @@ def compare_datetimes_utc(d1, d2):
 
 
 def test_compare_datetimes_utc():
+    """ Test compare_datetimes_utc """
     d1 = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(60))
     d2 = datetime.datetime(2020, 1, 21, 11, 30, 0, tzinfo=TZ(0))
     assert compare_datetimes_utc(d1, d2)
@@ -152,6 +168,7 @@ def test_compare_datetimes_utc():
 
 
 def convert_time_to_utc(d):
+    """ Convert datetime.time object to UTC"""
     d = datetime.datetime(1900, 1, 1, d.hour, d.minute, d.second, d.microsecond, d.tzinfo)
     d -= d.utcoffset()
 
@@ -159,6 +176,7 @@ def convert_time_to_utc(d):
 
 
 def compare_times_utc(d1, d2):
+    """ Test if two datetime.time objects with timezones have the same UTC time"""
     if d1.tzinfo is not None:
         d1 = convert_time_to_utc(d1)
 
@@ -169,6 +187,9 @@ def compare_times_utc(d1, d2):
 
 
 def test_compare_datetimes_utc():
+    """
+    Test compare_times_utc
+    """
     d1 = datetime.time(12, 30, 0, tzinfo=TZ(60))
     d2 = datetime.time(11, 30, 0, tzinfo=TZ(0))
     assert compare_times_utc(d1, d2)
@@ -183,17 +204,39 @@ def test_compare_datetimes_utc():
 
 
 def get_tz_offset(d):
+    """ Returns a Timezone (sign, hours, minutes) tuples
+
+        E.g.: for '2020-01-21T12:30:00+01:30' ('+', 1, 30) is returned
+
+    """
     offset_minutes = d.utcoffset().total_seconds() / 60
     if offset_minutes < 0:
         sign = "-"
     else:
         sign = "+"
-    hours = int(abs(offset_minutes / 60))
-    minutes = int(abs(offset_minutes % 60))
+    hours = int(abs(offset_minutes) / 60)
+    minutes = int(abs(offset_minutes) % 60)
     return sign, hours, minutes
 
 
+def test_get_tz_offset():
+    """ Test get_tz_offset"""
+    d = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(90))
+    assert get_tz_offset(d) == ('+', 1, 30)
+
+    d = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(-90))
+    assert get_tz_offset(d) == ('-', 1, 30)
+
+    d = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(60 * 24 - 15))
+    assert get_tz_offset(d) == ('+', 23, 45)
+
+    d = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(-60 * 24 + 15))
+    assert get_tz_offset(d) == ('-', 23, 45)
+
+
 def generate_testcases():
+    """ Generate test cases for drivers that support datefields, convert datefields to string or do not support 
+    datefiels"""
     _test_cases_datefield = []
     _test_cases_datefield_to_str = []
     _test_cases_datefield_not_supported = []
@@ -221,41 +264,54 @@ test_cases_datefield, test_cases_datefield_to_str, test_cases_datefield_not_supp
 @pytest.mark.parametrize("driver, field_type", test_cases_datefield)
 def test_datefield(tmpdir, driver, field_type):
     """
-    Test handling of date, time, datetime types for write capable drivers
+    Test date, time, datetime field types.
     """
 
     def _validate(val, val_exp, field_type, driver):
 
         if field_type == 'date':
             return val == val_exp.isoformat()
+
         elif field_type == 'datetime':
 
+            # some drivers do not support timezones. In this case, Fiona converts datetime fields with a timezone other
+            # than UTC to UTC. Thus, both the dateime read by Fiona, as well as expected value are first converted to
+            # UTC before compared.
+
+            # Milliseconds
             if _driver_supports_milliseconds(driver):
                 y, m, d, hh, mm, ss, ms, tz = parse_datetime(val)
                 if tz is not None:
                     tz = TZ(tz)
-                val_d = datetime.datetime(y, m, d, hh, mm, ss, int(ms), tz)
+                val_d = datetime.datetime(y, m, d, hh, mm, ss, ms, tz)
                 return compare_datetimes_utc(val_d, val_exp)
             else:
+                # No Milliseconds
                 y, m, d, hh, mm, ss, ms, tz = parse_datetime(val)
                 if tz is not None:
                     tz = TZ(tz)
-                val_d = datetime.datetime(y, m, d, hh, mm, ss, int(ms), tz)
+                val_d = datetime.datetime(y, m, d, hh, mm, ss, ms, tz)
                 return compare_datetimes_utc(val_d, val_exp.replace(microsecond=0))
 
         elif field_type == 'time':
 
+            # some drivers do not support timezones. In this case, Fiona converts datetime fields with a timezone other
+            # than UTC to UTC. Thus, both the time read by Fiona, as well as expected value are first converted to UTC
+            # before compared.
+
+            # Milliseconds
             if _driver_supports_milliseconds(driver):
                 y, m, d, hh, mm, ss, ms, tz = parse_time(val)
                 if tz is not None:
                     tz = TZ(tz)
-                val_d = datetime.time(hh, mm, ss, int(ms), tz)
+                val_d = datetime.time(hh, mm, ss, ms, tz)
                 return compare_times_utc(val_d, val_exp)
             else:
+                # No Milliseconds
                 y, m, d, hh, mm, ss, ms, tz = parse_time(val)
                 if tz is not None:
                     tz = TZ(tz)
-                val_d = datetime.time(hh, mm, ss, int(ms), tz)
+                val_d = datetime.time(hh, mm, ss, ms, tz)
                 return compare_times_utc(val_d, val_exp.replace(microsecond=0))
         return False
 
@@ -281,7 +337,12 @@ def test_datefield(tmpdir, driver, field_type):
 @pytest.mark.parametrize("driver, field_type", test_cases_datefield_to_str)
 def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
     """
-    Test handling of date, time, datetime types for write capable drivers
+    Test handling of date, time, datetime for drivers that convert these types to string.
+
+    As the formatting can be arbitrary, we only test if the elements of a date / datetime / time object
+    is included in the string. E.g. for the PCIDSK driver if hour 22 from date.time(22:49:05) is in
+    '0000/00/00 22:49:05'.
+
     """
 
     def _validate(val, val_exp, field_type, driver):
@@ -296,8 +357,13 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
             if not _driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
                 val_exp = convert_time_to_utc(val_exp)
 
+            # datetime fields can, depending on the driver, support:
+            # - Timezones
+            # - Milliseconds, respectively Microseconds
+
             # No timezone
             if val_exp.utcoffset() is None:
+                # No Milliseconds
                 if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.year) in val and
                             str(val_exp.month) in val and
@@ -307,6 +373,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             str(val_exp.second) in val):
                         return True
                 else:
+                    # Microseconds
                     if (str(val_exp.year) in val and
                             str(val_exp.month) in val and
                             str(val_exp.day) in val and
@@ -315,6 +382,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             str(val_exp.second) in val and
                             str(val_exp.microsecond) in val):
                         return True
+                    # Milliseconds
                     elif (str(val_exp.year) in val and
                           str(val_exp.month) in val and
                           str(val_exp.day) in val and
@@ -325,12 +393,15 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                         return True
             # With timezone
             else:
-
                 sign, hours, minutes = get_tz_offset(val_exp)
-                tz = "{sign}{hours:02d}{minutes:02d}".format(sign=sign,
-                                                             hours=int(hours),
-                                                             minutes=int(minutes))
-
+                if minutes > 0:
+                    tz = "{sign}{hours:02d}{minutes:02d}".format(sign=sign,
+                                                                 hours=int(hours),
+                                                                 minutes=int(minutes))
+                else:
+                    tz = "{sign}{hours:02d}".format(sign=sign, hours=int(hours))
+                print("tz", tz)
+                # No Milliseconds
                 if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.year) in val and
                             str(val_exp.month) in val and
@@ -341,6 +412,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             tz in val):
                         return True
                 else:
+                    # Microseconds
                     if (str(val_exp.year) in val and
                             str(val_exp.month) in val and
                             str(val_exp.day) in val and
@@ -350,6 +422,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             str(val_exp.microsecond) in val and
                             tz in val):
                         return True
+                    # Milliseconds
                     elif (str(val_exp.year) in val and
                           str(val_exp.month) in val and
                           str(val_exp.day) in val and
@@ -362,22 +435,29 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
 
         elif field_type == 'time':
 
+            # time fields can, depending on the driver, support:
+            # - Timezones
+            # - Milliseconds, respectively Microseconds
+
             if not _driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
                 val_exp = convert_time_to_utc(val_exp)
 
             # No timezone
             if val_exp.utcoffset() is None:
+                # No Milliseconds
                 if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val):
                         return True
                 else:
+                    # Microseconds
                     if (str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val and
                             str(val_exp.microsecond) in val):
                         return True
+                    # Milliseconds
                     elif (str(val_exp.hour) in val and
                           str(val_exp.minute) in val and
                           str(val_exp.second) in val and
@@ -387,10 +467,13 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
             else:
 
                 sign, hours, minutes = get_tz_offset(val_exp)
-                tz = "{sign}{hours:02d}{minutes:02d}".format(sign=sign,
-                                                             hours=int(hours),
-                                                             minutes=int(minutes))
-
+                if minutes > 0:
+                    tz = "{sign}{hours:02d}{minutes:02d}".format(sign=sign,
+                                                                 hours=int(hours),
+                                                                 minutes=int(minutes))
+                else:
+                    tz = "{sign}{hours:02d}".format(sign=sign, hours=int(hours))
+                # No Milliseconds
                 if not _driver_supports_milliseconds(driver):
                     if (str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
@@ -398,12 +481,14 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             tz in val):
                         return True
                 else:
+                    # Microseconds
                     if (str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val and
                             str(val_exp.microsecond) in val and
                             tz in val):
                         return True
+                    # Milliseconds
                     elif (str(val_exp.hour) in val and
                           str(val_exp.minute) in val and
                           str(val_exp.second) in val and
@@ -438,7 +523,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
 @pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
 def test_datefield_null(tmpdir, driver, field_type):
     """
-    Test handling of date, time, datetime types for write capable drivers
+    Test handling of null values for date, time, datetime types for write capable drivers
     """
 
     def _validate(val, val_exp, field_type, driver):
