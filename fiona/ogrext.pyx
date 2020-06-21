@@ -41,7 +41,8 @@ from fiona._shim cimport is_field_null, osr_get_name, osr_set_traditional_axis_m
 from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 from cpython cimport PyBytes_FromStringAndSize, PyBytes_AsString
-
+from fiona.drvsupport import driver_supports_timezones
+  
 
 cdef extern from "ogr_api.h" nogil:
 
@@ -407,13 +408,36 @@ cdef class OGRFeatureBuilder:
                         else:
                             tz = value.utcoffset().total_seconds() / 60
 
-                # Add microseconds to seconds
-                ss += ms / 10**6
+                print("before", y, m, d, hh, mm, ss, tz)
+                # Convert to UTC if driver does not support timezones
+                if tz is not None and not driver_supports_timezones(collection.driver, schema_type):
+                    print("convert to utc")
+                    if schema_type == 'datetime':
+                        print(y, m, d, hh, mm, ss, ms, tz)
+                        d_tz = datetime.datetime(y, m, d, hh, mm, ss, int(ms), TZ(tz))
+                        d_utc = d_tz + d_tz.utcoffset()
+                        print("datetime", d_utc)
+                        y, m, d = d_utc.year, d_utc.month, d_utc.day
+                        hh, mm, ss, ms = d_utc.hour, d_utc.minute, d_utc.second, d_utc.microsecond
+                        tz = 0
+                        del d_utc, d_tz
+                    elif schema_type == 'time':
+                        d_tz = datetime.datetime(1900, 1, 1, hh, mm, ss, int(ms), TZ(tz))
+                        d_utc = d_tz + d_tz.utcoffset()
+                        print("time", d_utc)
+                        y = m = d = 0
+                        hh, mm, ss, ms = d_utc.hour, d_utc.minute, d_utc.second, d_utc.microsecond
+                        tz = 0
+                        del d_utc, d_tz
 
+                # tzinfo: (0=unknown, 100=GMT, 101=GMT+15minute, 99=GMT-15minute), or NULL
                 if tz is not None:               
                     tzinfo = int(tz / 15.0 + 100)
                 else:
                     tzinfo = 0
+
+                # Add microseconds to seconds
+                ss += ms / 10**6
 
                 print("Set", y, m, d, hh, mm, ss, tzinfo)
                 set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, tzinfo)
