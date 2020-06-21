@@ -362,7 +362,7 @@ def testdata_generator():
                                       ('EntityHandle', str(i + 20000)),
                                       ('Text', None)])} for i in range],
                             'GPX': [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
-                                     'properties': {'ele': 0.0, 'time': '2020-03-24T16:08:40'}} for i
+                                     'properties': {'ele': 0.0, 'time': '2020-03-24T16:08:40+00:00'}} for i
                                     in range],
                             'GPSTrackMaker': [{'geometry': {'type': 'Point', 'coordinates': (0.0, float(i))},
                                                'properties': {}} for i in range],
