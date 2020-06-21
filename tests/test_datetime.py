@@ -4,6 +4,8 @@ See also test_rfc3339.py for datetime parser tests.
 
 from collections import OrderedDict
 
+from fiona._env import get_gdal_version_num, calc_gdal_version_num
+
 import fiona
 import pytest
 
@@ -91,8 +93,7 @@ def generate_testdata(field_type, driver):
                 (datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(90)),
                  datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(90))),
                 (datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-90)),
-                 datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-90))),
-                ]
+                 datetime.datetime(2018, 3, 25, 22, 49, 5, tzinfo=TZ(-90)))]
 
     # Test data for 'time' data type
     elif field_type == 'time':
@@ -105,8 +106,7 @@ def generate_testdata(field_type, driver):
                 ("22:49:05+01:30", datetime.time(22, 49, 5, tzinfo=TZ(90))),
                 ("22:49:05-01:30", datetime.time(22, 49, 5, tzinfo=TZ(-90))),
                 (datetime.time(22, 49, 5, tzinfo=TZ(90)), datetime.time(22, 49, 5, tzinfo=TZ(90))),
-                (datetime.time(22, 49, 5, tzinfo=TZ(-90)), datetime.time(22, 49, 5, tzinfo=TZ(-90))),
-        ]
+                (datetime.time(22, 49, 5, tzinfo=TZ(-90)), datetime.time(22, 49, 5, tzinfo=TZ(-90)))]
 
 
 def convert_datetime_to_utc(d):
@@ -150,21 +150,36 @@ def get_tz_offset(d):
     return sign, hours, minutes
 
 
-@pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
-                                    and (driver not in driver_mode_mingdal['w'] or
-                                         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
-@pytest.mark.parametrize("field_type", ['time', 'datetime', 'date'])
+def generate_testcases():
+    _test_cases_datefield = []
+    _test_cases_datefield_to_str = []
+    _test_cases_datefield_not_supported = []
+
+    for field_type in ['time', 'datetime', 'date']:
+        # Select only driver that are capable of writing fields
+        for driver, raw in supported_drivers.items():
+            if ('w' in raw and
+                    (driver not in driver_mode_mingdal['w'] or
+                     gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))):
+                if driver_supports_field(driver, field_type):
+                    if driver_converts_field_type_silently_to_str(driver, field_type):
+                        _test_cases_datefield_to_str.append((driver, field_type))
+                    else:
+                        _test_cases_datefield.append((driver, field_type))
+                else:
+                    _test_cases_datefield_not_supported.append((driver, field_type))
+
+    return _test_cases_datefield, _test_cases_datefield_to_str, _test_cases_datefield_not_supported
+
+
+test_cases_datefield, test_cases_datefield_to_str, test_cases_datefield_not_supported = generate_testcases()
+
+
+@pytest.mark.parametrize("driver, field_type", test_cases_datefield)
 def test_datefield(tmpdir, driver, field_type):
     """
     Test handling of date, time, datetime types for write capable drivers
     """
-
-    if driver_converts_field_type_silently_to_str(driver, field_type):
-        return
-
-    # Some driver do not support date, datetime or time
-    if not driver_supports_field(driver, field_type):
-        return
 
     def _validate(val, val_exp, field_type, driver):
 
@@ -220,21 +235,11 @@ def test_datefield(tmpdir, driver, field_type):
                 "{} does not match {}".format(val, val_exp.isoformat())
 
 
-@pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
-                                    and (driver not in driver_mode_mingdal['w'] or
-                                         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
-@pytest.mark.parametrize("field_type", ['time', 'datetime', 'date'])
+@pytest.mark.parametrize("driver, field_type", test_cases_datefield_to_str)
 def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
     """
     Test handling of date, time, datetime types for write capable drivers
     """
-
-    if not driver_converts_field_type_silently_to_str(driver, field_type):
-        return
-
-    # Some driver do not support date, datetime or time
-    if not driver_supports_field(driver, field_type):
-        return
 
     def _validate(val, val_exp, field_type, driver):
 
@@ -386,48 +391,40 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                 "{} does not match {}".format(val, val_exp.isoformat())
 
 
-# @pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
-#                                     and (driver not in driver_mode_mingdal['w'] or
-#                                          gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
-# @pytest.mark.parametrize("field_type", ['time', 'datetime', 'date'])
-# def test_datefield_null(tmpdir, driver, field_type):
-#     """
-#     Test handling of date, time, datetime types for write capable drivers
-#     """
-# 
-#     # Some driver do not support date, datetime or time
-#     if not driver_supports_field(driver, field_type):
-#         return
-# 
-#     def _validate(val, val_exp, field_type, driver):
-#         return False
-# 
-#     if driver_converts_field_type_silently_to_str(driver, field_type):
-#         return
-# 
-#     schema = get_schema(driver, field_type)
-#     path = str(tmpdir.join(get_temp_filename(driver)))
-#     values_in = ['None']
-#     records = get_records(driver, values_in)
-# 
-#     with fiona.open(path, 'w',
-#                     driver=driver,
-#                     schema=schema) as c:
-#         c.writerecords(records)
-# 
-#     with fiona.open(path, 'r') as c:
-#         assert get_schema_field(driver, c.schema) == field_type
-#         items = [get_field(driver, f) for f in c]
-#         assert len(items) == len(values_in)
-# 
-#         assert _validate(items[0], None, field_type, driver), \
-#             "{} does not match {}".format(items[0], None)
+@pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
+@pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
+def test_datefield_null(tmpdir, driver, field_type):
+    """
+    Test handling of date, time, datetime types for write capable drivers
+    """
+
+    def _validate(val, val_exp, field_type, driver):
+        if (driver == 'MapInfo File' and field_type == 'time' and
+                get_gdal_version_num() < calc_gdal_version_num(3, 1, 1)):
+            return val == '00:00:00'
+        if val is None or val == '':
+            return True
+        return False
+
+    schema = get_schema(driver, field_type)
+    path = str(tmpdir.join(get_temp_filename(driver)))
+    values_in = [None]
+    records = get_records(driver, values_in)
+
+    with fiona.open(path, 'w',
+                    driver=driver,
+                    schema=schema) as c:
+        c.writerecords(records)
+
+    with fiona.open(path, 'r') as c:
+        items = [get_field(driver, f) for f in c]
+        assert len(items) == 1
+
+        assert _validate(items[0], None, field_type, driver), \
+            "{} does not match {}".format(items[0], None)
 
 
-@pytest.mark.parametrize("driver", [driver for driver, raw in supported_drivers.items() if 'w' in raw
-                                    and (driver not in driver_mode_mingdal['w'] or
-                                         gdal_version >= GDALVersion(*driver_mode_mingdal['w'][driver][:2]))])
-@pytest.mark.parametrize("field_type", ['date', 'datetime', 'time'])
+@pytest.mark.parametrize("driver, field_type", test_cases_datefield_not_supported)
 def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, driver, field_type, monkeypatch):
     """ Test if a date/datetime/time field type marked as not not supported is really not supported
 
@@ -438,10 +435,6 @@ def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, drive
 
     if driver == "BNA" and gdal_version < GDALVersion(2, 0):
         # BNA driver segfaults with gdal 1.11
-        return
-
-    # If the driver supports the field we have nothing to do here
-    if driver_supports_field(driver, field_type):
         return
 
     monkeypatch.delitem(fiona.drvsupport.driver_field_type_unsupported[field_type], driver)
@@ -485,7 +478,8 @@ def generate_tostr_testcases():
     return cases
 
 
-@pytest.mark.parametrize("field_type,driver", generate_tostr_testcases())
+@pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
+@pytest.mark.parametrize("driver,field_type", test_cases_datefield_to_str)
 def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpdir, driver, field_type, monkeypatch):
     """ Test if a driver and field_type is marked in fiona.drvsupport.driver_converts_to_str to convert to str really
       silently converts to str
