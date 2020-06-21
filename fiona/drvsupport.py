@@ -268,12 +268,13 @@ drivers_not_supporting_timezones = {
     },
     'time': {
         'MapInfo File': None,
-        'GPKG': (3, 1, 0),
+        'GPKG': None,
         'GPSTrackMaker': None,
         'GeoJSON': None,
         'GeoJSONSeq': None,
         'GML': None,
-        'CSV': None
+        'CSV': None,
+        'GMT': (2, 0, 0)
     }
 }
 
