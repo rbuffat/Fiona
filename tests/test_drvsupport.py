@@ -188,9 +188,9 @@ def test_write_does_not_work_when_gdal_smaller_mingdal(tmpdir, driver, monkeypat
                                     and driver not in blacklist_append_drivers])
 def test_append_or_driver_error(tmpdir, driver):
     """ Test if driver supports append mode.
-    
+
     Some driver only allow a specific schema. These drivers can be excluded by adding them to blacklist_append_drivers.
-    
+
     """
 
     if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
@@ -281,9 +281,9 @@ def test_append_does_not_work_when_gdal_smaller_mingdal(tmpdir, driver, monkeypa
                                     raw == 'r' and driver not in blacklist_write_drivers])
 def test_no_write_driver_cannot_write(tmpdir, driver, monkeypatch):
     """Test if read only driver cannot write
-    
-    If this test fails, it should be considered to enable write support for the respective driver in drvsupport.py. 
-    
+
+    If this test fails, it should be considered to enable write support for the respective driver in drvsupport.py.
+
     """
 
     monkeypatch.setitem(fiona.drvsupport.supported_drivers, driver, 'rw')
