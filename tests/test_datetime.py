@@ -468,6 +468,21 @@ def test_datefield_null(tmpdir, driver, field_type):
 
 
 @pytest.mark.parametrize("driver, field_type", test_cases_datefield_not_supported)
+def test_datetime_field_unsupported(tmpdir, driver, field_type):
+    """ Test if DriverSupportError is raised for unsupported field_types"""
+    schema = get_schema(driver, field_type)
+    path = str(tmpdir.join(get_temp_filename(driver)))
+    values_in, values_out = zip(*generate_testdata(field_type, driver))
+    records = get_records(driver, values_in)
+
+    with pytest.raises(DriverSupportError):
+        with fiona.open(path, 'w',
+                        driver=driver,
+                        schema=schema) as c:
+            c.writerecords(records)
+
+
+@pytest.mark.parametrize("driver, field_type", test_cases_datefield_not_supported)
 def test_datetime_field_type_marked_not_supported_is_not_supported(tmpdir, driver, field_type, monkeypatch):
     """ Test if a date/datetime/time field type marked as not not supported is really not supported
 
