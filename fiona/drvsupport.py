@@ -227,21 +227,24 @@ driver_field_type_unsupported = {
         'GML': GDALVersion(3, 1),
         'DGN': None,
         'BNA': None,
-        'DXF': None
+        'DXF': None,
+        'PCIDSK': GDALVersion(2, 1)
     },
     'datetime': {
         'ESRI Shapefile': None,
         'GPKG': GDALVersion(2, 0),
         'DGN': None,
         'BNA': None,
-        'DXF': None
+        'DXF': None,
+        'PCIDSK': GDALVersion(2, 1)
     },
     'date': {
         'GPX': None,
         'GPSTrackMaker': None,
         'DGN': None,
         'BNA': None,
-        'DXF': None
+        'DXF': None,
+        'PCIDSK': GDALVersion(2, 1)
     }
 }
 
