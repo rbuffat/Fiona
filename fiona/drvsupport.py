@@ -290,7 +290,8 @@ _drivers_not_supporting_timezones = {
         'GeoJSONSeq': None,
         'GML': None,
         'CSV': None,
-        'GMT': (2, 0, 0)
+        'GMT': (2, 0, 0),
+        'OGR_GMT': (2, 4, 0)
     }
 }
 
