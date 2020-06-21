@@ -55,6 +55,10 @@ def test_write_or_driver_error(tmpdir, driver, testdata_generator):
             items = list(c)
             assert len(items) == len(records1)
             for val_in, val_out in zip(records1, items):
+                print("in")
+                print(val_in)
+                print("out")
+                print(val_out)
                 assert test_equal(driver, val_in, val_out), "in: {val_in}, out: {val_out}".format(val_in=val_in,
                                                                                                   val_out=val_out)
 
@@ -91,11 +95,8 @@ def test_write_does_not_work_when_gdal_smaller_mingdal(tmpdir, driver, testdata_
 def test_append_or_driver_error(tmpdir, testdata_generator, driver):
     """ Test if driver supports append mode.
 
-<<<<<<< HEAD
     Some driver only allow a specific schema. These drivers can be excluded by adding them to blacklist_append_drivers.
 
-=======
->>>>>>> update_drvsupport
     """
 
     if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
