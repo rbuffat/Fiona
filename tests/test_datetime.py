@@ -198,7 +198,7 @@ def test_datefield(tmpdir, driver, field_type):
                 if tz is not None:
                     tz = TZ(tz)
                 val_d = datetime.time(hh, mm, ss, int(ms), tz)
-                return compare_times_utc(val_d, val_exp)
+                return compare_times_utc(val_d, val_exp.replace(microsecond=0))
         return False
 
     schema = get_schema(driver, field_type)
