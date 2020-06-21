@@ -279,10 +279,9 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
             else:
 
                 sign, hours, minutes = get_tz_offset(val_exp)
-
                 tz = "{sign}{hours:02d}{minutes:02d}".format(sign=sign,
-                                                     hours=int(hours),
-                                                     minutes=int(minutes))
+                                                             hours=int(hours),
+                                                             minutes=int(minutes))
 
                 if not driver_supports_milliseconds(driver):
                     if (str(val_exp.year) in val and
@@ -291,7 +290,7 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val and
-                    tz in val):
+                            tz in val):
                         return True
                 else:
                     if (str(val_exp.year) in val and
@@ -300,7 +299,8 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                             str(val_exp.hour) in val and
                             str(val_exp.minute) in val and
                             str(val_exp.second) in val and
-                            str(val_exp.microsecond) in val and tz in val):
+                            str(val_exp.microsecond) in val and
+                            tz in val):
                         return True
                     elif (str(val_exp.year) in val and
                           str(val_exp.month) in val and
@@ -308,7 +308,8 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
                           str(val_exp.hour) in val and
                           str(val_exp.minute) in val and
                           str(val_exp.second) in val and
-                          str(int(val_exp.microsecond / 1000)) in val and tz in val):
+                          str(int(val_exp.microsecond / 1000)) in val and
+                          tz in val):
                         return True
 
         elif field_type == 'time':
@@ -316,22 +317,51 @@ def test_datefield_driver_converts_to_string(tmpdir, driver, field_type):
             if not driver_supports_timezones(driver, field_type) and val_exp.utcoffset() is not None:
                 val_exp = convert_time_to_utc(val_exp)
 
-            if not driver_supports_milliseconds(driver):
-                if (str(val_exp.hour) in val and
-                        str(val_exp.minute) in val and
-                        str(val_exp.second) in val):
-                    return True
+            # No timezone
+            if val_exp.utcoffset() is None:
+                if not driver_supports_milliseconds(driver):
+                    if (str(val_exp.hour) in val and
+                            str(val_exp.minute) in val and
+                            str(val_exp.second) in val):
+                        return True
+                else:
+                    if (str(val_exp.hour) in val and
+                            str(val_exp.minute) in val and
+                            str(val_exp.second) in val and
+                            str(val_exp.microsecond) in val):
+                        return True
+                    elif (str(val_exp.hour) in val and
+                          str(val_exp.minute) in val and
+                          str(val_exp.second) in val and
+                          str(int(val_exp.microsecond / 1000)) in val):
+                        return True
+            # With timezone
             else:
-                if (str(val_exp.hour) in val and
-                        str(val_exp.minute) in val and
-                        str(val_exp.second) in val and
-                        str(val_exp.microsecond) in val):
-                    return True
-                elif (str(val_exp.hour) in val and
-                      str(val_exp.minute) in val and
-                      str(val_exp.second) in val and
-                      str(int(val_exp.microsecond / 1000)) in val):
-                    return True
+
+                sign, hours, minutes = get_tz_offset(val_exp)
+                tz = "{sign}{hours:02d}{minutes:02d}".format(sign=sign,
+                                                             hours=int(hours),
+                                                             minutes=int(minutes))
+
+                if not driver_supports_milliseconds(driver):
+                    if (str(val_exp.hour) in val and
+                            str(val_exp.minute) in val and
+                            str(val_exp.second) in val and
+                            tz in val):
+                        return True
+                else:
+                    if (str(val_exp.hour) in val and
+                            str(val_exp.minute) in val and
+                            str(val_exp.second) in val and
+                            str(val_exp.microsecond) in val and
+                            tz in val):
+                        return True
+                    elif (str(val_exp.hour) in val and
+                          str(val_exp.minute) in val and
+                          str(val_exp.second) in val and
+                          str(int(val_exp.microsecond / 1000)) in val
+                          and tz in val):
+                        return True
         return False
 
     schema = get_schema(driver, field_type)
