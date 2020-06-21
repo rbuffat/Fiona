@@ -202,6 +202,7 @@ _driver_converts_to_str = {
         'GeoJSON': (2, 0, 0),
         'GPKG': None,
         'GMT': None,
+        'OGR_GMT': None
     },
     'datetime': {
         'CSV': None,
@@ -214,6 +215,7 @@ _driver_converts_to_str = {
         'PCIDSK': None,
         'GeoJSON': (2, 0, 0),
         'GMT': None,
+        'OGR_GMT': None,
         'GML': (3, 1, 0),
     }
 }
