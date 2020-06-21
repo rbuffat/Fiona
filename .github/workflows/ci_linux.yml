@@ -72,8 +72,9 @@ jobs:
 
       - name: Install  packages
         run: |
-          sudo apt install libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3 libgeos-dev
-          
+          sudo apt-get update
+          sudo apt install libatlas-dev libatlas-base-dev gfortran libsqlite3-dev libgeos-dev
+
       - name: Dependency Cache
         uses: actions/cache@v2
         with:
