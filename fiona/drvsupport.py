@@ -272,7 +272,8 @@ drivers_not_supporting_timezones = {
         'GPSTrackMaker': None,
         'GeoJSON': None,
         'GeoJSONSeq': None,
-        'GML': None
+        'GML': None,
+        'CSV': None
     }
 }
 
