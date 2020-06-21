@@ -243,7 +243,6 @@ cdef class FeatureBuilder:
 
             elif fieldtype in (FionaDateType, FionaTimeType, FionaDateTimeType):
                 retval, y, m, d, hh, mm, ss, tz = get_field_as_datetime(feature, i)
-                print("Get", y, m, d, hh, mm, ss, tz)
 
                 ms, ss = math.modf(ss)
                 ss = int(ss)
@@ -408,23 +407,19 @@ cdef class OGRFeatureBuilder:
                         else:
                             tz = value.utcoffset().total_seconds() / 60
 
-                print("before", y, m, d, hh, mm, ss, tz)
                 # Convert to UTC if driver does not support timezones
                 if tz is not None and not driver_supports_timezones(collection.driver, schema_type):
-                    print("convert to utc")
+
                     if schema_type == 'datetime':
-                        print(y, m, d, hh, mm, ss, ms, tz)
                         d_tz = datetime.datetime(y, m, d, hh, mm, ss, int(ms), TZ(tz))
-                        d_utc = d_tz + d_tz.utcoffset()
-                        print("datetime", d_utc)
+                        d_utc = d_tz - d_tz.utcoffset()
                         y, m, d = d_utc.year, d_utc.month, d_utc.day
                         hh, mm, ss, ms = d_utc.hour, d_utc.minute, d_utc.second, d_utc.microsecond
                         tz = 0
                         del d_utc, d_tz
                     elif schema_type == 'time':
                         d_tz = datetime.datetime(1900, 1, 1, hh, mm, ss, int(ms), TZ(tz))
-                        d_utc = d_tz + d_tz.utcoffset()
-                        print("time", d_utc)
+                        d_utc = d_tz - d_tz.utcoffset()
                         y = m = d = 0
                         hh, mm, ss, ms = d_utc.hour, d_utc.minute, d_utc.second, d_utc.microsecond
                         tz = 0
@@ -439,7 +434,6 @@ cdef class OGRFeatureBuilder:
                 # Add microseconds to seconds
                 ss += ms / 10**6
 
-                print("Set", y, m, d, hh, mm, ss, tzinfo)
                 set_field_datetime(cogr_feature, i, y, m, d, hh, mm, ss, tzinfo)
 
             elif isinstance(value, bytes) and schema_type == "bytes":

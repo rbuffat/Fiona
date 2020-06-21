@@ -4,6 +4,7 @@ See also test_rfc3339.py for datetime parser tests.
 
 from collections import OrderedDict
 
+import pytz
 from fiona._env import get_gdal_version_num, calc_gdal_version_num
 
 import fiona
@@ -17,6 +18,8 @@ import datetime
 from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, driver_converts_field_type_silently_to_str,
                               driver_supports_field, driver_converts_to_str, driver_supports_timezones,
                               driver_supports_milliseconds)
+from pytz import timezone
+
 
 gdal_version = GDALVersion.runtime()
 
@@ -110,7 +113,7 @@ def generate_testdata(field_type, driver):
 
 
 def convert_datetime_to_utc(d):
-    return d + d.utcoffset()
+    return d - d.utcoffset()
 
 
 def compare_datetimes_utc(d1, d2):
@@ -119,13 +122,39 @@ def compare_datetimes_utc(d1, d2):
 
     if d2.tzinfo is not None:
         d2 = convert_datetime_to_utc(d2)
-
     return d1.replace(tzinfo=None) == d2.replace(tzinfo=None)
+
+
+def test_compare_datetimes_utc():
+    d1 = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(60))
+    d2 = datetime.datetime(2020, 1, 21, 11, 30, 0, tzinfo=TZ(0))
+    assert compare_datetimes_utc(d1, d2)
+
+    d1 = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(-60))
+    d2 = datetime.datetime(2020, 1, 21, 11, 30, 0, tzinfo=TZ(0))
+    assert not compare_datetimes_utc(d1, d2)
+
+    d1 = datetime.datetime(2020, 1, 21, 13, 0, 0, tzinfo=TZ(60))
+    d2 = datetime.datetime(2020, 1, 21, 5, 0, 0, tzinfo=TZ(-60 * 7))
+    assert compare_datetimes_utc(d1, d2)
+
+    d1 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))
+    d2 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc)
+    assert compare_datetimes_utc(d1, d2)
+
+    d1 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))
+    d2 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('US/Mountain'))
+    assert compare_datetimes_utc(d1, d2)
+
+    d1 = datetime.datetime(2020, 6, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))
+    d2 = datetime.datetime(2020, 6, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('US/Mountain'))
+    assert compare_datetimes_utc(d1, d2)
 
 
 def convert_time_to_utc(d):
     d = datetime.datetime(1900, 1, 1, d.hour, d.minute, d.second, d.microsecond, d.tzinfo)
-    d += d.utcoffset()
+    d -= d.utcoffset()
+
     return datetime.time(d.hour, d.minute, d.second, d.microsecond)
 
 
@@ -137,6 +166,20 @@ def compare_times_utc(d1, d2):
         d2 = convert_time_to_utc(d2)
 
     return d1.replace(tzinfo=None) == d2.replace(tzinfo=None)
+
+
+def test_compare_datetimes_utc():
+    d1 = datetime.time(12, 30, 0, tzinfo=TZ(60))
+    d2 = datetime.time(11, 30, 0, tzinfo=TZ(0))
+    assert compare_times_utc(d1, d2)
+
+    d1 = datetime.time(12, 30, 0, tzinfo=TZ(-60))
+    d2 = datetime.time(11, 30, 0, tzinfo=TZ(0))
+    assert not compare_times_utc(d1, d2)
+
+    d1 = datetime.time(13, 0, 0, tzinfo=TZ(60))
+    d2 = datetime.time(5, 0, 0, tzinfo=TZ(-60 * 7))
+    assert compare_times_utc(d1, d2)
 
 
 def get_tz_offset(d):
