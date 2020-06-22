@@ -144,26 +144,32 @@ def test_compare_datetimes_utc():
     """ Test compare_datetimes_utc """
     d1 = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(60))
     d2 = datetime.datetime(2020, 1, 21, 11, 30, 0, tzinfo=TZ(0))
+    assert d1 == d2
     assert compare_datetimes_utc(d1, d2)
 
     d1 = datetime.datetime(2020, 1, 21, 12, 30, 0, tzinfo=TZ(-60))
     d2 = datetime.datetime(2020, 1, 21, 11, 30, 0, tzinfo=TZ(0))
+    assert not d1 == d2
     assert not compare_datetimes_utc(d1, d2)
 
     d1 = datetime.datetime(2020, 1, 21, 13, 0, 0, tzinfo=TZ(60))
     d2 = datetime.datetime(2020, 1, 21, 5, 0, 0, tzinfo=TZ(-60 * 7))
+    assert d1 == d2
     assert compare_datetimes_utc(d1, d2)
 
     d1 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))
     d2 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc)
+    assert d1 == d2
     assert compare_datetimes_utc(d1, d2)
 
     d1 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))
     d2 = datetime.datetime(2020, 1, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('US/Mountain'))
+    assert d1 == d2
     assert compare_datetimes_utc(d1, d2)
 
     d1 = datetime.datetime(2020, 6, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('Europe/Zurich'))
     d2 = datetime.datetime(2020, 6, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('US/Mountain'))
+    assert d1 == d2
     assert compare_datetimes_utc(d1, d2)
 
 
@@ -186,7 +192,7 @@ def compare_times_utc(d1, d2):
     return d1.replace(tzinfo=None) == d2.replace(tzinfo=None)
 
 
-def test_compare_datetimes_utc():
+def test_compare_times_utc():
     """
     Test compare_times_utc
     """
@@ -645,3 +651,42 @@ def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpd
 
     with fiona.open(path, 'r') as c:
         assert get_schema_field(driver, c.schema) == 'str'
+
+
+# 
+# @pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
+# @pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
+# def test_no_unkown_timezone(tmpdir, driver, field_type):
+# def test_no_unkown_timezone(tmpdir, driver, field_type):
+#     if field_type == 'date':
+#         return
+# 
+#     if not driver == 'GPX':
+#         return
+# 
+#     drivers_not_supporting_unknown_timezone = {'GPKG'}
+# 
+#     schema = get_schema(driver, field_type)
+#     path = str(tmpdir.join(get_temp_filename(driver)))
+#     if field_type == 'datetime':
+#         values_in = ['2020-03-24T16:08:40']
+#     elif field_type == 'time':
+#         values_in = ['16:08:40']
+#     records = get_records(driver, values_in)
+# 
+#     with fiona.open(path, 'w',
+#                     driver=driver,
+#                     schema=schema) as c:
+#         c.writerecords(records)
+# 
+#     with fiona.open(path, 'r') as c:
+#         items = [get_field(driver, f) for f in c]
+#         assert len(items) == 1
+#         print(items)
+# 
+#         if driver in drivers_not_supporting_unknown_timezone:
+#             assert items[0] == values_in[0]+"+00:00", "{} does not match {}".format(items[0], values_in[0]+"+00:00")
+#         else:
+#             assert items[0] == values_in[0], "{} does not match {}".format(items[0], values_in[0])
+# 
+#     a = 5 / 0

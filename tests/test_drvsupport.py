@@ -55,10 +55,6 @@ def test_write_or_driver_error(tmpdir, driver, testdata_generator):
             items = list(c)
             assert len(items) == len(records1)
             for val_in, val_out in zip(records1, items):
-                print("in")
-                print(val_in)
-                print("out")
-                print(val_out)
                 assert test_equal(driver, val_in, val_out), "in: {val_in}, out: {val_out}".format(val_in=val_in,
                                                                                                   val_out=val_out)
 
