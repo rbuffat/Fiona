@@ -241,7 +241,7 @@ def test_get_tz_offset():
 
 
 def generate_testcases():
-    """ Generate test cases for drivers that support datefields, convert datefields to string or do not support 
+    """ Generate test cases for drivers that support datefields, convert datefields to string or do not support
     datefiels"""
     _test_cases_datefield = []
     _test_cases_datefield_to_str = []
@@ -654,12 +654,11 @@ def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpd
 
 
 @pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
-@pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
+@pytest.mark.parametrize("driver,field_type", [(driver, field_type) for driver, field_type in
+                                               test_cases_datefield + test_cases_datefield_to_str
+                                               if not field_type == 'date'])
 def test_no_unknown_timezone(tmpdir, driver, field_type):
     """ Some driver do not support unknown timezones (TZFlag=0) and convert datetimes silently to UTC"""
-
-    if field_type == 'date':
-        return
 
     schema = get_schema(driver, field_type)
     path = str(tmpdir.join(get_temp_filename(driver)))
