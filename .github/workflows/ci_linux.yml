@@ -40,6 +40,7 @@ jobs:
           - {python-version: 3.6, GDALVERSION: "3.0.3",   PROJVERSION: "6.2.1"}
           - {python-version: 3.6, GDALVERSION: "3.0.4",   PROJVERSION: "6.2.1"}
           - {python-version: 3.6, GDALVERSION: "3.1.0",   PROJVERSION: "6.2.1"}
+          - {python-version: 3.6, GDALVERSION: "master",   PROJVERSION: "6.2.1"}
 
     steps:
       - uses: actions/checkout@v2
