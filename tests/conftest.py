@@ -7,7 +7,6 @@ import shutil
 import tarfile
 import zipfile
 from collections import OrderedDict
-import pprint
 from click.testing import CliRunner
 import pytest
 
