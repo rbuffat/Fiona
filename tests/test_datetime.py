@@ -649,40 +649,49 @@ def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpd
         assert get_schema_field(driver, c.schema) == 'str'
 
 
-# 
-# @pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
-# @pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
-# def test_no_unkown_timezone(tmpdir, driver, field_type):
-# def test_no_unkown_timezone(tmpdir, driver, field_type):
-#     if field_type == 'date':
-#         return
-# 
-#     if not driver == 'GPX':
-#         return
-# 
-#     drivers_not_supporting_unknown_timezone = {'GPKG'}
-# 
-#     schema = get_schema(driver, field_type)
-#     path = str(tmpdir.join(get_temp_filename(driver)))
-#     if field_type == 'datetime':
-#         values_in = ['2020-03-24T16:08:40']
-#     elif field_type == 'time':
-#         values_in = ['16:08:40']
-#     records = get_records(driver, values_in)
-# 
-#     with fiona.open(path, 'w',
-#                     driver=driver,
-#                     schema=schema) as c:
-#         c.writerecords(records)
-# 
-#     with fiona.open(path, 'r') as c:
-#         items = [get_field(driver, f) for f in c]
-#         assert len(items) == 1
-#         print(items)
-# 
-#         if driver in drivers_not_supporting_unknown_timezone:
-#             assert items[0] == values_in[0]+"+00:00", "{} does not match {}".format(items[0], values_in[0]+"+00:00")
-#         else:
-#             assert items[0] == values_in[0], "{} does not match {}".format(items[0], values_in[0])
-# 
-#     a = 5 / 0
+_drivers_not_supporting_unknown_timezone = {
+    'datetime':
+        {'GPKG': None}
+}
+
+
+def _driver_supports_unknown_timezones(driver, field_type):
+    """ Returns True if the driver supports timezones for field_type, False otherwise"""
+
+    if field_type in _drivers_not_supporting_unknown_timezone and driver in _drivers_not_supporting_unknown_timezone[field_type]:
+        if _drivers_not_supporting_unknown_timezone[field_type][driver] is None:
+            return False
+        elif get_gdal_version_num() < calc_gdal_version_num(*_drivers_not_supporting_unknown_timezone[field_type][driver]):
+            return False
+    return True
+
+
+@pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
+@pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
+def test_no_unkown_timezone(tmpdir, driver, field_type):
+
+    if field_type == 'date':
+        return
+
+    schema = get_schema(driver, field_type)
+    path = str(tmpdir.join(get_temp_filename(driver)))
+
+    if field_type == 'datetime':
+        values_in = ['2020-03-24T16:08:40']
+    elif field_type == 'time':
+        values_in = ['16:08:40']
+    records = get_records(driver, values_in)
+
+    with fiona.open(path, 'w',
+                    driver=driver,
+                    schema=schema) as c:
+        c.writerecords(records)
+
+    with fiona.open(path, 'r') as c:
+        items = [get_field(driver, f) for f in c]
+        assert len(items) == 1
+
+        if _driver_supports_unknown_timezones(driver, field_type):
+            assert "+" not in items[0], "{} contains a timezone".format(items[0])
+        else:
+            assert "+" in items[0], "{} contains no timezone".format(items[0])
