@@ -44,7 +44,18 @@ class group_accessor(object):
 
 
 def parse_time(text):
-    """Given a time, returns a datetime tuple"""
+    """ Given a time, returns a datetime tuple
+
+    Parameters
+    ----------
+    text: string to be parsed
+
+    Returns
+    -------
+        (int, int , int, int, int, int, int, int):
+            datetime tuple: (year, month, day, hour, minute, second, microsecond, utcoffset in minutes or None)
+
+    """
     match = re.search(pattern_time, text)
     if match is None:
         raise ValueError("Time data '%s' does not match pattern" % text)
@@ -68,7 +79,17 @@ def parse_time(text):
 
 
 def parse_date(text):
-    """Given a date, returns a datetime tuple"""
+    """Given a date, returns a datetime tuple
+
+    Parameters
+    ----------
+    text: string to be parsed
+
+    Returns
+    -------
+        (int, int , int, int, int, int, int, int):
+            datetime tuple: (year, month, day, hour, minute, second, microsecond, utcoffset in minutes or None)
+    """
     match = re.search(pattern_date, text)
     if match is None:
         raise ValueError("Time data '%s' does not match pattern" % text)
@@ -82,7 +103,17 @@ def parse_date(text):
 
 
 def parse_datetime(text):
-    """Given a datetime, returns a datetime tuple"""
+    """Given a datetime, returns a datetime tuple
+
+    Parameters
+    ----------
+    text: string to be parsed
+
+    Returns
+    -------
+        (int, int , int, int, int, int, int, int):
+            datetime tuple: (year, month, day, hour, minute, second, microsecond, utcoffset in minutes or None)
+    """
     match = re.search(pattern_datetime, text)
     if match is None:
         raise ValueError("Time data '%s' does not match pattern" % text)

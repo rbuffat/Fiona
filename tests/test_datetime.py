@@ -125,19 +125,16 @@ def generate_testdata(field_type, driver):
                 ("22:49:05+23:45", datetime.time(22, 49, 5, tzinfo=TZ(60 * 24 - 15)))]
 
 
-def convert_datetime_to_utc(d):
-    """ Convert datetime.datetime to UTC"""
-    return d - d.utcoffset()
-
-
 def compare_datetimes_utc(d1, d2):
-    """ Test if two datetime.datetime objects with timezones have the same UTC time"""
-    if d1.tzinfo is not None:
-        d1 = convert_datetime_to_utc(d1)
+    """ Test if two time objects are the same. Native times are assumed to be UTC"""
 
-    if d2.tzinfo is not None:
-        d2 = convert_datetime_to_utc(d2)
-    return d1.replace(tzinfo=None) == d2.replace(tzinfo=None)
+    if d1.tzinfo is None:
+        d1 = d1.replace(tzinfo=TZ(0))
+
+    if d2.tzinfo is None:
+        d2 = d2.replace(tzinfo=TZ(0))
+
+    return d1 == d2
 
 
 def test_compare_datetimes_utc():
@@ -177,12 +174,11 @@ def convert_time_to_utc(d):
     """ Convert datetime.time object to UTC"""
     d = datetime.datetime(1900, 1, 1, d.hour, d.minute, d.second, d.microsecond, d.tzinfo)
     d -= d.utcoffset()
-
-    return datetime.time(d.hour, d.minute, d.second, d.microsecond)
+    return d.time()
 
 
 def compare_times_utc(d1, d2):
-    """ Test if two datetime.time objects with timezones have the same UTC time"""
+    """ Test if two datetime.time objects with fixed timezones have the same UTC time"""
     if d1.tzinfo is not None:
         d1 = convert_time_to_utc(d1)
 
