@@ -651,7 +651,9 @@ def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpd
 
 _drivers_not_supporting_unknown_timezone = {
     'datetime':
-        {'GPKG': None}
+        {'GPKG': None,
+         'GPX': (2, 4, 0)
+         }
 }
 
 
