@@ -13,7 +13,7 @@ from fiona.env import GDALVersion
 import datetime
 from fiona.drvsupport import (supported_drivers, driver_mode_mingdal, _driver_converts_field_type_silently_to_str,
                               _driver_supports_field, _driver_converts_to_str, _driver_supports_timezones,
-                              _driver_supports_milliseconds)
+                              _driver_supports_milliseconds, _driver_supports_unknown_timezones)
 import pytz
 from pytz import timezone
 
@@ -202,6 +202,10 @@ def test_compare_times_utc():
 
     d1 = datetime.time(13, 0, 0, tzinfo=TZ(60))
     d2 = datetime.time(5, 0, 0, tzinfo=TZ(-60 * 7))
+    assert compare_times_utc(d1, d2)
+
+    d1 = datetime.datetime(2020, 6, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('MET')).timetz()
+    d2 = datetime.datetime(2020, 6, 21, 12, 0, 0, tzinfo=pytz.utc).astimezone(timezone('EST')).timetz()
     assert compare_times_utc(d1, d2)
 
 
@@ -649,28 +653,10 @@ def test_driver_marked_as_silently_converts_to_str_converts_silently_to_str(tmpd
         assert get_schema_field(driver, c.schema) == 'str'
 
 
-_drivers_not_supporting_unknown_timezone = {
-    'datetime':
-        {'GPKG': None,
-         'GPX': (2, 4, 0)
-         }
-}
-
-
-def _driver_supports_unknown_timezones(driver, field_type):
-    """ Returns True if the driver supports timezones for field_type, False otherwise"""
-
-    if field_type in _drivers_not_supporting_unknown_timezone and driver in _drivers_not_supporting_unknown_timezone[field_type]:
-        if _drivers_not_supporting_unknown_timezone[field_type][driver] is None:
-            return False
-        elif get_gdal_version_num() < calc_gdal_version_num(*_drivers_not_supporting_unknown_timezone[field_type][driver]):
-            return False
-    return True
-
-
 @pytest.mark.filterwarnings('ignore:.*driver silently converts *:UserWarning')
 @pytest.mark.parametrize("driver,field_type", test_cases_datefield + test_cases_datefield_to_str)
-def test_no_unkown_timezone(tmpdir, driver, field_type):
+def test_no_unknown_timezone(tmpdir, driver, field_type):
+    """ Some driver do not support unknown timezones (TZFlag=0) and convert datetimes silently to UTC"""
 
     if field_type == 'date':
         return

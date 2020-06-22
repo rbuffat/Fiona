@@ -326,3 +326,22 @@ def _driver_supports_milliseconds(driver):
             return False
 
     return True
+
+
+_drivers_not_supporting_unknown_timezone = {
+    'datetime':
+        {'GPKG': None,
+         'GPX': (2, 4, 0)
+         }
+}
+
+
+def _driver_supports_unknown_timezones(driver, field_type):
+    """ Returns True if the driver supports timezones for field_type, False otherwise"""
+
+    if field_type in _drivers_not_supporting_unknown_timezone and driver in _drivers_not_supporting_unknown_timezone[field_type]:
+        if _drivers_not_supporting_unknown_timezone[field_type][driver] is None:
+            return False
+        elif get_gdal_version_num() < calc_gdal_version_num(*_drivers_not_supporting_unknown_timezone[field_type][driver]):
+            return False
+    return True
