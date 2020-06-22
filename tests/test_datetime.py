@@ -682,3 +682,10 @@ def test_no_unknown_timezone(tmpdir, driver, field_type):
             assert "+" not in items[0], "{} contains a timezone".format(items[0])
         else:
             assert "+" in items[0], "{} contains no timezone".format(items[0])
+
+
+def test_read_timezone_geojson(path_test_tz_geojson):
+    """Test if timezones are read correctly"""
+    with fiona.open(path_test_tz_geojson) as c:
+        items = list(c)
+        assert items[0]['properties']['datetime'] == '2015-04-22T00:00:00+07:00'

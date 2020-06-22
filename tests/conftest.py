@@ -436,3 +436,9 @@ def testdata_generator():
                test_equal
 
     return _testdata_generator
+
+
+@pytest.fixture(scope='session')
+def path_test_tz_geojson(data_dir):
+    """Path to ```test_tz.geojson``"""
+    return os.path.join(data_dir, 'test_tz.geojson')
