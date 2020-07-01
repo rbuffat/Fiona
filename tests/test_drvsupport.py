@@ -20,20 +20,57 @@ def get_schema(driver):
     """
     schemas = {
         'GPX': {'properties': OrderedDict([('ele', 'float'),
-                                           ('time', 'datetime')]),
+                                           ('time', 'datetime'),
+                                           ('magvar', 'float'),
+                                           ('geoidheight', 'float'),
+                                           ('name', 'str'),
+                                           ('cmt', 'str'),
+                                           ('desc', 'str'),
+                                           ('src', 'str'),
+                                           ('link1_href', 'str'),
+                                           ('link1_text', 'str'),
+                                           ('link1_type', 'str'),
+                                           ('link2_href', 'str'),
+                                           ('link2_text', 'str'),
+                                           ('link2_type', 'str'),
+                                           ('sym', 'str'),
+                                           ('type', 'str'),
+                                           ('fix', 'str'),
+                                           ('sat', 'int'),
+                                           ('hdop', 'float'),
+                                           ('vdop', 'float'),
+                                           ('pdop', 'float'),
+                                           ('ageofdgpsdata', 'float'),
+                                           ('dgpsid', 'int')]),
                 'geometry': 'Point'},
-        'GPSTrackMaker': {'properties': OrderedDict([]),
+        'GPSTrackMaker': {'properties': OrderedDict([('name', 'str'),
+                                                     ('comment', 'str'),
+                                                     ('icon', 'int'),
+                                                     ('time', 'datetime')]),
                           'geometry': 'Point'},
         'DXF': {'properties': OrderedDict(
             [('Layer', 'str'),
+             ('PaperSpace', 'int'),
              ('SubClasses', 'str'),
              ('Linetype', 'str'),
              ('EntityHandle', 'str'),
-             ('Text', 'str')]),
+             ('Text', 'str'),
+             ('BlockName', 'str'),
+             ('BlockAngle', 'float'),
+             ('Block', 'str'),
+             ('AttributeTag', 'str')]),
             'geometry': 'Point'},
         'CSV': {'properties': OrderedDict([('ele', 'float')]),
                 'geometry': None},
-        'DGN': {'properties': OrderedDict([]),
+        'DGN': {'properties': OrderedDict([('Type', 'int:2'),
+                                           ('Level', 'int:2'),
+                                           ('GraphicGroup', 'int:4'),
+                                           ('ColorIndex', 'int:3'),
+                                           ('Weight', 'int:2'),
+                                           ('Style', 'int:1'),
+                                           ('EntityNum', 'int'),
+                                           ('MSLink', 'int'),
+                                           ('Text', 'str')]),
                 'geometry': 'LineString'}
     }
     default_schema = {'geometry': 'LineString',
@@ -47,21 +84,58 @@ def get_record1(driver):
     """
     records = {
         'GPX': {'properties': OrderedDict([('ele', 386.3),
-                                           ('time', '2020-03-24T16:08:40')]),
+                                           ('time', '2020-03-24T16:08:40'),
+                                           ('magvar', None),
+                                           ('geoidheight', None),
+                                           ('name', None),
+                                           ('cmt', None),
+                                           ('desc', None),
+                                           ('src', None),
+                                           ('link1_href', None),
+                                           ('link1_text', None),
+                                           ('link1_type', None),
+                                           ('link2_href', None),
+                                           ('link2_text', None),
+                                           ('link2_type', None),
+                                           ('sym', None),
+                                           ('type', None),
+                                           ('fix', None),
+                                           ('sat', None),
+                                           ('hdop', None),
+                                           ('vdop', None),
+                                           ('pdop', None),
+                                           ('ageofdgpsdata', None),
+                                           ('dgpsid', None)]),
                 'geometry': {'type': 'Point', 'coordinates': (8.306711, 47.475623)}},
-        'GPSTrackMaker': {'properties': OrderedDict([]),
+        'GPSTrackMaker': {'properties': OrderedDict([('name', 'test'),
+                                                     ('comment', ''),
+                                                     ('icon', 0),
+                                                     ('time', '2018-03-25T22:49:05')]),
                           'geometry': {'type': 'Point', 'coordinates': (8.306711, 47.475623)}},
         'DXF': {'properties': OrderedDict(
             [('Layer', '0'),
+             ('PaperSpace', None),
              ('SubClasses', 'AcDbEntity:AcDbPoint'),
              ('Linetype', None),
              ('EntityHandle', '20000'),
-             ('Text', None)]),
+             ('Text', None),
+             ('BlockName', None),
+             ('BlockAngle', None),
+             ('Block', None),
+             ('AttributeTag', None)]),
             'geometry': {'type': 'Point', 'coordinates': (8.306711, 47.475623)}},
         'CSV': {'properties': OrderedDict([('ele', 386.3)]),
                 'geometry': None},
         'DGN': {'properties': OrderedDict(
-            []),
+            [('Type', 3),
+             ('Level', 0),
+             ('GraphicGroup', 0),
+             ('ColorIndex', 0),
+             ('Weight', 0),
+             ('Style', 0),
+             ('EntityNum', None),
+             ('MSLink', None),
+             ('Text', None)]),
             'geometry': {'type': 'LineString', 'coordinates': [
                 (1.0, 0.0), (0.0, 0.0)]}}
     }
@@ -78,16 +152,45 @@ def get_record2(driver):
     """
     records = {
         'GPX': {'properties': OrderedDict([('ele', 386.3),
-                                           ('time', '2020-03-24T16:19:14')]),
+                                           ('time', '2020-03-24T16:19:14'),
+                                           ('magvar', None),
+                                           ('geoidheight', None),
+                                           ('name', None),
+                                           ('cmt', None),
+                                           ('desc', None),
+                                           ('src', None),
+                                           ('link1_href', None),
+                                           ('link1_text', None),
+                                           ('link1_type', None),
+                                           ('link2_href', None),
+                                           ('link2_text', None),
+                                           ('link2_type', None),
+                                           ('sym', None),
+                                           ('type', None),
+                                           ('fix', None),
+                                           ('sat', None),
+                                           ('hdop', None),
+                                           ('vdop', None),
+                                           ('pdop', None),
+                                           ('ageofdgpsdata', None),
+                                           ('dgpsid', None)]),
                 'geometry': {'type': 'Point', 'coordinates': (8.307451, 47.474996)}},
-        'GPSTrackMaker': {'properties': OrderedDict([]),
+        'GPSTrackMaker': {'properties': OrderedDict([('name', 'test'),
+                                                     ('comment', ''),
+                                                     ('icon', 0),
+                                                     ('time', '2018-03-25T22:49:05')]),
                           'geometry': {'type': 'Point', 'coordinates': (8.307451, 47.474996)}},
         'DXF': {'properties': OrderedDict(
             [('Layer', '0'),
+             ('PaperSpace', None),
              ('SubClasses', 'AcDbEntity:AcDbPoint'),
              ('Linetype', None),
              ('EntityHandle', '20000'),
-             ('Text', None)]),
+             ('Text', None),
+             ('BlockName', None),
+             ('BlockAngle', None),
+             ('Block', None),
+             ('AttributeTag', None)]),
             'geometry': {'type': 'Point', 'coordinates': (8.307451, 47.474996)}},
         'CSV': {'properties': OrderedDict([('ele', 386.8)]),
                 'geometry': None},
@@ -112,10 +215,10 @@ def get_record2(driver):
 
 
 @requires_gdal24
-@pytest.mark.parametrize('format', ['GeoJSON', 'ESRIJSON', 'TopoJSON', 'GeoJSONSeq'])
-def test_geojsonseq(format):
+@pytest.mark.parametrize('drv', ['GeoJSON', 'ESRIJSON', 'TopoJSON', 'GeoJSONSeq'])
+def test_geojsonseq(drv):
     """Format is available"""
-    assert format in fiona.drvsupport.supported_drivers.keys()
+    assert drv in fiona.drvsupport.supported_drivers.keys()
 
 
 @pytest.mark.parametrize('driver', [driver for driver, raw in supported_drivers.items() if 'w' in raw
@@ -188,9 +291,9 @@ def test_write_does_not_work_when_gdal_smaller_mingdal(tmpdir, driver, monkeypat
                                     and driver not in blacklist_append_drivers])
 def test_append_or_driver_error(tmpdir, driver):
     """ Test if driver supports append mode.
-    
+
     Some driver only allow a specific schema. These drivers can be excluded by adding them to blacklist_append_drivers.
-    
+
     """
 
     if driver == "BNA" and GDALVersion.runtime() < GDALVersion(2, 0):
@@ -281,9 +384,9 @@ def test_append_does_not_work_when_gdal_smaller_mingdal(tmpdir, driver, monkeypa
                                     raw == 'r' and driver not in blacklist_write_drivers])
 def test_no_write_driver_cannot_write(tmpdir, driver, monkeypatch):
     """Test if read only driver cannot write
-    
-    If this test fails, it should be considered to enable write support for the respective driver in drvsupport.py. 
-    
+
+    If this test fails, it should be considered to enable write support for the respective driver in drvsupport.py.
+
     """
 
     monkeypatch.setitem(fiona.drvsupport.supported_drivers, driver, 'rw')

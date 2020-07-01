@@ -1083,7 +1083,23 @@ cdef class WritingSession(Session):
 
             encoding = self._get_internal_encoding()
 
-            for key, value in collection.schema['properties'].items():
+            # Test if default fields are included in provided schema
+            schema_fields = collection.schema['properties']
+            default_fields = self.get_schema()['properties']
+            for key, value in default_fields.items():
+                if key not in schema_fields or not schema_fields[key] == value:
+                    raise SchemaError("Schema properties for driver '{}' must include {}".format(self.collection.driver,
+                                                                                                 default_fields))
+
+            # Fields to create
+            new_fields = OrderedDict([(key, value) for key, value in schema_fields.items() if key not in default_fields])
+
+            # Update schema
+            schema_fields = default_fields.copy()
+            schema_fields.update(new_fields)
+            collection.schema['properties'] = schema_fields
+
+            for key, value in new_fields.items():
 
                 log.debug("Begin creating field: %r value: %r", key, value)
 
