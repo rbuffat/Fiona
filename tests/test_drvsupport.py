@@ -54,7 +54,7 @@ def test_write_or_driver_error(tmpdir, driver, testdata_generator):
             open_driver = driver
         else:
             open_driver = None
-        with fiona.open(pathdriver=open_driver) as c:
+        with fiona.open(path, driver=open_driver) as c:
             assert c.driver == driver
             items = list(c)
             assert len(items) == len(records1)
