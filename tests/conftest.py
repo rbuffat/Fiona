@@ -400,7 +400,10 @@ def testdata_generator():
         is_good = is_good and val_in['geometry'] == val_out['geometry']
         for key in val_in['properties']:
             if key in val_out['properties']:
-                is_good = is_good and str(val_in['properties'][key]) == str(val_out['properties'][key])
+                if driver == 'FileGDB' and isinstance(val_in['properties'][key], int):
+                    is_good = is_good and str(val_in['properties'][key]) == str(int(val_out['properties'][key]))
+                else:
+                    is_good = is_good and str(val_in['properties'][key]) == str(val_out['properties'][key])
             else:
                 is_good = False
         return is_good
