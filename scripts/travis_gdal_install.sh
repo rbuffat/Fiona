@@ -45,7 +45,8 @@ GDALOPTS="  --with-ogr \
             --without-python \
             --with-oci=no \
             --without-mrf \
-            --with-webp=no"
+            --with-webp=no \
+            --enable-driver-flatgeobuf"
 
 
 # Create build dir if not exists
