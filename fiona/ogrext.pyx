@@ -1229,7 +1229,7 @@ cdef class WritingSession(Session):
             return record["geometry"]["type"].lstrip("3D ") in valid_geom_types
 
         log.debug("Starting transaction (initial)")
-        result = gdal_start_transaction(self.cogr_ds, 0)
+        result = gdal_start_transaction(self.cogr_ds, 1)
         if result == OGRERR_FAILURE:
             raise TransactionError("Failed to start transaction")
 
