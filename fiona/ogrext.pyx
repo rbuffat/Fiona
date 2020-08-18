@@ -1269,7 +1269,7 @@ cdef class WritingSession(Session):
                 if result == OGRERR_FAILURE:
                     raise TransactionError("Failed to commit transaction")
                 log.debug("Starting transaction (intermediate)")
-                result = gdal_start_transaction(self.cogr_ds, 0)
+                result = gdal_start_transaction(self.cogr_ds, 1)
                 if result == OGRERR_FAILURE:
                     raise TransactionError("Failed to start transaction")
                 features_in_transaction = 0
