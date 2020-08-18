@@ -17,7 +17,7 @@ from fiona.env import GDALVersion
 driver_extensions = {'DXF': 'dxf',
                      'CSV': 'csv',
                      'ESRI Shapefile': 'shp',
-                     'FGDB': 'gdb',
+                     'FileGDB': 'gdb',
                      'GML': 'gml',
                      'GPX': 'gpx',
                      'GPSTrackMaker': 'gtm',
