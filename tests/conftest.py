@@ -27,7 +27,8 @@ driver_extensions = {'DXF': 'dxf',
                      'GeoJSONSeq': 'geojsons',
                      'GMT': 'gmt',
                      'OGR_GMT': 'gmt',
-                     'BNA': 'bna'}
+                     'BNA': 'bna',
+                     'FlatGeobuf': 'fgb'}
 
 
 def pytest_report_header(config):
