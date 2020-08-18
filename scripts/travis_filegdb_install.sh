@@ -13,3 +13,7 @@ if [ ! -d "$FILEGDB" ]; then
   ls -l
   export LD_LIBRARY_PATH=$FILEGDB/lib:$LD_LIBRARY_PATH
 fi
+
+# change back to travis build dir
+cd $TRAVIS_BUILD_DIR
+
