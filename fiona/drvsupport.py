@@ -251,7 +251,8 @@ _driver_field_type_unsupported = {
         'DGN': None,
         'BNA': None,
         'DXF': None,
-        'PCIDSK': (2, 1, 0)
+        'PCIDSK': (2, 1, 0),
+        'FlatGeobuf': None
     },
     'datetime': {
         'ESRI Shapefile': None,
@@ -267,7 +268,8 @@ _driver_field_type_unsupported = {
         'DGN': None,
         'BNA': None,
         'DXF': None,
-        'PCIDSK': (2, 1, 0)
+        'PCIDSK': (2, 1, 0),
+        'FlatGeobuf': None
     }
 }
 
