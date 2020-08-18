@@ -321,7 +321,8 @@ def _driver_supports_timezones(driver, field_type):
 
 # None: driver never supports timezones, (2, 0, 0): driver supports timezones with GDAL 2.0.0
 _drivers_not_supporting_milliseconds = {
-    'GPSTrackMaker': None
+    'GPSTrackMaker': None,
+    'FileGDB': None
 }
 
 
