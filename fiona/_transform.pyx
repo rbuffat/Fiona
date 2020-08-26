@@ -72,6 +72,7 @@ cdef void *_crs_from_crs(object crs):
         proj_b = crs.encode('utf-8')
         proj_c = proj_b
         _crs.OSRSetFromUserInput(osr, proj_c)
+        osr_set_traditional_axis_mapping_strategy(osr)
     return osr
 
 
