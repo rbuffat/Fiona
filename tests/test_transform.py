@@ -2,6 +2,7 @@
 
 import math
 
+import fiona
 import pytest
 
 from fiona import transform
@@ -48,3 +49,7 @@ from fiona import transform
 def test_transform_geom_with_z(geom):
     """Transforming a geom with Z succeeds"""
     g2 = transform.transform_geom("epsg:4326", "epsg:3857", geom, precision=3)
+
+
+def test_axis_ordering():
+    assert transform.transform("epsg:4326", "epsg:3857", [-75.71], [38.06]) == ([-8427998.647958742], [4587905.27136252])
