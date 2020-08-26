@@ -49,6 +49,8 @@ def test_transform_geom_with_z(geom):
 
 
 @pytest.mark.parametrize("source_crs", ["epsg:4326",
+                                        "EPSG:4326",
+                                        "WGS84",
                                         {'init': 'epsg:4326'},
                                         {'proj': 'longlat', 'datum': 'WGS84', 'no_defs': True},
                                         "OGC:CRS84"])
@@ -63,4 +65,3 @@ def test_axis_ordering(source_crs):
     geom = {"type": "Point", "coordinates": [-75.71, 38.06]}
     g1 = transform.transform_geom(source_crs, "epsg:3857", geom, precision=3)
     assert g1["coordinates"] == pytest.approx(expected)
-
