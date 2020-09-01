@@ -348,14 +348,14 @@ def _driver_supports_milliseconds(driver):
 # None: field type never supports unknown timezones, (2, 0, 0): field type supports unknown timezones with GDAL 2.0.0
 _drivers_not_supporting_unknown_timezone = {
     'datetime':
-        {'GPKG': None,
+        {'GPKG': (3, 1, 3),
          'GPX': (2, 4, 0)
          }
 }
 
 
 def _driver_supports_unknown_timezones(driver, field_type):
-    """ Returns True if the driver supports timezones for field_type, False otherwise
+    """ Returns True if the driver supports unknown timezones for field_type, False otherwise
 
         Note: this function is not part of Fiona's public API.
     """
