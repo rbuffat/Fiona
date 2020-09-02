@@ -65,7 +65,7 @@ def _read_file(name):
 
 
 has_gpkg = "GPKG" in fiona.drvsupport.supported_drivers.keys()
-has_gpkg_reason = "Requires geopackage driver"
+has_gpkg_reason = "Requires at least geopackage driver"
 requires_gpkg = pytest.mark.skipif(not has_gpkg, reason=has_gpkg_reason)
 
 
@@ -280,27 +280,31 @@ requires_only_gdal1 = pytest.mark.skipif(
 
 requires_gdal2 = pytest.mark.skipif(
     not gdal_version.major >= 2,
-    reason="Requires GDAL 2.x")
+    reason="Requires at least GDAL 2.x")
 
 requires_gdal21 = pytest.mark.skipif(
     not gdal_version.at_least('2.1'),
-    reason="Requires GDAL 2.1.x")
+    reason="Requires at least GDAL 2.1.x")
 
 requires_gdal22 = pytest.mark.skipif(
     not gdal_version.at_least('2.2'),
-    reason="Requires GDAL 2.2.x")
+    reason="Requires at least GDAL 2.2.x")
+
+requires_gdal23 = pytest.mark.skipif(
+    not gdal_version.at_least('2.3'),
+    reason="Requires at least GDAL 2.3.x")
 
 requires_gdal24 = pytest.mark.skipif(
     not gdal_version.at_least('2.4'),
-    reason="Requires GDAL 2.4.x")
+    reason="Requires at least GDAL 2.4.x")
 
 requires_gdal_lt_3 = pytest.mark.skipif(
     not gdal_version.major < 3,
-    reason="Requires GDAL < 3")
+    reason="Requires at least GDAL < 3")
 
 requires_gdal3 = pytest.mark.skipif(
     not gdal_version.major >= 3,
-    reason="Requires GDAL 3.x")
+    reason="Requires at least GDAL 3.x")
 
 travis_only = pytest.mark.skipif(
     not os.getenv("TRAVIS", "false") == "true",
