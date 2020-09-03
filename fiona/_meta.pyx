@@ -1,9 +1,10 @@
 
 include "gdal.pxi"
 
-from fiona._err cimport  exc_wrap_pointer
+from fiona._err cimport exc_wrap_pointer
 from fiona._shim cimport gdal_open_vector
 from fiona._env import get_gdal_version_tuple
+from fiona.errors import FionaValueError
 import logging
 
 
@@ -37,7 +38,10 @@ def _get_metadata_item(driver, metadata_item):
     except UnicodeDecodeError:
         driver_b = driver
 
-    cogr_driver = exc_wrap_pointer(GDALGetDriverByName(driver_b))
+    cogr_driver = GDALGetDriverByName(driver_b)
+    if cogr_driver == NULL:
+        raise FionaValueError("Could not find driver '{}'".format(driver))
+    
     metadata_c = GDALGetMetadataItem(cogr_driver, metadata_item.encode('utf-8'), NULL)
 
     metadata = None

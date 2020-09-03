@@ -1,7 +1,10 @@
 import xml.etree.ElementTree as ET
-from fiona._meta import _get_metadata_item
-from fiona.env import require_gdal_version
-import logging
+import fiona
+with fiona._loading.add_gdal_dll_directories():
+    from fiona._meta import _get_metadata_item
+    from fiona.env import require_gdal_version
+    from fiona._env import get_gdal_version_num, calc_gdal_version_num
+    import logging
 
 log = logging.getLogger(__name__)
 
@@ -69,56 +72,57 @@ def dataset_creation_options(driver):
     Returns
     -------
     dict
-        Dataset creation options or None if not specified by driver
+        Dataset creation options
 
     """
 
     xml = _get_metadata_item(driver, MetadataItem.CREATION_OPTION_LIST)
 
     if xml is None:
-        return None
+        return {}
 
     if len(xml) == 0:
-        return None
+        return {}
 
     # Fix errors in GDALs XML
     # Same changes as in https://github.com/OSGeo/gdal/commit/f447a31822e26ddf0cabcee0ce673a028550a2a0
-    if driver == 'GML':
-        xml = xml.replace("<gml:boundedBy>", "&lt;gml:boundedBy&gt;")
-        xml = xml.replace(">Space separated list of filenames of XML schemas that apply to the data file'/>", ">")
-    elif driver == 'GPX':
-        xml = xml.replace("<extensions>", "&lt;extensions&gt;")
-    elif driver == "FileGDB":
-        xml = xml.replace("<esri:DataElement>", "&lt;esri:DataElement&gt;")
-    elif driver == 'KML':
-        xml = xml.replace("<extensions>", "&lt;extensions&gt;")
-        xml = xml.replace("<name>", "&lt;name&gt;")
-        xml = xml.replace("<description>", "&lt;description&gt;")
-        xml = xml.replace("<AltitudeMode>", "&lt;AltitudeMode&gt;")
-    elif driver == 'GeoRSS':
-        for tag in ['item', 'entry', 'channel', 'title', 'description', 'link', 'updated', 'author', 'name', 'id']:
-            xml = xml.replace("<{}>".format(tag),
-                              "&lt;{}&gt;".format(tag))
-    elif driver == 'LIBKML':
-        for tag in ['BallonStyle', 'ItemIcon', 'NetworkLinkControl', 'Update', 'atom:Author', 'atom:link', 'cookie',
-                    'description', 'expires', 'linkDescription', 'linkName', 'linkSnippet', 'listItemType',
-                    'maxSessionLength', 'message', 'minRefreshPeriod', 'name', 'open', 'phoneNumber', 'snippet',
-                    'visibility']:
-            xml = xml.replace("<{}>".format(tag),
-                              "&lt;{}&gt;".format(tag))
-        xml = xml.replace("root_doc'/>'", "root_doc'/>")
-    elif driver == 'KML':
-        xml = xml.replace("'root_doc'/>'", "'root_doc'/>")
-    elif driver == 'ISIS3':
-        xml = xml.replace("'boolean'", "'boolean' ")
-        xml = xml.replace("'string'", "'string' ")
-    elif driver == 'GRIB':
-        xml = xml.replace("max='100'", "max='100' ")
-    elif driver == 'Rasterlite':
-        xml = xml.replace("default='(GTiff", "description='(GTiff")
-        xml = xml.replace("type='string' default='GTiff'", "type='string'")
-    elif driver == 'PDF':
-        xml = xml.replace("alt_config_option=", " alt_config_option=")
+    if get_gdal_version_num() < calc_gdal_version_num(3, 1, 1):
+        if driver == 'GML':
+            xml = xml.replace("<gml:boundedBy>", "&lt;gml:boundedBy&gt;")
+            xml = xml.replace(">Space separated list of filenames of XML schemas that apply to the data file'/>", ">")
+        elif driver == 'GPX':
+            xml = xml.replace("<extensions>", "&lt;extensions&gt;")
+        elif driver == "FileGDB":
+            xml = xml.replace("<esri:DataElement>", "&lt;esri:DataElement&gt;")
+        elif driver == 'KML':
+            xml = xml.replace("<extensions>", "&lt;extensions&gt;")
+            xml = xml.replace("<name>", "&lt;name&gt;")
+            xml = xml.replace("<description>", "&lt;description&gt;")
+            xml = xml.replace("<AltitudeMode>", "&lt;AltitudeMode&gt;")
+        elif driver == 'GeoRSS':
+            for tag in ['item', 'entry', 'channel', 'title', 'description', 'link', 'updated', 'author', 'name', 'id']:
+                xml = xml.replace("<{}>".format(tag),
+                                  "&lt;{}&gt;".format(tag))
+        elif driver == 'LIBKML':
+            for tag in ['BallonStyle', 'ItemIcon', 'NetworkLinkControl', 'Update', 'atom:Author', 'atom:link', 'cookie',
+                        'description', 'expires', 'linkDescription', 'linkName', 'linkSnippet', 'listItemType',
+                        'maxSessionLength', 'message', 'minRefreshPeriod', 'name', 'open', 'phoneNumber', 'snippet',
+                        'visibility']:
+                xml = xml.replace("<{}>".format(tag),
+                                  "&lt;{}&gt;".format(tag))
+            xml = xml.replace("root_doc'/>'", "root_doc'/>")
+        elif driver == 'KML':
+            xml = xml.replace("'root_doc'/>'", "'root_doc'/>")
+        elif driver == 'ISIS3':
+            xml = xml.replace("'boolean'", "'boolean' ")
+            xml = xml.replace("'string'", "'string' ")
+        elif driver == 'GRIB':
+            xml = xml.replace("max='100'", "max='100' ")
+        elif driver == 'Rasterlite':
+            xml = xml.replace("default='(GTiff", "description='(GTiff")
+            xml = xml.replace("type='string' default='GTiff'", "type='string'")
+        elif driver == 'PDF':
+            xml = xml.replace("alt_config_option=", " alt_config_option=")
 
     return _parse_options(xml)
 
@@ -134,31 +138,32 @@ def layer_creation_options(driver):
     Returns
     -------
     dict
-        Layer creation options or None if not specified by driver
+        Layer creation options
 
     """
     xml = _get_metadata_item(driver, MetadataItem.LAYER_CREATION_OPTION_LIST)
 
     if xml is None:
-        return None
+        return {}
 
     if len(xml) == 0:
-        return None
+        return {}
 
     # Fix GDALs XML
     # Same changes as in https://github.com/OSGeo/gdal/commit/f447a31822e26ddf0cabcee0ce673a028550a2a0
-    if driver == "LIBKML":
-        for tag in ['BallonStyle', 'Camera', 'Document', 'Folder', 'ItemIcon', 'LookAt', 'NetworkLinkControl', 'Region',
-                    'ScreenOverlay', 'Update', 'altitude', 'altitudeMode', 'atom:Author', 'atom:link', 'description',
-                    'expires', 'heading', 'latitude', 'linkDescription', 'linkSnippet', 'listItemType', 'longitude',
-                    'maxSessionLengthcookie', 'message', 'minRefreshPeriod', 'name', 'open', 'overlayXY', 'phoneNumber',
-                    'range', 'roll', 'screenXY', 'sizeXY', 'snippet', 'tilt', 'visibility']:
-            xml = xml.replace("<{}>".format(tag),
-                              "&lt;{}&gt;".format(tag))
-    elif driver == 'ElasticSearch':
-        xml = xml.replace("FeatureCollection'/>.", "FeatureCollection'/>")
-    elif driver in {'CouchDB', 'Cloudant'}:
-        xml = xml.replace("'GEOJSON '", "'GEOJSON'")
+    if get_gdal_version_num() < calc_gdal_version_num(3, 1, 1):
+        if driver == "LIBKML":
+            for tag in ['BallonStyle', 'Camera', 'Document', 'Folder', 'ItemIcon', 'LookAt', 'NetworkLinkControl', 'Region',
+                        'ScreenOverlay', 'Update', 'altitude', 'altitudeMode', 'atom:Author', 'atom:link', 'description',
+                        'expires', 'heading', 'latitude', 'linkDescription', 'linkSnippet', 'listItemType', 'longitude',
+                        'maxSessionLengthcookie', 'message', 'minRefreshPeriod', 'name', 'open', 'overlayXY', 'phoneNumber',
+                        'range', 'roll', 'screenXY', 'sizeXY', 'snippet', 'tilt', 'visibility']:
+                xml = xml.replace("<{}>".format(tag),
+                                  "&lt;{}&gt;".format(tag))
+        elif driver == 'ElasticSearch':
+            xml = xml.replace("FeatureCollection'/>.", "FeatureCollection'/>")
+        elif driver in {'CouchDB', 'Cloudant'}:
+            xml = xml.replace("'GEOJSON '", "'GEOJSON'")
 
     return _parse_options(xml)
 
@@ -174,16 +179,16 @@ def dataset_open_options(driver):
     Returns
     -------
     dict
-        Dataset open options or None if not specified by driver
+        Dataset open options
 
     """
     xml = _get_metadata_item(driver, MetadataItem.DATASET_OPEN_OPTIONS)
 
     if xml is None:
-        return None
+        return {}
 
     if len(xml) == 0:
-        return None
+        return {}
 
     return _parse_options(xml)
 
@@ -203,9 +208,7 @@ def print_driver_options(driver):
                                  ("Layer Creation Options", layer_creation_options(driver))]:
 
         print("{option_type}:".format(option_type=option_type))
-        if options is None:
-            print("\tNo options specified by GDAL. Please consult GDAL's driver documentation.")
-        elif len(options) == 0:
+        if len(options) == 0:
             print("\tNo options available.")
         else:
             for option_name in options:
