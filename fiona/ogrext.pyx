@@ -1588,7 +1588,7 @@ cdef class Iterator:
             # calling GetNextFeature n times. We can shortcut that if we know the previous index.
             # OGR_L_GetNextFeature increments cursor by 1, therefore self.step - 1 as one increment was performed when feature is read
             for _ in range(self.step - 1):
-                cogr_feature = exc_wrap_int(OGR_L_GetNextFeature(session.cogr_layer))
+                cogr_feature = OGR_L_GetNextFeature(session.cogr_layer)
                 if cogr_feature == NULL:
                     raise StopIteration
         elif self.step > 1 and not self.fastindex and self.next_index == self.start:
