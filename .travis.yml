@@ -23,56 +23,89 @@ env:
 
 matrix:
   include:
+    
+    # Test lates gdal on arm
+    - python: "3.8"
+      os: linux
+      arch: arm64
+      env:
+        GDALVERSION="3.1.2"
+        PROJVERSION="6.3.2"
+
     # Test all supported gdal minor versions (except latest stable) with one python version
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="1.11.5"
         PROJVERSION="4.8.0"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="2.0.3"
         PROJVERSION="4.9.3"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="2.1.4"
         PROJVERSION="4.9.3"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="2.2.4"
         PROJVERSION="4.9.3"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="2.3.3"
         PROJVERSION="4.9.3"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="2.4.4"
         PROJVERSION="4.9.3"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="3.0.4"
         PROJVERSION="6.2.1"
 
     # Test all supported python versions with latest stable gdal release
     - python: "2.7"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="3.1.2"
         PROJVERSION="6.3.2"
     - python: "3.6"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="3.1.2"
         PROJVERSION="6.3.2"
     - python: "3.7"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="3.1.2"
         PROJVERSION="6.3.2"
     - python: "3.8"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="3.1.2"
         PROJVERSION="6.3.2"
 
     # Test master
     - python: "3.8"
+      os: linux
+      arch: amd64
       env:
         GDALVERSION="master"
         PROJVERSION="7.0.1"
