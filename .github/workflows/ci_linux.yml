@@ -51,7 +51,7 @@ jobs:
           echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> $GITHUB_WORKSPACE/env_variables
           echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> $GITHUB_WORKSPACE/env_variables
           echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:\$PATH" >> $GITHUB_WORKSPACE/env_variables
-          echo "export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:\$LD_LIBRARY_PATH" >> $GITHUB_WORKSPACE/env_variables
+          echo "export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$FILEGDB/lib:\$LD_LIBRARY_PATH" >> $GITHUB_WORKSPACE/env_variables
           cat $GITHUB_WORKSPACE/env_variables
 
       - name: Install apt packages
@@ -76,10 +76,14 @@ jobs:
           source $GITHUB_WORKSPACE/env_variables
           chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
 
-      - name: Build GDAL
+      - name: Install FileGDB
         run: |
           source $GITHUB_WORKSPACE/env_variables
           chmod +x scripts/travis_filegdb_install.sh && ./scripts/travis_filegdb_install.sh
+
+      - name: Build GDAL
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
           chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
           gdal-config --version
 
