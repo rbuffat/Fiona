@@ -80,8 +80,8 @@ jobs:
       - name: Build GDAL
         run: |
           source $GITHUB_WORKSPACE/env_variables
-          ./scripts/travis_filegdb_install.sh
-          ./scripts/travis_gdal_install.sh
+          chmod +x scripts/travis_filegdb_install.sh && ./scripts/travis_filegdb_install.sh
+          chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
           gdal-config --version
 
       - name: Build Fiona
