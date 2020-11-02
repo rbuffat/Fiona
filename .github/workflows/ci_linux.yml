@@ -108,3 +108,5 @@ jobs:
 
       - name: Coveralls
         run: coveralls || echo "!! intermittent coveralls failure"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
