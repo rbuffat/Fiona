@@ -57,7 +57,7 @@ jobs:
 
       - name: Install apt packages
         run: |
-          sudo apt-get install libatlas-base-dev gfortran libsqlite3-dev sqlite3 libcurl4-openssl-dev
+          sudo apt-get install libatlas-base-dev gfortran libsqlite3-dev sqlite3 libcurl4-openssl-dev libgeos-dev libexpat1-dev libspatialite-dev libxml2-dev libfreexl-dev libzstd-dev
 
       - name: Dependency Cache
         uses: actions/cache@v2
