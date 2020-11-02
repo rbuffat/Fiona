@@ -10,19 +10,19 @@ jobs:
       matrix:
         config:
           # Test all supported gdal minor versions (except latest stable) with one python version
-          - { python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.1.4",   PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.2.4",   PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.3.3",   PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.4.4",   PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "3.0.4",   PROJVERSION: "6.2.1" }
-          - { python-version: 3.6, GDALVERSION: "3.1.0",   PROJVERSION: "6.3.2" }
+#          - { python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3" }
+#          - { python-version: 3.6, GDALVERSION: "2.1.4",   PROJVERSION: "4.9.3" }
+#          - { python-version: 3.6, GDALVERSION: "2.2.4",   PROJVERSION: "4.9.3" }
+#          - { python-version: 3.6, GDALVERSION: "2.3.3",   PROJVERSION: "4.9.3" }
+#          - { python-version: 3.6, GDALVERSION: "2.4.4",   PROJVERSION: "4.9.3" }
+#          - { python-version: 3.6, GDALVERSION: "3.0.4",   PROJVERSION: "6.2.1" }
+#          - { python-version: 3.6, GDALVERSION: "3.1.0",   PROJVERSION: "6.3.2" }
 
           # Test all supported python versions with latest stable gdal release
           - { python-version: 3.6, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
-          - { python-version: 3.7, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
-          - { python-version: 3.8, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
-          - { python-version: 3.9, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+#          - { python-version: 3.7, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+#          - { python-version: 3.8, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+#          - { python-version: 3.9, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
 
     steps:
       - uses: actions/checkout@v2
@@ -55,17 +55,15 @@ jobs:
           echo "export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH" >> $GITHUB_WORKSPACE/env_variables
           cat $GITHUB_WORKSPACE/env_variables
 
-      - name: Install brew packages
+      - name: Install apt packages
         run: |
-          brew install pkg-config expat libspatialite sqlite geos
-          brew list --versions | grep 'expat\|libspatialite\|sqlite\|geos\|curl\|libxml2\|freexl\|zstd' > $GITHUB_WORKSPACE/brew_list
-          cat $GITHUB_WORKSPACE/brew_list
+          sudo apt-get install libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3
 
       - name: Dependency Cache
         uses: actions/cache@v2
         with:
           path: gdalinstall
-          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/brew_list')}}
+          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}
 
       - name: Install Python dependencies
         run: |
