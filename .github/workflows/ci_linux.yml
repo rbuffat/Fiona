@@ -46,13 +46,11 @@ jobs:
           echo "export PROJVERSION=${{matrix.config.PROJVERSION}}" >> $GITHUB_WORKSPACE/env_variables
           echo "export TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" >> $GITHUB_WORKSPACE/env_variables
           echo "export TRAVIS_OS_NAME=linux" >> $GITHUB_WORKSPACE/env_variables
-          echo "export PATH="/usr/local/opt/expat/bin:\$PATH" >> $GITHUB_WORKSPACE/env_variables
-          echo "export PATH="/usr/local/opt/libxml2/bin:\$PATH" >> $GITHUB_WORKSPACE/env_variables
           source $GITHUB_WORKSPACE/env_variables
           echo "export GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> $GITHUB_WORKSPACE/env_variables
           echo "export PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> $GITHUB_WORKSPACE/env_variables
           echo "export PATH=$GDALINST/gdal-$GDALVERSION/bin:$GDALINST/proj-$PROJVERSION/bin:\$PATH" >> $GITHUB_WORKSPACE/env_variables
-          echo "export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$LD_LIBRARY_PATH" >> $GITHUB_WORKSPACE/env_variables
+          echo "export LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:\$LD_LIBRARY_PATH" >> $GITHUB_WORKSPACE/env_variables
           cat $GITHUB_WORKSPACE/env_variables
 
       - name: Install apt packages
@@ -63,7 +61,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: gdalinstall
-          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}
+          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-v2
 
       - name: Install Python dependencies
         run: |
