@@ -57,7 +57,7 @@ jobs:
 
       - name: Install apt packages
         run: |
-          sudo apt-get install libatlas-base-dev gfortran libsqlite3-dev sqlite3
+          sudo apt-get install libatlas-base-dev gfortran libsqlite3-dev sqlite3 libcurl-dev
 
       - name: Dependency Cache
         uses: actions/cache@v2
@@ -101,7 +101,7 @@ jobs:
       - name: Test with pytest
         run: |
           source $GITHUB_WORKSPACE/env_variables
-          python -m pytest -m "not wheel and not network" --cov fiona --cov-report term-missing
+          python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
