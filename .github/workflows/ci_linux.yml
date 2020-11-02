@@ -13,13 +13,13 @@ jobs:
 #          - { python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3" }
 #          - { python-version: 3.6, GDALVERSION: "2.1.4",   PROJVERSION: "4.9.3" }
 #          - { python-version: 3.6, GDALVERSION: "2.2.4",   PROJVERSION: "4.9.3" }
-#          - { python-version: 3.6, GDALVERSION: "2.3.3",   PROJVERSION: "4.9.3" }
+          - { python-version: 3.6, GDALVERSION: "2.3.3",   PROJVERSION: "4.9.3" }
 #          - { python-version: 3.6, GDALVERSION: "2.4.4",   PROJVERSION: "4.9.3" }
 #          - { python-version: 3.6, GDALVERSION: "3.0.4",   PROJVERSION: "6.2.1" }
 #          - { python-version: 3.6, GDALVERSION: "3.1.0",   PROJVERSION: "6.3.2" }
 
           # Test all supported python versions with latest stable gdal release
-          - { python-version: 3.6, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+#          - { python-version: 3.6, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
 #          - { python-version: 3.7, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
 #          - { python-version: 3.8, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
 #          - { python-version: 3.9, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
@@ -57,7 +57,7 @@ jobs:
 
       - name: Install apt packages
         run: |
-          sudo apt-get install libatlas-dev gfortran libsqlite3-dev sqlite3
+          sudo apt-get install libatlas-base-dev gfortran libsqlite3-dev sqlite3
 
       - name: Dependency Cache
         uses: actions/cache@v2
