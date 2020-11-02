@@ -10,19 +10,19 @@ jobs:
       matrix:
         config:
           # Test all supported gdal minor versions (except latest stable) with one python version
-#          - { python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3" }
-#          - { python-version: 3.6, GDALVERSION: "2.1.4",   PROJVERSION: "4.9.3" }
-#          - { python-version: 3.6, GDALVERSION: "2.2.4",   PROJVERSION: "4.9.3" }
+          - { python-version: 3.6, GDALVERSION: "2.0.3",   PROJVERSION: "4.9.3" }
+          - { python-version: 3.6, GDALVERSION: "2.1.4",   PROJVERSION: "4.9.3" }
+          - { python-version: 3.6, GDALVERSION: "2.2.4",   PROJVERSION: "4.9.3" }
           - { python-version: 3.6, GDALVERSION: "2.3.3",   PROJVERSION: "4.9.3" }
-#          - { python-version: 3.6, GDALVERSION: "2.4.4",   PROJVERSION: "4.9.3" }
-#          - { python-version: 3.6, GDALVERSION: "3.0.4",   PROJVERSION: "6.2.1" }
-#          - { python-version: 3.6, GDALVERSION: "3.1.0",   PROJVERSION: "6.3.2" }
+          - { python-version: 3.6, GDALVERSION: "2.4.4",   PROJVERSION: "4.9.3" }
+          - { python-version: 3.6, GDALVERSION: "3.0.4",   PROJVERSION: "6.2.1" }
+          - { python-version: 3.6, GDALVERSION: "3.1.0",   PROJVERSION: "6.3.2" }
 
           # Test all supported python versions with latest stable gdal release
-#          - { python-version: 3.6, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
-#          - { python-version: 3.7, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
-#          - { python-version: 3.8, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
-#          - { python-version: 3.9, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+          - { python-version: 3.6, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+          - { python-version: 3.7, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+          - { python-version: 3.8, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
+          - { python-version: 3.9, GDALVERSION: "3.2.0",   PROJVERSION: "7.2.0" }
 
     steps:
       - uses: actions/checkout@v2
@@ -101,7 +101,7 @@ jobs:
       - name: Test with pytest
         run: |
           source $GITHUB_WORKSPACE/env_variables
-          python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+          python -m pytest -m "not wheel and not network" --cov fiona --cov-report term-missing
 
       - name: Coveralls
         uses: coverallsapp/github-action@master

@@ -102,7 +102,7 @@ jobs:
       - name: Test with pytest
         run: |
           source $GITHUB_WORKSPACE/env_variables
-          python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+          python -m pytest -m "not wheel and not network" --cov fiona --cov-report term-missing
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
