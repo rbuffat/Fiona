@@ -68,57 +68,57 @@ jobs:
           path: gdalinstall
           key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/apt_list') }}
 
-        - name: Cache pip
-          uses: actions/cache@v2
-          with:
-            path: ~/.cache/pip
-            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-            restore-keys: |
-              ${{ runner.os }}-pip-
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-        - name: Install Python dependencies
-          run: |
-            python -m pip install -U pip wheel
-            python -m pip install -r requirements-ci.txt
-            python -m pip wheel -r requirements-dev.txt
-            python -m pip install -r requirements-dev.txt
+      - name: Install Python dependencies
+        run: |
+          python -m pip install -U pip wheel
+          python -m pip install -r requirements-ci.txt
+          python -m pip wheel -r requirements-dev.txt
+          python -m pip install -r requirements-dev.txt
 
-        - name: Build PROJ
-          run: |
-            source $GITHUB_WORKSPACE/env_variables
-            chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
+      - name: Build PROJ
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
+          chmod +x scripts/travis_proj_install.sh && ./scripts/travis_proj_install.sh
 
-        - name: Install FileGDB
-          run: |
-            source $GITHUB_WORKSPACE/env_variables
-            chmod +x scripts/travis_filegdb_install.sh && ./scripts/travis_filegdb_install.sh
+      - name: Install FileGDB
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
+          chmod +x scripts/travis_filegdb_install.sh && ./scripts/travis_filegdb_install.sh
 
-        - name: Build GDAL
-          run: |
-            source $GITHUB_WORKSPACE/env_variables
-            chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
-            gdal-config --version
+      - name: Build GDAL
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
+          chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
+          gdal-config --version
 
-        - name: Build Fiona
-          run: |
-            source $GITHUB_WORKSPACE/env_variables
-            if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
-            GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install --no-deps --force-reinstall --no-use-pep517 -e .
+      - name: Build Fiona
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
+          if [ "$GDALVERSION" = "master" ]; then echo "Using gdal master"; elif [ $($GDALINST/gdal-$GDALVERSION/bin/gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< $GDALVERSION) ]; then echo "Using gdal $GDALVERSION"; else echo "NOT using gdal $GDALVERSION as expected; aborting"; exit 1; fi
+          GDAL_CONFIG=$GDALINST/gdal-$GDALVERSION/bin/gdal-config python -m pip install --no-deps --force-reinstall --no-use-pep517 -e .
 
-        - name: Print Environment
-          run: |
-            source $GITHUB_WORKSPACE/env_variables
-            python -m pip freeze
-            fio --version
-            fio --gdal-version
-            python -c "import fiona; fiona.show_versions()"
+      - name: Print Environment
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
+          python -m pip freeze
+          fio --version
+          fio --gdal-version
+          python -c "import fiona; fiona.show_versions()"
 
-        - name: Test with pytest
-          run: |
-            source $GITHUB_WORKSPACE/env_variables
-            python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+      - name: Test with pytest
+        run: |
+          source $GITHUB_WORKSPACE/env_variables
+          python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
 
-        - name: Coveralls
-          run: coveralls || echo "!! intermittent coveralls failure"
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Coveralls
+        run: coveralls || echo "!! intermittent coveralls failure"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
