@@ -68,16 +68,13 @@ jobs:
           path: gdalinstall
           key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/apt_list') }}
 
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          # This path is specific to Ubuntu
-          path: ~/.cache/pip
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
+        - name: Cache pip
+          uses: actions/cache@v2
+          with:
+            path: ~/.cache/pip
+            key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+              ${{ runner.os }}-pip-
 
         - name: Install Python dependencies
           run: |
