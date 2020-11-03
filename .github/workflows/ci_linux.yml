@@ -108,9 +108,13 @@ jobs:
       - name: Print Environment
         run: |
           source $GITHUB_WORKSPACE/env_variables
+          echo "python -m pip freeze"
           python -m pip freeze
+          echo "fio --version"
           fio --version
+          echo "fio --gdal-version"
           fio --gdal-version
+          echo "python -c \"import fiona; fiona.show_versions()\""
           python -c "import fiona; fiona.show_versions()"
 
       - name: Test with pytest
