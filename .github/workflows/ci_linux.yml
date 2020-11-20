@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
+        include:
           # Test all supported gdal minor versions (except latest stable) with one python version
           - { python-version: 3.6, GDALVERSION: "2.0.3", PROJVERSION: "4.9.3" }
           # - { python-version: 3.6, GDALVERSION: "2.1.4", PROJVERSION: "4.9.3" }
@@ -27,19 +27,23 @@ jobs:
           # # Test GDAL master
           # - { python-version: 3.9, GDALVERSION: "master", PROJVERSION: "7.2.0" }
 
+    env:
+      PROJVERSION: ${{ matrix.PROJVERSION }}
+      GDALVERSION: ${{ matrix.GDALVERSION }}
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.config.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.config.python-version }}
+          python-version: ${{ matrix.python-version }}
 
         # Environment variables need to be newly set in each step. Create env_variables to facilitate this.
       - name: Set env variables
         run: |
-          echo "PROJVERSION=\"${{ matrix.PROJVERSION }}\"" >> $GITHUB_ENV
-          echo "GDALVERSION=\"${{ matrix.GDALVERSION }}\"" >> $GITHUB_ENV
+          # echo "PROJVERSION=\"${{ matrix.PROJVERSION }}\"" >> $GITHUB_ENV
+          # echo "GDALVERSION=\"${{ matrix.GDALVERSION }}\"" >> $GITHUB_ENV
           echo "CYTHON_COVERAGE=\"true\"" >> $GITHUB_ENV
           echo "MAKEFLAGS=\"-j 4 -s\"" >> $GITHUB_ENV
           echo "CXXFLAGS=\"-O0\"" >> $GITHUB_ENV
@@ -80,7 +84,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: gdalinstall
-          key: ${{ runner.os }}-gdal-${{ matrix.config.GDALVERSION }}-proj-${{ matrix.config.PROJVERSION }}-${{ hashFiles('**/apt_list') }}
+          key: ${{ runner.os }}-gdal-${{ matrix.GDALVERSION }}-proj-${{ matrix.PROJVERSION }}-${{ hashFiles('**/apt_list') }}
 
       - name: Cache pip
         uses: actions/cache@v2
