@@ -34,14 +34,14 @@ jobs:
       CFLAGS: "-O0"
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
-      GDALINST: ${{ github.workspace }/gdalinstall
-      GDALBUILD: ${{ github.workspace }/gdalbuild
-      PROJINST: ${{ github.workspace }/gdalinstall
-      PROJBUILD: ${{ github.workspace }/projbuild
-      FILEGDB: ${{ github.workspace }/gdalinstall/filegdb
+      GDALINST: ${{ github.workspace }}/gdalinstall
+      GDALBUILD: ${{ github.workspace }}/gdalbuild
+      PROJINST: ${{ github.workspace }}/gdalinstall
+      PROJBUILD: ${{ github.workspace }}/projbuild
+      FILEGDB: ${{ github.workspace }}/gdalinstall/filegdb
 
       # Emulate travis
-      TRAVIS_BUILD_DIR: ${{ github.workspace }
+      TRAVIS_BUILD_DIR: ${{ github.workspace }}
       TRAVIS_OS_NAME: "linux"
 
     steps:
