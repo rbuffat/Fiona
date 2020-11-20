@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    name: Python ${{ matrix.python }} GDAL ${{ matrix.GDALVERSION }} PROJ ${{ matrix.PROJVERSION }}
     runs-on: [ubuntu-18.04]
     strategy:
       fail-fast: false
@@ -24,8 +25,8 @@ jobs:
           # - { python-version: 3.8, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
           # - { python-version: 3.9, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
 
-          # # Test GDAL master
-          # - { python-version: 3.9, GDALVERSION: "master", PROJVERSION: "7.2.0" }
+          # Test GDAL master
+          - { python-version: 3.9, GDALVERSION: "master", PROJVERSION: "7.2.0" }
 
     env:
       CYTHON_COVERAGE: "true"
