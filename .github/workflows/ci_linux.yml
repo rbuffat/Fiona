@@ -30,6 +30,7 @@ jobs:
     env:
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
+      GDALINST: "$GITHUB_WORKSPACE/gdalinstall"
 
     steps:
       - uses: actions/checkout@v2
@@ -48,7 +49,7 @@ jobs:
           echo "MAKEFLAGS=\"-j 4 -s\"" >> $GITHUB_ENV
           echo "CXXFLAGS=\"-O0\"" >> $GITHUB_ENV
           echo "CFLAGS=\"-O0\"" >> $GITHUB_ENV
-          echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
+          # echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
           echo "GDALBUILD=\"$GITHUB_WORKSPACE/gdalbuild\"" >> $GITHUB_ENV
           echo "PROJINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
           echo "PROJBUILD=\"$GITHUB_WORKSPACE/projbuild\"" >> $GITHUB_ENV
