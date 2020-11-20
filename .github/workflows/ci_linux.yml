@@ -11,21 +11,21 @@ jobs:
         config:
           # Test all supported gdal minor versions (except latest stable) with one python version
           - { python-version: 3.6, GDALVERSION: "2.0.3", PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.1.4", PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.2.4", PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.3.3", PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "2.4.4", PROJVERSION: "4.9.3" }
-          - { python-version: 3.6, GDALVERSION: "3.0.4", PROJVERSION: "6.2.1" }
-          - { python-version: 3.6, GDALVERSION: "3.1.0", PROJVERSION: "6.3.2" }
+          # - { python-version: 3.6, GDALVERSION: "2.1.4", PROJVERSION: "4.9.3" }
+          # - { python-version: 3.6, GDALVERSION: "2.2.4", PROJVERSION: "4.9.3" }
+          # - { python-version: 3.6, GDALVERSION: "2.3.3", PROJVERSION: "4.9.3" }
+          # - { python-version: 3.6, GDALVERSION: "2.4.4", PROJVERSION: "4.9.3" }
+          # - { python-version: 3.6, GDALVERSION: "3.0.4", PROJVERSION: "6.2.1" }
+          # - { python-version: 3.6, GDALVERSION: "3.1.0", PROJVERSION: "6.3.2" }
 
-          # Test all supported python versions with latest stable gdal release
-          - { python-version: 3.6, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
-          - { python-version: 3.7, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
-          - { python-version: 3.8, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
-          - { python-version: 3.9, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          # # Test all supported python versions with latest stable gdal release
+          # - { python-version: 3.6, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          # - { python-version: 3.7, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          # - { python-version: 3.8, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          # - { python-version: 3.9, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
 
-          # Test GDAL master
-          - { python-version: 3.9, GDALVERSION: "master", PROJVERSION: "7.2.0" }
+          # # Test GDAL master
+          # - { python-version: 3.9, GDALVERSION: "master", PROJVERSION: "7.2.0" }
 
     env:
       GDALVERSION: ${{ matrix.GDALVERSION }}
@@ -46,7 +46,7 @@ jobs:
           echo "MAKEFLAGS=\"-j 4 -s\"" >> $GITHUB_ENV
           echo "CXXFLAGS=\"-O0\"" >> $GITHUB_ENV
           echo "CFLAGS=\"-O0\"" >> $GITHUB_ENV
-          echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >>$GITHUB_ENV
+          echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
           echo "GDALBUILD=\"$GITHUB_WORKSPACE/gdalbuild\"" >> $GITHUB_ENV
           echo "PROJINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
           echo "PROJBUILD=\"$GITHUB_WORKSPACE/projbuild\"" >> $GITHUB_ENV
@@ -56,6 +56,8 @@ jobs:
           echo "GDAL_DATA=\"$GDALINST/gdal-$GDALVERSION/share/gdal\"" >> $GITHUB_ENV
           echo "PROJ_LIB=\"$GDALINST/gdal-$GDALVERSION/share/proj\"" >> $GITHUB_ENV
 
+          source $GITHUB_ENV
+
           # Add PATH
           echo "$GDALINST/gdal-$GDALVERSION/bin" >> $GITHUB_PATH
           echo "$GDALINST/proj-$PROJVERSION/bin" >> $GITHUB_PATH
@@ -63,7 +65,7 @@ jobs:
 
           echo "cat \$GITHUB_ENV"
           cat $GITHUB_ENV
-
+          echo ""
           echo "cat \$GITHUB_PATH"
           cat $GITHUB_PATH
 
