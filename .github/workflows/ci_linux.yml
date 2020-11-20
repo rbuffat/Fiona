@@ -35,6 +35,14 @@ jobs:
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
       GDALINST: "$GITHUB_WORKSPACE/gdalinstall"
+      GDALBUILD: "$GITHUB_WORKSPACE/gdalbuild"
+      PROJINST: "$GITHUB_WORKSPACE/gdalinstall"
+      PROJBUILD: "$GITHUB_WORKSPACE/projbuild"
+      FILEGDB: "$GITHUB_WORKSPACE/gdalinstall/filegdb"
+
+      # Emulate travis
+      TRAVIS_BUILD_DIR: "$GITHUB_WORKSPACE"
+      TRAVIS_OS_NAME: "linux"
 
     steps:
       - uses: actions/checkout@v2
@@ -44,25 +52,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-        # Environment variables need to be newly set in each step. Create env_variables to facilitate this.
       - name: Set env variables
         run: |
-          echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
-          echo "GDALBUILD=\"$GITHUB_WORKSPACE/gdalbuild\"" >> $GITHUB_ENV
-          echo "PROJINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
-          echo "PROJBUILD=\"$GITHUB_WORKSPACE/projbuild\"" >> $GITHUB_ENV
-          echo "FILEGDB=\"$GITHUB_WORKSPACE/gdalinstall/filegdb\"" >> $GITHUB_ENV
-          echo "TRAVIS_BUILD_DIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-          echo "TRAVIS_OS_NAME=\"linux\"" >> $GITHUB_ENV
+
+          # Additional env variables
           echo "GDAL_DATA=\"$GDALINST/gdal-$GDALVERSION/share/gdal\"" >> $GITHUB_ENV
           echo "PROJ_LIB=\"$GDALINST/gdal-$GDALVERSION/share/proj\"" >> $GITHUB_ENV
-
-          source $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$FILEGDB/lib:\$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
           # Add PATH
           echo "$GDALINST/gdal-$GDALVERSION/bin" >> $GITHUB_PATH
           echo "$GDALINST/proj-$PROJVERSION/bin" >> $GITHUB_PATH
-          echo "LD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$FILEGDB/lib:\$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
           echo "cat \$GITHUB_ENV"
           cat $GITHUB_ENV
