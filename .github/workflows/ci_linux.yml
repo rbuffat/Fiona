@@ -28,6 +28,10 @@ jobs:
           # - { python-version: 3.9, GDALVERSION: "master", PROJVERSION: "7.2.0" }
 
     env:
+      CYTHON_COVERAGE: "true"
+      MAKEFLAGS: "-j 4 -s"
+      CXXFLAGS: "-O0"
+      CFLAGS: "-O0"
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
       GDALINST: "$GITHUB_WORKSPACE/gdalinstall"
@@ -43,13 +47,7 @@ jobs:
         # Environment variables need to be newly set in each step. Create env_variables to facilitate this.
       - name: Set env variables
         run: |
-          # echo "PROJVERSION=\"${{ matrix.PROJVERSION }}\"" >> $GITHUB_ENV
-          # echo "GDALVERSION=\"${{ matrix.GDALVERSION }}\"" >> $GITHUB_ENV
-          echo "CYTHON_COVERAGE=\"true\"" >> $GITHUB_ENV
-          echo "MAKEFLAGS=\"-j 4 -s\"" >> $GITHUB_ENV
-          echo "CXXFLAGS=\"-O0\"" >> $GITHUB_ENV
-          echo "CFLAGS=\"-O0\"" >> $GITHUB_ENV
-          # echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
+          echo "GDALINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
           echo "GDALBUILD=\"$GITHUB_WORKSPACE/gdalbuild\"" >> $GITHUB_ENV
           echo "PROJINST=\"$GITHUB_WORKSPACE/gdalinstall\"" >> $GITHUB_ENV
           echo "PROJBUILD=\"$GITHUB_WORKSPACE/projbuild\"" >> $GITHUB_ENV
