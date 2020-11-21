@@ -20,6 +20,7 @@ def add_gdal_dll_directories():
     print(platform.system(), sys.version_info)
     if platform.system() == 'Windows' and sys.version_info >= (3, 8):
         dll_directory = os.path.join(os.path.dirname(__file__), '.libs')
+        print(dll_directory, os.path.exists(dll_directory))
         if os.path.exists(dll_directory):
             dll_dirs.append(os.add_dll_directory(dll_directory))
     try:
