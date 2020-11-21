@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Python ${{ matrix.python }} / GDAL ${{ matrix.GDAL_VERSION }}
+    name: Windwos / Python ${{ matrix.python }} / GDAL ${{ matrix.GDAL_VERSION }}
     runs-on: [windows-2019]
     strategy:
       fail-fast: false
@@ -14,6 +14,7 @@ jobs:
             GDAL_VERSION: 3.0.4
             GIS_INTERNALS: release-1911-x64-gdal-3-0-4-mapserver-7-4-3.zip
             GIS_INTERNALS_LIBS: release-1911-x64-gdal-3-0-4-mapserver-7-4-3-libs.zip
+            allow_failure: true
 
     env:
       GDAL_VERSION: ${{ matrix.GDAL_VERSION }}
