@@ -6,7 +6,6 @@ jobs:
   build:
     name: Windwos / Python ${{ matrix.python }} / GDAL ${{ matrix.GDAL_VERSION }}
     runs-on: [windows-2019]
-    continue-on-error: ${{ matrix.allow_failure }}
     strategy:
       fail-fast: false
       matrix:
@@ -15,7 +14,6 @@ jobs:
             GDAL_VERSION: 3.0.4
             GIS_INTERNALS: release-1911-x64-gdal-3-0-4-mapserver-7-4-3.zip
             GIS_INTERNALS_LIBS: release-1911-x64-gdal-3-0-4-mapserver-7-4-3-libs.zip
-            allow_failure: true
 
     env:
       GDAL_VERSION: ${{ matrix.GDAL_VERSION }}
@@ -24,6 +22,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Cache GDAL binaries
+        uses: actions/cache@v2
+        with:
+          path: C:\gdal
+          key: ${{ runner.os }}-gdal-${{ matrix.GDALVERSION }}
 
       - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v2
@@ -34,7 +38,7 @@ jobs:
         run: |
           echo "C:\\gdal\\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "GDAL_DATA=C:\\gdal\\bin\\gdal-data" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
-          # if ($env:GDAL_VERSION -ge '3.0.0') { echo "PROJ_LIB=C:\\gdal\\bin\\proj6\\share" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append }
+          if ($env:GDAL_VERSION -ge '3.0.0') { echo "PROJ_LIB=C:\\gdal\\bin\\proj6\\share" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append }
 
           echo "GITHUB_PATH"
           Get-Content -Path $env:GITHUB_PATH
@@ -47,11 +51,13 @@ jobs:
 
       - name: Download GIS_INTERNALS
         run: |
-          curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS --output gdalbin.zip
-          Expand-Archive -LiteralPath gdalbin.zip -DestinationPath C:\gdal
-          curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS_LIBS --output gdallibs.zip
-          Expand-Archive -LiteralPath gdallibs.zip -DestinationPath C:\gdal
-          Get-ChildItem -Path C:\gdal
+          if (!(test-path C:\gdal)) {
+            curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS --output gdalbin.zip
+            Expand-Archive -LiteralPath gdalbin.zip -DestinationPath C:\gdal
+            curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS_LIBS --output gdallibs.zip
+            Expand-Archive -LiteralPath gdallibs.zip -DestinationPath C:\gdal
+            Get-ChildItem -Path C:\gdal
+          }
 
       - name: Install Python dependencies
         run: |
