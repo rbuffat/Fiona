@@ -39,11 +39,10 @@ jobs:
 
       - name: Download GIS_INTERNALS
         run: |
-          echo $env:GIS_INTERNALS
           curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS --output gdalbin.zip
-          7z x gdalbin.zip -o C:\gdal
+          Expand-Archive -LiteralPath gdalbin.zip -DestinationPath C:\gdal
           curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS_LIBS --output gdallibs.zip
-          7z x gdallibs.zip -o C:\gdal
+          Expand-Archive -LiteralPath gdallibs.zip -DestinationPath C:\gdal
 
       - name: Install Python dependencies
         run: |
