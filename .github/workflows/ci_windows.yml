@@ -51,6 +51,7 @@ jobs:
             GDAL_VERSION: 3.2.0
             GIS_INTERNALS: release-1911-x64-gdal-3-2-0-mapserver-7-6-1.zip
             GIS_INTERNALS_LIBS: release-1911-x64-gdal-3-2-0-mapserver-7-6-1-libs.zip
+            allow_failure: false
 
     env:
       GDAL_VERSION: ${{ matrix.GDAL_VERSION }}
