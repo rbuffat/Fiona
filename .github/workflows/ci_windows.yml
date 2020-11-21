@@ -39,7 +39,7 @@ jobs:
 
       - name: Download GIS_INTERNALS
         run: |
-          echo $GIS_INTERNALS
+          echo $env:GIS_INTERNALS
           curl http://download.gisinternals.com/sdk/downloads/$GIS_INTERNALS --output gdalbin.zip
           7z x gdalbin.zip -o C:\gdal
           curl http://download.gisinternals.com/sdk/downloads/$GIS_INTERNALS_LIBS --output gdallibs.zip
