@@ -117,17 +117,17 @@ jobs:
           echo "python -m pip freeze"
           python -m pip freeze
 
-          echo ""
-          echo "fio --version"
-          fio --version
+          # echo ""
+          # echo "fio --version"
+          # fio --version
 
-          echo ""
-          echo "fio --gdal-version"
-          fio --gdal-version
+          # echo ""
+          # echo "fio --gdal-version"
+          # fio --gdal-version
 
-          echo ""
-          echo "python -c import fiona; fiona.show_versions()"
-          python -c "import fiona; fiona.show_versions()"
+          # echo ""
+          # echo "python -c import fiona; fiona.show_versions()"
+          # python -c "import fiona; fiona.show_versions()"
 
       - name: pytest
         continue-on-error: ${{ matrix.allow_failure }}
