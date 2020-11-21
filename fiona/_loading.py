@@ -17,6 +17,7 @@ log.addHandler(logging.NullHandler())
 @contextlib.contextmanager
 def add_gdal_dll_directories():
     dll_dirs = []
+    print(platform.system(), sys.version_info)
     if platform.system() == 'Windows' and sys.version_info >= (3, 8):
         dll_directory = os.path.join(os.path.dirname(__file__), '.libs')
         if os.path.exists(dll_directory):
