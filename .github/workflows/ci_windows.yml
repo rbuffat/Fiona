@@ -15,9 +15,11 @@ jobs:
             GIS_INTERNALS: release-1911-x64-gdal-3-0-4-mapserver-7-4-3.zip
             GIS_INTERNALS_LIBS: release-1911-x64-gdal-3-0-4-mapserver-7-4-3-libs.zip
 
-    # env:
-    #   PROJVERSION: ${{ matrix.PROJVERSION }}
-    #   GDALVERSION: ${{ matrix.GDALVERSION }}
+    env:
+      GIS_INTERNALS: ${{ matrix.GIS_INTERNALS }}
+      GIS_INTERNALS_LIBS: ${{ matrix.GIS_INTERNALS_LIBS }}
+      # PROJVERSION: ${{ matrix.PROJVERSION }}
+      # GDALVERSION: ${{ matrix.GDALVERSION }}
 
     steps:
       - uses: actions/checkout@v2
