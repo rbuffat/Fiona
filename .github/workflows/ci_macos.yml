@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     name: Python ${{ matrix.python }} / GDAL ${{ matrix.GDALVERSION }} / PROJ ${{ matrix.PROJVERSION }}
-    runs-on: [macos-10.15]
+    runs-on: [macos-11.0]
     strategy:
       fail-fast: false
       matrix:
@@ -34,7 +34,6 @@ jobs:
       # CXXFLAGS: "-O0"
       # CFLAGS: "-O0 -std=c++11"
       # CC: clang
-      CFLAGS: "-std=c++11"
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
       GDALINST: ${{ github.workspace }}/gdalinstall
