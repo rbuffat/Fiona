@@ -82,8 +82,8 @@ jobs:
       - name: Cache GDAL binaries
         uses: actions/cache@v2
         with:
-          path: gdalinstall
-          key: ${{ runner.os }}-gdal-${{ matrix.GDALVERSION }}-proj-${{ matrix.PROJVERSION }}-${{ hashFiles('**/brew_list') }}
+          path: ${{ github.workspace }}/gdalinstall
+          key: ${{ runner.os }}-gdal-${{ matrix.GDALVERSION }}-proj-${{ matrix.PROJVERSION }}-${{ hashFiles('**/brew_list') }}-v2
 
       # - name: Cache pip
       #   uses: actions/cache@v2
@@ -109,6 +109,8 @@ jobs:
         run: |
           chmod +x scripts/travis_gdal_install.sh && ./scripts/travis_gdal_install.sh
           gdal-config --version
+          echo "rm -rf $GDALBUILD"
+          rm -rf $GDALBUILD
 
       - name: Build Fiona
         continue-on-error: ${{ matrix.GDALVERSION == 'master' }}
