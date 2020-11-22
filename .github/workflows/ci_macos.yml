@@ -58,7 +58,7 @@ jobs:
           # Additional env variables
           echo "GDAL_DATA=$GDALINST/gdal-$GDALVERSION/share/gdal" >> $GITHUB_ENV
           echo "PROJ_LIB=$GDALINST/gdal-$GDALVERSION/share/proj" >> $GITHUB_ENV
-          echo "DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib:$FILEGDB/lib:\$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "DYLD_LIBRARY_PATH=$GDALINST/gdal-$GDALVERSION/lib:$GDALINST/proj-$PROJVERSION/lib" >> $GITHUB_ENV
 
           # Add PATH
           echo "$GDALINST/gdal-$GDALVERSION/bin" >> $GITHUB_PATH
@@ -95,7 +95,8 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          python -m pip install -U pip wheel
+          python -m pip install -U pip
+          python -m pip install -U wheel
           python -m pip install -r requirements-ci.txt
           python -m pip wheel -r requirements-dev.txt
           python -m pip install -r requirements-dev.txt
