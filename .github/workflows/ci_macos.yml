@@ -33,7 +33,8 @@ jobs:
       MAKEFLAGS: "-j 4 -s"
       # CXXFLAGS: "-O0"
       # CFLAGS: "-O0 -std=c++11"
-      # CC: clang
+      CC: clang
+      CFLAGS: "-std=c++11"
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
       GDALINST: ${{ github.workspace }}/gdalinstall
