@@ -42,6 +42,7 @@ jobs:
       # Emulate travis
       TRAVIS_BUILD_DIR: ${{ github.workspace }}
       TRAVIS_OS_NAME: "osx"
+      CC: clang
 
     steps:
       - uses: actions/checkout@v2
