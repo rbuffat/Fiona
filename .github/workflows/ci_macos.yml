@@ -6,27 +6,28 @@ jobs:
   build:
     name: Python ${{ matrix.python }} / GDAL ${{ matrix.GDALVERSION }} / PROJ ${{ matrix.PROJVERSION }}
     runs-on: [macos-11.0]
+    if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]')"
     strategy:
       fail-fast: false
       matrix:
         include:
           # Test all supported gdal minor versions (except latest stable) with one python version
           - { python: 3.6, GDALVERSION: "2.0.3", PROJVERSION: "4.9.3" }
-          # - { python: 3.6, GDALVERSION: "2.1.4", PROJVERSION: "4.9.3" }
-          # - { python: 3.6, GDALVERSION: "2.2.4", PROJVERSION: "4.9.3" }
-          # - { python: 3.6, GDALVERSION: "2.3.3", PROJVERSION: "4.9.3" }
-          # - { python: 3.6, GDALVERSION: "2.4.4", PROJVERSION: "4.9.3" }
-          # - { python: 3.6, GDALVERSION: "3.0.4", PROJVERSION: "6.2.1" }
-          # - { python: 3.6, GDALVERSION: "3.1.0", PROJVERSION: "6.3.2" }
+          - { python: 3.6, GDALVERSION: "2.1.4", PROJVERSION: "4.9.3" }
+          - { python: 3.6, GDALVERSION: "2.2.4", PROJVERSION: "4.9.3" }
+          - { python: 3.6, GDALVERSION: "2.3.3", PROJVERSION: "4.9.3" }
+          - { python: 3.6, GDALVERSION: "2.4.4", PROJVERSION: "4.9.3" }
+          - { python: 3.6, GDALVERSION: "3.0.4", PROJVERSION: "6.2.1" }
+          - { python: 3.6, GDALVERSION: "3.1.0", PROJVERSION: "6.3.2" }
 
-          # # Test all supported python versions with latest stable gdal release
-          # - { python: 3.6, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
-          # - { python: 3.7, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
-          # - { python: 3.8, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
-          # - { python: 3.9, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          # Test all supported python versions with latest stable gdal release
+          - { python: 3.6, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          - { python: 3.7, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          - { python: 3.8, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          - { python: 3.9, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
 
-          # # # Test GDAL master
-          # - { python: 3.6, GDALVERSION: "master", PROJVERSION: "7.2.0" }
+          # Test GDAL master
+          - { python: 3.6, GDALVERSION: "master", PROJVERSION: "7.2.0" }
 
     env:
       CYTHON_COVERAGE: "true"
