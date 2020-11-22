@@ -19,21 +19,20 @@ jobs:
           # - { python: 3.6, GDALVERSION: "3.0.4", PROJVERSION: "6.2.1" }
           # - { python: 3.6, GDALVERSION: "3.1.0", PROJVERSION: "6.3.2" }
 
-          # Test all supported python versions with latest stable gdal release
-          - { python: 3.6, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
+          # # Test all supported python versions with latest stable gdal release
+          # - { python: 3.6, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
           # - { python: 3.7, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
           # - { python: 3.8, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
           # - { python: 3.9, GDALVERSION: "3.2.0", PROJVERSION: "7.2.0" }
 
-          # # Test GDAL master
+          # # # Test GDAL master
           # - { python: 3.6, GDALVERSION: "master", PROJVERSION: "7.2.0" }
 
     env:
       CYTHON_COVERAGE: "true"
       MAKEFLAGS: "-j 4 -s"
-      # CXXFLAGS: "-O0"
-      # CFLAGS: "-O0 -std=c++11"
-      # CC: clang
+      CXXFLAGS: "-O0"
+      CFLAGS: "-O0"
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
       GDALINST: ${{ github.workspace }}/gdalinstall
@@ -67,7 +66,6 @@ jobs:
           echo "/usr/local/opt/expat/bin" >> $GITHUB_PATH
           echo "/usr/local/opt/libxml2/bin" >> $GITHUB_PATH
 
-
           echo "cat \$GITHUB_ENV"
           cat $GITHUB_ENV
           echo ""
@@ -76,7 +74,7 @@ jobs:
 
       - name: Install brew packages
         run: |
-          brew install pkg-config expat libspatialite sqlite geos
+          brew install expat libspatialite geos
           brew list --versions | grep 'expat\|libspatialite\|sqlite\|geos\|curl\|libxml2\|freexl\|zstd' > $GITHUB_WORKSPACE/brew_list
           cat $GITHUB_WORKSPACE/brew_list
 

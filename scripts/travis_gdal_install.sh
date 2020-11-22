@@ -47,6 +47,20 @@ GDALOPTS="  --with-ogr \
             --without-mrf \
             --with-webp=no"
 
+# OS specific gdal build options
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+
+    GDALOPTS="$GDALOPTS \
+                --with-expat \
+                --with-sqlite3"
+
+elif [ $TRAVIS_OS_NAME = 'osx' ]; then
+
+    GDALOPTS="$GDALOPTS \
+                --with-expat=/usr/local/opt/expat \
+                --with-sqlite3=/usr/local/opt/sqlite"
+fi
+
 if [ -d "$FILEGDB" ]; then
   GDALOPTS="$GDALOPTS --with-fgdb=$FILEGDB"
 fi
