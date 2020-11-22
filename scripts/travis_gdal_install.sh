@@ -140,5 +140,8 @@ else
     fi
 fi
 
+# Remove gdalbuild to emulate travis cache
+rm -rf $GDALBUILD
+
 # change back to travis build dir
 cd $TRAVIS_BUILD_DIR
