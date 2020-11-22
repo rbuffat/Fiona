@@ -32,7 +32,8 @@ jobs:
       CYTHON_COVERAGE: "true"
       MAKEFLAGS: "-j 4 -s"
       CXXFLAGS: "-O0"
-      CFLAGS: "-O0"
+      CFLAGS: "-O0 -std=c++11"
+      # CC: clang
       PROJVERSION: ${{ matrix.PROJVERSION }}
       GDALVERSION: ${{ matrix.GDALVERSION }}
       GDALINST: ${{ github.workspace }}/gdalinstall
@@ -42,7 +43,6 @@ jobs:
       # Emulate travis
       TRAVIS_BUILD_DIR: ${{ github.workspace }}
       TRAVIS_OS_NAME: "osx"
-      CC: clang
 
     steps:
       - uses: actions/checkout@v2
